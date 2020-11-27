@@ -15,9 +15,7 @@ public class ScoreAnswer {
     @Id
     private Long id;
 
-    private Long educationalProgramId;
-
-    private Long stakeholderCategoryId;
+    private String questionNumber;
 
     private Long submissionId;
 

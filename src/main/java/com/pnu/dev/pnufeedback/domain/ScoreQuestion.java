@@ -6,21 +6,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Submission {
+public class ScoreQuestion {
 
     @Id
     private Long id;
 
-    private Long educationalProgramId;
+    private String questionNumber;
 
     private Long stakeholderCategoryId;
 
-    private LocalDateTime submissionTime;
+    private String content;
 
 }

@@ -15,10 +15,6 @@ public class OpenAnswer {
     @Id
     private Long id;
 
-    private Long educationalProgramId;
-
-    private Long stakeholderCategoryId;
-
     private Long submissionId;
 
     private String content;
