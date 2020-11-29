@@ -2,12 +2,11 @@ package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
-import com.pnu.dev.pnufeedback.dto.GenerateTokenForm;
+import com.pnu.dev.pnufeedback.dto.form.GenerateTokenForm;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
