@@ -12,15 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
 @RequestMapping("/admin/generate-token")
 public class TokenGenerationController {
-
-    private static final String GENERATED_TOKEN_LINK_ATTRIBUTE = "generatedTokenLink";
 
     private EducationalProgramRepository educationalProgramRepository;
 
@@ -41,10 +38,6 @@ public class TokenGenerationController {
     @GetMapping
     public String showGenerateTokenPage(Model model) {
 
-        if (model.containsAttribute(GENERATED_TOKEN_LINK_ATTRIBUTE)) {
-            return "admin/show-generated-token";
-        }
-
         List<EducationalProgram> educationalPrograms = educationalProgramRepository.findAll();
         model.addAttribute("educationalPrograms", educationalPrograms);
 
@@ -55,12 +48,12 @@ public class TokenGenerationController {
     }
 
     @PostMapping
-    public String generateToken(GenerateTokenForm generateTokenForm, RedirectAttributes redirectAttributes) {
+    public String generateToken(GenerateTokenForm generateTokenForm, Model model) {
 
         String jwtTokenLink = jwtTokenService.generateTokenLink(generateTokenForm);
-        redirectAttributes.addFlashAttribute(GENERATED_TOKEN_LINK_ATTRIBUTE, jwtTokenLink);
+        model.addAttribute("generatedTokenLink", jwtTokenLink);
 
-        return "redirect:/admin/generate-token";
+        return "admin/show-generated-token";
     }
 
 }

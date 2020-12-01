@@ -23,7 +23,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Value("${app.baseUrl}")
     private String appBaseUrl;
 
-
     @Override
     public String generateTokenLink(GenerateTokenForm generateTokenForm) {
 
