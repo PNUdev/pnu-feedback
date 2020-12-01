@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SpringBootTest
-class PnuFeedbackApplicationTests {
+class DbSetupUtil {
 
     @Autowired
     private EducationalProgramRepository educationalProgramRepository;
