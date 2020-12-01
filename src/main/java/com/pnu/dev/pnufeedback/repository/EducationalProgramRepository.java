@@ -9,4 +9,6 @@ public interface EducationalProgramRepository extends CrudRepository<Educational
 
     List<EducationalProgram> findAll();
 
+    boolean existsByTitle(String title);
+
 }

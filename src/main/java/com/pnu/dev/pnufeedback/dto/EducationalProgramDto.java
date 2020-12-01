@@ -1,20 +1,17 @@
-package com.pnu.dev.pnufeedback.domain;
+package com.pnu.dev.pnufeedback.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EducationalProgram {
+public class EducationalProgramDto {
 
-    @Id
     private Long id;
 
     private String title;
-
 }
