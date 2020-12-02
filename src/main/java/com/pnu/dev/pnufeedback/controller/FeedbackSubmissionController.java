@@ -10,6 +10,7 @@ import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -39,6 +40,9 @@ public class FeedbackSubmissionController {
     private StakeholderCategoryRepository stakeholderCategoryRepository;
 
     private ScoreQuestionRepository scoreQuestionRepository;
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
 
     @Autowired
     public FeedbackSubmissionController(JwtTokenService jwtTokenService,
@@ -108,6 +112,8 @@ public class FeedbackSubmissionController {
                 .build();
 
         redirectAttributes.addFlashAttribute("show-after-submitted", true);
+
+        jmsTemplate.convertAndSend("submissions", feedbackSubmission);
 
         return "redirect:/feedback/after-submit";
     }

@@ -11,6 +11,8 @@ spring:
   security.user:
     name: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD:admin}
+  activemq:
+    in-memory: true
 jwt:
   secret: ${JWT_SECRET:secret}
 app:
