@@ -1,17 +1,15 @@
-package com.pnu.dev.pnufeedback.dto;
+package com.pnu.dev.pnufeedback.dto.form;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EducationalProgramDto {
+public class StakeholderCategoryForm {
 
-    private Long id;
-
+    @NonNull
     private String title;
 }

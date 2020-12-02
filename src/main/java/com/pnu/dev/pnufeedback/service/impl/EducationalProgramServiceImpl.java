@@ -1,7 +1,6 @@
 package com.pnu.dev.pnufeedback.service.impl;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
-import com.pnu.dev.pnufeedback.dto.EducationalProgramDto;
 import com.pnu.dev.pnufeedback.dto.form.EducationalProgramForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
@@ -10,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class EducationalProgramServiceImpl implements EducationalProgramService {
@@ -24,13 +21,8 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
     }
 
     @Override
-    public List<EducationalProgramDto> findAll() {
-        return StreamSupport.stream(repository.findAll().spliterator(), false)
-                .map(educationalProgram -> EducationalProgramDto.builder()
-                        .id(educationalProgram.getId())
-                        .title(educationalProgram.getTitle())
-                        .build())
-                .collect(Collectors.toList());
+    public List<EducationalProgram> findAll() {
+        return repository.findAll();
     }
 
     @Override
