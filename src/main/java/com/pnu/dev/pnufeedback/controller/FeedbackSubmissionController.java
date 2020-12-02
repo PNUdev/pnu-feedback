@@ -106,7 +106,7 @@ public class FeedbackSubmissionController {
         FeedbackSubmissionDto feedbackSubmission = FeedbackSubmissionDto.builder()
                 .openAnswer(openAnswer)
                 .scoreAnswers(scoreAnswers)
-                .educationalProgramId(jwtTokenPayload.getStakeholderCategoryId())
+                .educationalProgramId(jwtTokenPayload.getEducationalProgramId())
                 .stakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId())
                 .submissionTime(LocalDateTime.now(ZoneId.of("Europe/Kiev")))
                 .build();

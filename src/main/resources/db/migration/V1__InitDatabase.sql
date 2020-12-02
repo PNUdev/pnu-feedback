@@ -22,7 +22,7 @@ create table open_answer(
   id                       bigserial    primary key,
   submission_id            bigint       not null,
   content                  text not null,
-  approved   bit           not null,
+  approved   boolean       not null,
 
   constraint fk_submission foreign key (submission_id) references submission(id)
 );
