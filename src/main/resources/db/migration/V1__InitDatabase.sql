@@ -21,15 +21,15 @@ create table submission(
 create table open_answer(
   id                       bigserial    primary key,
   submission_id            bigint       not null,
-  content                  varchar(255) not null,
-  approved   bit           not null,
+  content                  text not null,
+  approved   boolean       not null,
 
   constraint fk_submission foreign key (submission_id) references submission(id)
 );
 
 create table score_answer(
   id                       bigserial    primary key,
-  question_number          varchar(255) not null,
+  question_number          varchar(10) not null,
   submission_id            bigint       not null,
   score                    int          not null,
 
@@ -38,9 +38,9 @@ create table score_answer(
 
 create table score_question(
   id                       bigserial    primary key,
-  question_number          varchar(255) not null,
+  question_number          varchar(10) not null,
   stakeholder_category_id  bigint       not null,
-  score                    int          not null,
+  content                  varchar(255) not null,
 
   constraint fk_stakeholder_category foreign key (stakeholder_category_id) references stakeholder_category(id)
 );
