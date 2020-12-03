@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 // ToDo refactor
+// ToDo Customize JWT
+// ToDo Fix /error
 
 @Controller
 @RequestMapping("/feedback")
