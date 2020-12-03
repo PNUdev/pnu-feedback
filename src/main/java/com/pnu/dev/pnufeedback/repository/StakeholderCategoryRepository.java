@@ -9,5 +9,7 @@ public interface StakeholderCategoryRepository extends CrudRepository<Stakeholde
 
     List<StakeholderCategory> findAll();
 
+    List<StakeholderCategory> findAllByIdIn(List<Long> idList);
+
     boolean existsByTitle(String title);
 }
