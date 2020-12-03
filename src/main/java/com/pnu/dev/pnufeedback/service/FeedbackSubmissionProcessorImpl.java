@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProcessor {
 
+    public static final String SUBMISSIONS_QUEUE_TOPIC = "submissions";
+
     private SubmissionRepository submissionRepository;
 
     private OpenAnswerRepository openAnswerRepository;
@@ -38,7 +40,7 @@ public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProces
     }
 
     @Override
-    @JmsListener(destination = "submissions", containerFactory = "submissionListenerFactory")
+    @JmsListener(destination = SUBMISSIONS_QUEUE_TOPIC, containerFactory = "submissionListenerFactory")
     public void processSubmission(FeedbackSubmissionDto feedbackSubmission) {
 
         log.info("Received submission: {}", feedbackSubmission);
