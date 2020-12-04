@@ -27,9 +27,6 @@ import java.util.stream.Collectors;
 
 import static com.pnu.dev.pnufeedback.service.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
 
-// ToDo Customize JWT
-// ToDo Fix /error
-
 @Controller
 @RequestMapping("/feedback")
 public class FeedbackSubmissionController {
