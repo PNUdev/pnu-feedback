@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import static com.pnu.dev.pnufeedback.service.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
 
 // ToDo Customize JWT
-// ToDo arbitrary pages UI
 // ToDo Fix /error
 
 @Controller

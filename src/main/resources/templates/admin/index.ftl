@@ -1,3 +1,5 @@
 <#include "include/header.ftl">
-<h1>Hello admin!</h1>
+<div class="mt-5 p-4">
+    <h3>Відгуків у системі: ${submissionsCount}</h3>
+</div>
 <#include "include/footer.ftl">
