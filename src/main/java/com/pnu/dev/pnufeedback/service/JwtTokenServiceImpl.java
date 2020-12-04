@@ -56,7 +56,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                     .build();
 
         } catch (JwtException | IllegalArgumentException e) {
-            throw new ServiceException("Не валідне посилання");
+            throw new ServiceException("Невалідне посилання");
         }
 
     }

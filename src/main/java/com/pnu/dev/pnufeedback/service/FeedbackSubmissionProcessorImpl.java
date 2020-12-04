@@ -13,6 +13,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProces
     }
 
     @Override
+    @Transactional
     @JmsListener(destination = SUBMISSIONS_QUEUE_TOPIC, containerFactory = "submissionListenerFactory")
     public void processSubmission(FeedbackSubmissionDto feedbackSubmission) {
 
