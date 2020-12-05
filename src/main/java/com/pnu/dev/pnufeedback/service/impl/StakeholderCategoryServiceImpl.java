@@ -6,12 +6,15 @@ import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class StakeholderCategoryServiceImpl implements StakeholderCategoryService {
+
+    private final static Sort SORT_BY_TITLE_ASC = Sort.by(Sort.Direction.ASC, "title");
 
     private final StakeholderCategoryRepository repository;
 
@@ -22,7 +25,7 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
     @Override
     public List<StakeholderCategory> findAll() {
-        return repository.findAll();
+        return repository.findAll(SORT_BY_TITLE_ASC);
     }
 
     @Override

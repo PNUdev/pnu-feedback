@@ -8,10 +8,8 @@ import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,33 +22,37 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
 
     private final StakeholderCategoryRepository stakeholderCategoryRepository;
 
+    private final ScoreQuestionComparator scoreQuestionComparator;
+
     @Autowired
     public ScoreQuestionServiceImpl(ScoreQuestionRepository scoreQuestionRepository,
-                                    StakeholderCategoryRepository stakeholderCategoryRepository) {
+                                    StakeholderCategoryRepository stakeholderCategoryRepository, ScoreQuestionComparator scoreQuestionComparator) {
         this.scoreQuestionRepository = scoreQuestionRepository;
         this.stakeholderCategoryRepository = stakeholderCategoryRepository;
+        this.scoreQuestionComparator = scoreQuestionComparator;
     }
 
 
     @Override
-    public Page<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderCategoryId, Pageable pageable) {
+    public List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderCategoryId) {
 
         StakeholderCategory stakeholderCategory = stakeholderCategoryRepository.findById(stakeHolderCategoryId)
                 .orElseThrow(() -> new ServiceException("Stakeholder category not found"));
 
-        Page<ScoreQuestion> scoreQuestionPage = scoreQuestionRepository
-                .findAllByStakeholderCategoryId(stakeHolderCategoryId, pageable);
+        List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
+                .findAllByStakeholderCategoryId(stakeHolderCategoryId);
 
-        List<ScoreQuestionDto> scoreQuestionDtos = scoreQuestionPage.getContent().stream()
+        List<ScoreQuestionDto> scoreQuestionDtos = scoreQuestions.stream()
                 .map(scoreQuestion -> ScoreQuestionDto.builder()
                         .id(scoreQuestion.getId())
                         .questionNumber(scoreQuestion.getQuestionNumber())
                         .stakeholderCategory(stakeholderCategory)
                         .content(scoreQuestion.getContent())
                         .build())
+                .sorted(scoreQuestionComparator)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(scoreQuestionDtos, scoreQuestionPage.getPageable(), scoreQuestionPage.getTotalElements());
+        return scoreQuestionDtos;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
     }
 
     @Override
-    public void create(ScoreQuestionForm scoreQuestionForm) {
+    public ScoreQuestion create(ScoreQuestionForm scoreQuestionForm) {
 
         findStakeholderCategoryById(scoreQuestionForm.getStakeholderCategoryId());
 
@@ -86,11 +88,11 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                 .content(scoreQuestionForm.getContent())
                 .build();
 
-        scoreQuestionRepository.save(scoreQuestion);
+        return scoreQuestionRepository.save(scoreQuestion);
     }
 
     @Override
-    public void update(Long id, ScoreQuestionForm scoreQuestionForm) {
+    public ScoreQuestion update(Long id, ScoreQuestionForm scoreQuestionForm) {
 
         ScoreQuestion scoreQuestionFromDb = scoreQuestionRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Питання не знайдено"));
@@ -98,7 +100,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         findStakeholderCategoryById(scoreQuestionForm.getStakeholderCategoryId());
 
         if (scoreQuestionRepository
-                .existsByIdNotEqualsAndStakeholderCategoryIdAndAndQuestionNumber(
+                .existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
                         id,
                         scoreQuestionForm.getStakeholderCategoryId(),
                         scoreQuestionForm.getQuestionNumber())) {
@@ -112,7 +114,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                 .content(scoreQuestionForm.getContent())
                 .build();
 
-        scoreQuestionRepository.save(updatedScoreQuestion);
+        return scoreQuestionRepository.save(updatedScoreQuestion);
     }
 
     private StakeholderCategory findStakeholderCategoryById(Long stakeholderCategoryId) {

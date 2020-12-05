@@ -1,18 +1,19 @@
 package com.pnu.dev.pnufeedback.service;
 
+import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
 import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface ScoreQuestionService {
 
-    Page<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderId, Pageable pageable);
+    List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderId);
 
     ScoreQuestionDto findById(Long id);
 
-    void create(ScoreQuestionForm scoreQuestionForm);
+    ScoreQuestion create(ScoreQuestionForm scoreQuestionForm);
 
-    void update(Long id, ScoreQuestionForm scoreQuestionForm);
+    ScoreQuestion update(Long id, ScoreQuestionForm scoreQuestionForm);
 
 }
