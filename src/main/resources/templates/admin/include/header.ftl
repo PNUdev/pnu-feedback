@@ -5,5 +5,8 @@
 </head>
 <body>
 <nav class="navbar navbar-dark bg-info">
-    <a class="navbar-brand" href="#">Link sample</a>
+    <div>
+        <a class="navbar-brand" href="/admin">Головна</a>
+        <a class="navbar-brand" href="/admin/generate-token">Генерація посилання</a>
+    </div>
 </nav>

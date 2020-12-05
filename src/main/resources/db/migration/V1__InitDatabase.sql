@@ -40,7 +40,7 @@ create table score_question(
   id                       bigserial    primary key,
   question_number          varchar(10) not null,
   stakeholder_category_id  bigint       not null,
-  content                  varchar(255) not null,
+  content                  text not null,
 
   constraint fk_stakeholder_category foreign key (stakeholder_category_id) references stakeholder_category(id)
 );
