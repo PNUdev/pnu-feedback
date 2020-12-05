@@ -25,11 +25,11 @@ public class JwtTokenPayloadValidator {
     public void validate(JwtTokenPayload jwtTokenPayload) {
 
         if (!educationalProgramRepository.existsById(jwtTokenPayload.getEducationalProgramId())) {
-            throw new ServiceException("Освітньої програми не існує!");
+            throw new ServiceException("Освітню програму не знайдено!");
         }
 
         if (!stakeholderCategoryRepository.existsById(jwtTokenPayload.getStakeholderCategoryId())) {
-            throw new ServiceException("Категорії стейкхолдерів не існує!");
+            throw new ServiceException("Категорію стейкхолдерів не знайдено!");
         }
     }
 

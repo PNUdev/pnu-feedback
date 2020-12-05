@@ -1,9 +1,12 @@
 package com.pnu.dev.pnufeedback.controller;
 
+import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.dto.FeedbackSubmissionDto;
 import com.pnu.dev.pnufeedback.dto.JwtTokenPayload;
 import com.pnu.dev.pnufeedback.dto.ScoreAnswerDto;
+import com.pnu.dev.pnufeedback.exception.ServiceException;
+import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
 import com.pnu.dev.pnufeedback.util.JwtTokenPayloadValidator;
@@ -25,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.pnu.dev.pnufeedback.service.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
+import static com.pnu.dev.pnufeedback.processor.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
 
 @Controller
 @RequestMapping("/feedback")
@@ -39,6 +42,8 @@ public class FeedbackSubmissionController {
 
     private ScoreQuestionRepository scoreQuestionRepository;
 
+    private EducationalProgramRepository educationalProgramRepository;
+
     private JwtTokenPayloadValidator jwtTokenPayloadValidator;
 
     private JmsTemplate jmsTemplate;
@@ -46,11 +51,13 @@ public class FeedbackSubmissionController {
     @Autowired
     public FeedbackSubmissionController(JwtTokenService jwtTokenService,
                                         ScoreQuestionRepository scoreQuestionRepository,
+                                        EducationalProgramRepository educationalProgramRepository,
                                         JwtTokenPayloadValidator jwtTokenPayloadValidator,
                                         JmsTemplate jmsTemplate) {
 
         this.jwtTokenService = jwtTokenService;
         this.scoreQuestionRepository = scoreQuestionRepository;
+        this.educationalProgramRepository = educationalProgramRepository;
         this.jwtTokenPayloadValidator = jwtTokenPayloadValidator;
         this.jmsTemplate = jmsTemplate;
     }
@@ -64,7 +71,12 @@ public class FeedbackSubmissionController {
         List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
 
+        EducationalProgram educationalProgram = educationalProgramRepository
+                .findById(jwtTokenPayload.getEducationalProgramId())
+                .orElseThrow(() -> new ServiceException("Освітню програму не знайдено!"));
+
         model.addAttribute("scoreQuestions", scoreQuestions);
+        model.addAttribute("educationalProgram", educationalProgram);
         return "submission/feedback-submission";
     }
 

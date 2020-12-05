@@ -1,9 +1,6 @@
 <#include "../include/header.ftl">
 
 <style>
-    body {
-        font-size: 1.0em;
-    }
 
     .question-content {
         font-size: 1.2em;
@@ -12,10 +9,19 @@
     .score-option {
         font-size: 1.2em;
     }
+
+    .educational-program-label {
+        font-size: 1.4em;
+    }
 </style>
 
 <div class="col-lg-12">
     <div class="mx-auto my-5 col-lg-9">
+        <div class="p-3 rounded bg-light educational-program-label">
+            <div class="text-center text-wrap mx-auto py-1 px-3 rounded border border-secondary">
+                Освітня програма: ${educationalProgram.title}
+            </div>
+        </div>
         <form method="POST">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <#list scoreQuestions as scoreQuestion>

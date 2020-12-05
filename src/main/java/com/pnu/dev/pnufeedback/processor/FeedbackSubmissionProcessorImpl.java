@@ -1,4 +1,4 @@
-package com.pnu.dev.pnufeedback.service;
+package com.pnu.dev.pnufeedback.processor;
 
 import com.pnu.dev.pnufeedback.domain.OpenAnswer;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
@@ -12,13 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @Slf4j
 public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProcessor {
 
