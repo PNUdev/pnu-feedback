@@ -19,8 +19,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/admin/**")
                 .authenticated()
-                .antMatchers("/admin/generate-report")
-                .permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/**")
