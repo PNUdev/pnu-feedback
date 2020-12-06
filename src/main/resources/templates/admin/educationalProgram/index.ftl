@@ -14,7 +14,7 @@
             <#list educationalPrograms as educationalProgram>
                 <tr>
                     <th scope="row">
-                        <p class="h4">${educationalProgram.title}</p>
+                        <p class="h5">${educationalProgram.title}</p>
                     </th>
                     <td>
                         <a href="/admin/educational-programs/edit/${educationalProgram.id}">

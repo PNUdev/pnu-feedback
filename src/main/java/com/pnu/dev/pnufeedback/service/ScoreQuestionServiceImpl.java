@@ -1,4 +1,4 @@
-package com.pnu.dev.pnufeedback.service.impl;
+package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
@@ -36,8 +36,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
     @Override
     public List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderCategoryId) {
 
-        StakeholderCategory stakeholderCategory = stakeholderCategoryRepository.findById(stakeHolderCategoryId)
-                .orElseThrow(() -> new ServiceException("Stakeholder category not found"));
+        StakeholderCategory stakeholderCategory = findStakeholderCategoryById(stakeHolderCategoryId);
 
         List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
                 .findAllByStakeholderCategoryId(stakeHolderCategoryId);

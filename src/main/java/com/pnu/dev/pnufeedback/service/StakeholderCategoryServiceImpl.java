@@ -1,10 +1,9 @@
-package com.pnu.dev.pnufeedback.service.impl;
+package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.StakeholderCategoryForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
-import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,13 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
     @Override
     public StakeholderCategory findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ServiceException("Stakeholder category not found"));
+                .orElseThrow(() -> new ServiceException("Категорія стейкхолдерів не знайдена"));
     }
 
     @Override
     public void create(StakeholderCategoryForm stakeholderCategoryForm) {
         if (repository.existsByTitle(stakeholderCategoryForm.getTitle()))
-            throw new ServiceException("Educational program already exists");
+            throw new ServiceException("Категорія стейкхолдерів з такою назвою вже існує");
 
         StakeholderCategory stakeholderCategory = StakeholderCategory.builder()
                 .title(stakeholderCategoryForm.getTitle())
@@ -47,6 +46,9 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
     @Override
     public void update(Long id, StakeholderCategoryForm stakeholderCategoryForm) {
+        if (repository.existsByIdNotAndTitle(id, stakeholderCategoryForm.getTitle()))
+            throw new ServiceException("Категорія стейкхолдерів з такою назвою вже існує");
+
         StakeholderCategory stakeholderCategoryFromDb = findById(id);
         StakeholderCategory updatedStakeholderCategory = stakeholderCategoryFromDb.toBuilder()
                 .title(stakeholderCategoryForm.getTitle())

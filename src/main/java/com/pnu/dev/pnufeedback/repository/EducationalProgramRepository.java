@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface EducationalProgramRepository extends CrudRepository<EducationalProgram, Long> {
 
-    List<EducationalProgram> findAll();
-
     List<EducationalProgram> findAll(Sort sort);
 
     boolean existsByTitle(String title);
+
+    boolean existsByIdNotAndTitle(Long id, String title);
 
 }

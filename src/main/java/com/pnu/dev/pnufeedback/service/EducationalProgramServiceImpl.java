@@ -1,10 +1,9 @@
-package com.pnu.dev.pnufeedback.service.impl;
+package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.dto.form.EducationalProgramForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
-import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,13 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
     @Override
     public EducationalProgram findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ServiceException("Educational program not found"));
+                .orElseThrow(() -> new ServiceException("Освітня програма не знайдена"));
     }
 
     @Override
     public void create(EducationalProgramForm educationalProgramForm) {
         if (repository.existsByTitle(educationalProgramForm.getTitle()))
-            throw new ServiceException("Educational program already exists");
+            throw new ServiceException("Освітня програма з такою назвою вже існує");
 
         EducationalProgram educationalProgram = EducationalProgram.builder()
                 .title(educationalProgramForm.getTitle())
@@ -47,10 +46,14 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
 
     @Override
     public void update(Long id, EducationalProgramForm educationalProgramForm) {
+        if (repository.existsByIdNotAndTitle(id, educationalProgramForm.getTitle()))
+            throw new ServiceException("Освітня програма з такою назвою вже існує");
+
         EducationalProgram educationalProgramFromDb = findById(id);
         EducationalProgram updatedEducationalProgram = educationalProgramFromDb.toBuilder()
                 .title(educationalProgramForm.getTitle())
                 .build();
         repository.save(updatedEducationalProgram);
     }
+
 }
