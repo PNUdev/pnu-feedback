@@ -1,14 +1,13 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
-import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.dto.FeedbackSubmissionDto;
 import com.pnu.dev.pnufeedback.dto.JwtTokenPayload;
 import com.pnu.dev.pnufeedback.dto.ScoreAnswerDto;
-import com.pnu.dev.pnufeedback.exception.ServiceException;
-import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
-import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
+import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
+import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
+import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
 import com.pnu.dev.pnufeedback.util.JwtTokenPayloadValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +39,9 @@ public class FeedbackSubmissionController {
 
     private JwtTokenService jwtTokenService;
 
-    private ScoreQuestionRepository scoreQuestionRepository;
+    private ScoreQuestionService scoreQuestionService;
 
-    private EducationalProgramRepository educationalProgramRepository;
+    private EducationalProgramService educationalProgramService;
 
     private JwtTokenPayloadValidator jwtTokenPayloadValidator;
 
@@ -50,14 +49,14 @@ public class FeedbackSubmissionController {
 
     @Autowired
     public FeedbackSubmissionController(JwtTokenService jwtTokenService,
-                                        ScoreQuestionRepository scoreQuestionRepository,
-                                        EducationalProgramRepository educationalProgramRepository,
+                                        ScoreQuestionService scoreQuestionService,
+                                        EducationalProgramService educationalProgramService,
                                         JwtTokenPayloadValidator jwtTokenPayloadValidator,
                                         JmsTemplate jmsTemplate) {
 
         this.jwtTokenService = jwtTokenService;
-        this.scoreQuestionRepository = scoreQuestionRepository;
-        this.educationalProgramRepository = educationalProgramRepository;
+        this.scoreQuestionService = scoreQuestionService;
+        this.educationalProgramService = educationalProgramService;
         this.jwtTokenPayloadValidator = jwtTokenPayloadValidator;
         this.jmsTemplate = jmsTemplate;
     }
@@ -68,12 +67,11 @@ public class FeedbackSubmissionController {
         JwtTokenPayload jwtTokenPayload = jwtTokenService.resolveTokenPayload(jwtToken);
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
-        List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
+        List<ScoreQuestionDto> scoreQuestions = scoreQuestionService
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
 
-        EducationalProgram educationalProgram = educationalProgramRepository
-                .findById(jwtTokenPayload.getEducationalProgramId())
-                .orElseThrow(() -> new ServiceException("Освітню програму не знайдено!"));
+        EducationalProgram educationalProgram = educationalProgramService
+                .findById(jwtTokenPayload.getEducationalProgramId());
 
         model.addAttribute("scoreQuestions", scoreQuestions);
         model.addAttribute("educationalProgram", educationalProgram);

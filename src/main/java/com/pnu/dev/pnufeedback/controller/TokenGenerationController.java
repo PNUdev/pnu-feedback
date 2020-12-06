@@ -3,9 +3,9 @@ package com.pnu.dev.pnufeedback.controller;
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.GenerateTokenForm;
-import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
-import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
+import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
+import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,29 +19,29 @@ import java.util.List;
 @RequestMapping("/admin/generate-token")
 public class TokenGenerationController {
 
-    private EducationalProgramRepository educationalProgramRepository;
+    private EducationalProgramService educationalProgramService;
 
-    private StakeholderCategoryRepository stakeholderCategoryRepository;
+    private StakeholderCategoryService stakeholderCategoryService;
 
     private JwtTokenService jwtTokenService;
 
     @Autowired
-    public TokenGenerationController(EducationalProgramRepository educationalProgramRepository,
-                                     StakeholderCategoryRepository stakeholderCategoryRepository,
+    public TokenGenerationController(EducationalProgramService educationalProgramService,
+                                     StakeholderCategoryService stakeholderCategoryService,
                                      JwtTokenService jwtTokenService) {
 
-        this.educationalProgramRepository = educationalProgramRepository;
-        this.stakeholderCategoryRepository = stakeholderCategoryRepository;
+        this.educationalProgramService = educationalProgramService;
+        this.stakeholderCategoryService = stakeholderCategoryService;
         this.jwtTokenService = jwtTokenService;
     }
 
     @GetMapping
     public String showGenerateTokenPage(Model model) {
 
-        List<EducationalProgram> educationalPrograms = educationalProgramRepository.findAll();
+        List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
         model.addAttribute("educationalPrograms", educationalPrograms);
 
-        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryRepository.findAll();
+        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
         model.addAttribute("stakeholderCategories", stakeholderCategories);
 
         return "admin/generate-token";
