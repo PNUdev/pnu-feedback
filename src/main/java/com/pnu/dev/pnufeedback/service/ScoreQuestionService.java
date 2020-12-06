@@ -1,16 +1,15 @@
 package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
-import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
 import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
 
 import java.util.List;
 
 public interface ScoreQuestionService {
 
-    List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderId);
+    List<ScoreQuestion> findAllByStakeholderCategoryId(Long stakeHolderId);
 
-    ScoreQuestionDto findById(Long id);
+    ScoreQuestion findById(Long id);
 
     ScoreQuestion create(ScoreQuestionForm scoreQuestionForm);
 

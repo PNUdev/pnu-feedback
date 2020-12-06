@@ -1,82 +1,60 @@
 package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
-import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
-import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
 import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
-import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
-import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
 import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class ScoreQuestionServiceImpl implements ScoreQuestionService {
 
     private final ScoreQuestionRepository scoreQuestionRepository;
 
-    private final StakeholderCategoryRepository stakeholderCategoryRepository;
+    private final StakeholderCategoryService stakeholderCategoryService;
 
     private final ScoreQuestionComparator scoreQuestionComparator;
 
     @Autowired
     public ScoreQuestionServiceImpl(ScoreQuestionRepository scoreQuestionRepository,
-                                    StakeholderCategoryRepository stakeholderCategoryRepository, ScoreQuestionComparator scoreQuestionComparator) {
+                                    StakeholderCategoryService stakeholderCategoryService, ScoreQuestionComparator scoreQuestionComparator) {
         this.scoreQuestionRepository = scoreQuestionRepository;
-        this.stakeholderCategoryRepository = stakeholderCategoryRepository;
+        this.stakeholderCategoryService = stakeholderCategoryService;
         this.scoreQuestionComparator = scoreQuestionComparator;
     }
 
 
     @Override
-    public List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderCategoryId) {
+    public List<ScoreQuestion> findAllByStakeholderCategoryId(Long stakeHolderCategoryId) {
 
-        StakeholderCategory stakeholderCategory = findStakeholderCategoryById(stakeHolderCategoryId);
         List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
                 .findAllByStakeholderCategoryId(stakeHolderCategoryId);
+        scoreQuestions.sort(scoreQuestionComparator);
 
-        return scoreQuestions.stream()
-                .map(scoreQuestion -> ScoreQuestionDto.builder()
-                        .id(scoreQuestion.getId())
-                        .questionNumber(scoreQuestion.getQuestionNumber())
-                        .stakeholderCategory(stakeholderCategory)
-                        .content(scoreQuestion.getContent())
-                        .build())
-                .sorted(scoreQuestionComparator)
-                .collect(Collectors.toList());
+        return scoreQuestions;
     }
 
     @Override
-    public ScoreQuestionDto findById(Long id) {
+    public ScoreQuestion findById(Long id) {
 
-        ScoreQuestion scoreQuestion = scoreQuestionRepository.findById(id)
+        return scoreQuestionRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Питання не знайдено"));
-
-        StakeholderCategory stakeholderCategory = findStakeholderCategoryById(scoreQuestion.getStakeholderCategoryId());
-
-        return ScoreQuestionDto.builder()
-                .id(scoreQuestion.getId())
-                .stakeholderCategory(stakeholderCategory)
-                .questionNumber(scoreQuestion.getQuestionNumber())
-                .content(scoreQuestion.getContent())
-                .build();
     }
 
     @Override
     public ScoreQuestion create(ScoreQuestionForm scoreQuestionForm) {
 
-        findStakeholderCategoryById(scoreQuestionForm.getStakeholderCategoryId());
+        stakeholderCategoryService.findById(scoreQuestionForm.getStakeholderCategoryId());
 
-        if (scoreQuestionRepository
-                .existsByStakeholderCategoryIdAndAndQuestionNumber(
-                        scoreQuestionForm.getStakeholderCategoryId(),
-                        scoreQuestionForm.getQuestionNumber())
-        ) {
+        if (isScoreQuestionNumberAvailable(null, scoreQuestionForm)) {
             throw new ServiceException("Питання з таким номером вже існує в даній категорії стейкхолдерів");
         }
 
@@ -95,14 +73,9 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         ScoreQuestion scoreQuestionFromDb = scoreQuestionRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Питання не знайдено"));
 
-        findStakeholderCategoryById(scoreQuestionForm.getStakeholderCategoryId());
+        stakeholderCategoryService.findById(scoreQuestionForm.getStakeholderCategoryId());
 
-        if (scoreQuestionRepository
-                .existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
-                        id,
-                        scoreQuestionForm.getStakeholderCategoryId(),
-                        scoreQuestionForm.getQuestionNumber())
-        ) {
+        if (isScoreQuestionNumberAvailable(id, scoreQuestionForm)) {
             throw new ServiceException("Питання з таким номером вже існує в даній категорії стейкхолдерів");
         }
 
@@ -116,8 +89,19 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         return scoreQuestionRepository.save(updatedScoreQuestion);
     }
 
-    private StakeholderCategory findStakeholderCategoryById(Long stakeholderCategoryId) {
-        return stakeholderCategoryRepository.findById(stakeholderCategoryId)
-                .orElseThrow(() -> new ServiceException("Категорія стейкхолдерів не знайдена"));
+    private boolean isScoreQuestionNumberAvailable(@Nullable Long scoreQuestionId,
+                                                   @NonNull ScoreQuestionForm scoreQuestionForm) {
+        if (nonNull(scoreQuestionId)) {
+            return scoreQuestionRepository.existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
+                    scoreQuestionId,
+                    scoreQuestionForm.getStakeholderCategoryId(),
+                    scoreQuestionForm.getQuestionNumber()
+            );
+        } else {
+            return scoreQuestionRepository.existsByStakeholderCategoryIdAndAndQuestionNumber(
+                    scoreQuestionForm.getStakeholderCategoryId(),
+                    scoreQuestionForm.getQuestionNumber()
+            );
+        }
     }
 }

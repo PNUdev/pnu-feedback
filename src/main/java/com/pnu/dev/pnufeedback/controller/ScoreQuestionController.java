@@ -3,7 +3,6 @@ package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
-import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
 import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
 import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
 import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
@@ -35,7 +34,7 @@ public class ScoreQuestionController {
     @GetMapping
     public String findAll(@PathVariable(name = "stakeholderCategoryId") Long stakeholderCategoryId,
                           Model model) {
-        List<ScoreQuestionDto> scoreQuestions =
+        List<ScoreQuestion> scoreQuestions =
                 scoreQuestionService.findAllByStakeholderCategoryId(stakeholderCategoryId);
         StakeholderCategory stakeholderCategory = stakeholderCategoryService.findById(stakeholderCategoryId);
         model.addAttribute("scoreQuestions", scoreQuestions);
@@ -56,7 +55,7 @@ public class ScoreQuestionController {
     public String editForm(@PathVariable("id") Long id,
                            @PathVariable(name = "stakeholderCategoryId") Long stakeholderCategoryId,
                            Model model) {
-        ScoreQuestionDto scoreQuestion = scoreQuestionService.findById(id);
+        ScoreQuestion scoreQuestion = scoreQuestionService.findById(id);
         StakeholderCategory stakeholderCategory = stakeholderCategoryService.findById(stakeholderCategoryId);
         model.addAttribute("scoreQuestion", scoreQuestion);
         model.addAttribute("stakeholderCategory", stakeholderCategory);

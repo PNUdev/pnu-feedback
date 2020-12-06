@@ -35,8 +35,9 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
     @Override
     public void create(StakeholderCategoryForm stakeholderCategoryForm) {
-        if (repository.existsByTitle(stakeholderCategoryForm.getTitle()))
+        if (repository.existsByTitle(stakeholderCategoryForm.getTitle())) {
             throw new ServiceException("Категорія стейкхолдерів з такою назвою вже існує");
+        }
 
         StakeholderCategory stakeholderCategory = StakeholderCategory.builder()
                 .title(stakeholderCategoryForm.getTitle())
@@ -46,8 +47,9 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
     @Override
     public void update(Long id, StakeholderCategoryForm stakeholderCategoryForm) {
-        if (repository.existsByIdNotAndTitle(id, stakeholderCategoryForm.getTitle()))
+        if (repository.existsByIdNotAndTitle(id, stakeholderCategoryForm.getTitle())) {
             throw new ServiceException("Категорія стейкхолдерів з такою назвою вже існує");
+        }
 
         StakeholderCategory stakeholderCategoryFromDb = findById(id);
         StakeholderCategory updatedStakeholderCategory = stakeholderCategoryFromDb.toBuilder()

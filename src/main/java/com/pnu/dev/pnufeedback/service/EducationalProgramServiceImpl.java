@@ -35,8 +35,9 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
 
     @Override
     public void create(EducationalProgramForm educationalProgramForm) {
-        if (repository.existsByTitle(educationalProgramForm.getTitle()))
+        if (repository.existsByTitle(educationalProgramForm.getTitle())) {
             throw new ServiceException("Освітня програма з такою назвою вже існує");
+        }
 
         EducationalProgram educationalProgram = EducationalProgram.builder()
                 .title(educationalProgramForm.getTitle())
@@ -46,8 +47,9 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
 
     @Override
     public void update(Long id, EducationalProgramForm educationalProgramForm) {
-        if (repository.existsByIdNotAndTitle(id, educationalProgramForm.getTitle()))
+        if (repository.existsByIdNotAndTitle(id, educationalProgramForm.getTitle())) {
             throw new ServiceException("Освітня програма з такою назвою вже існує");
+        }
 
         EducationalProgram educationalProgramFromDb = findById(id);
         EducationalProgram updatedEducationalProgram = educationalProgramFromDb.toBuilder()

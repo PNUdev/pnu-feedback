@@ -1,10 +1,10 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
+import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.dto.FeedbackSubmissionDto;
 import com.pnu.dev.pnufeedback.dto.JwtTokenPayload;
 import com.pnu.dev.pnufeedback.dto.ScoreAnswerDto;
-import com.pnu.dev.pnufeedback.dto.ScoreQuestionDto;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
 import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
@@ -67,7 +67,7 @@ public class FeedbackSubmissionController {
         JwtTokenPayload jwtTokenPayload = jwtTokenService.resolveTokenPayload(jwtToken);
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
-        List<ScoreQuestionDto> scoreQuestions = scoreQuestionService
+        List<ScoreQuestion> scoreQuestions = scoreQuestionService
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
 
         EducationalProgram educationalProgram = educationalProgramService
