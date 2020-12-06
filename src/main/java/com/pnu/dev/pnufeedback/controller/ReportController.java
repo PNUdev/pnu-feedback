@@ -1,8 +1,11 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
+import com.pnu.dev.pnufeedback.dto.Employee;
+import com.pnu.dev.pnufeedback.dto.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
+import com.pnu.dev.pnufeedback.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,8 +13,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Controller
@@ -19,10 +26,14 @@ import java.util.List;
 public class ReportController {
 
     private EducationalProgramRepository educationalProgramRepository;
+    private ReportService reportService;
+    final ModelAndView model = new ModelAndView();
 
     @Autowired
-    public ReportController(EducationalProgramRepository educationalProgramRepository) {
+    public ReportController(EducationalProgramRepository educationalProgramRepository,
+                            ReportService reportService) {
         this.educationalProgramRepository = educationalProgramRepository;
+        this.reportService = reportService;
     }
 
     @GetMapping
@@ -35,16 +46,10 @@ public class ReportController {
     }
 
     @PostMapping
-    public String generateReport(GenerateReportDto generateReportDto, Model model) {
-        log.debug("Report generation!" + generateReportDto);
-
-        return "admin/show-generated-report";
-    }
-
-    @PostMapping("/download")
-    public String downloadReport(Model model) {
-        log.debug("Report downloading!");
-
-        return "admin/show-generated-report";
+    public void generateReport(GenerateReportDto generateReportDto, HttpServletResponse response) {
+        log.info("Report generation started!");
+        ReportDataDto reportDataDto = reportService.getReportData(generateReportDto);
+        reportService.exportReport(reportDataDto, response);
+        log.info("File successfully generated");
     }
 }
