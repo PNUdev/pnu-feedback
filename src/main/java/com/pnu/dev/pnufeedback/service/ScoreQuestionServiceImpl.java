@@ -37,11 +37,10 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
     public List<ScoreQuestionDto> findAllByStakeholderCategoryId(Long stakeHolderCategoryId) {
 
         StakeholderCategory stakeholderCategory = findStakeholderCategoryById(stakeHolderCategoryId);
-
         List<ScoreQuestion> scoreQuestions = scoreQuestionRepository
                 .findAllByStakeholderCategoryId(stakeHolderCategoryId);
 
-        List<ScoreQuestionDto> scoreQuestionDtos = scoreQuestions.stream()
+        return scoreQuestions.stream()
                 .map(scoreQuestion -> ScoreQuestionDto.builder()
                         .id(scoreQuestion.getId())
                         .questionNumber(scoreQuestion.getQuestionNumber())
@@ -50,8 +49,6 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                         .build())
                 .sorted(scoreQuestionComparator)
                 .collect(Collectors.toList());
-
-        return scoreQuestionDtos;
     }
 
     @Override
@@ -76,9 +73,11 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         findStakeholderCategoryById(scoreQuestionForm.getStakeholderCategoryId());
 
         if (scoreQuestionRepository
-                .existsByStakeholderCategoryIdAndAndQuestionNumber(scoreQuestionForm.getStakeholderCategoryId(),
-                        scoreQuestionForm.getQuestionNumber())) {
-            throw new ServiceException("Питання з таким номером вже існує в цій категорії стейкхолдерів");
+                .existsByStakeholderCategoryIdAndAndQuestionNumber(
+                        scoreQuestionForm.getStakeholderCategoryId(),
+                        scoreQuestionForm.getQuestionNumber())
+        ) {
+            throw new ServiceException("Питання з таким номером вже існує в даній категорії стейкхолдерів");
         }
 
         ScoreQuestion scoreQuestion = ScoreQuestion.builder()
@@ -102,8 +101,9 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                 .existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
                         id,
                         scoreQuestionForm.getStakeholderCategoryId(),
-                        scoreQuestionForm.getQuestionNumber())) {
-            throw new ServiceException("Питання з таким номером вже існує в цій категорії стейкхолдерів");
+                        scoreQuestionForm.getQuestionNumber())
+        ) {
+            throw new ServiceException("Питання з таким номером вже існує в даній категорії стейкхолдерів");
         }
 
         ScoreQuestion updatedScoreQuestion = ScoreQuestion.builder()
