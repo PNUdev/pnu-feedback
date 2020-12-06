@@ -6,14 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnswerInfoDto {
     private StakeholderCategory stakeholderCategory;
+    private String stakeholderName;
+    private String question;
+    private Double score;
     private Integer answerAmount;
-    private List<Integer> scores;
 }

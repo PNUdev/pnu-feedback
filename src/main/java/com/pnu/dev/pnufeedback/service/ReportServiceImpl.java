@@ -4,7 +4,6 @@ import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
-import com.pnu.dev.pnufeedback.dto.Employee;
 import com.pnu.dev.pnufeedback.dto.AnswerInfoDto;
 import com.pnu.dev.pnufeedback.dto.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
@@ -31,7 +30,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -86,7 +84,7 @@ public class ReportServiceImpl implements ReportService {
                         educationalProgram.getId(), startDateTime, endDateTime
                 );
 
-        Map<String, List<AnswerInfoDto>> data = getData(submissions);
+        List<AnswerInfoDto> data = getData(submissions);
 
         ReportDataDto reportDataDto = new ReportDataDto();
         reportDataDto.setEducationalProgram(educationalProgram);
@@ -106,7 +104,7 @@ public class ReportServiceImpl implements ReportService {
         try {
             final InputStream stream = this.getClass().getResourceAsStream(TEMPLATE_PATH);
             final JasperReport report = JasperCompileManager.compileReport(stream);
-            final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(Arrays.asList(reportDataDto));
+            final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(reportDataDto.getData());
 
             final Map<String, Object> parameters = prepareParameters();
             parameters.put("CHART_DATASET", source);
@@ -128,15 +126,14 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-
     private Map<String, Object> prepareParameters(){
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("createdBy", "mslob.com");
         return parameters;
     }
 
-    private Map<String, List<AnswerInfoDto>> getData(List<Submission> submissions){
-        Map<String, List<AnswerInfoDto>> data = new HashMap<>();
+    private List<AnswerInfoDto> getData(List<Submission> submissions){
+        List<AnswerInfoDto> answerInfos = new ArrayList<>();
 
         List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
@@ -159,13 +156,11 @@ public class ReportServiceImpl implements ReportService {
 
         questionNumbers.stream().forEach(questionNumber->{
 
-            List<AnswerInfoDto> answerInfos = new ArrayList<>();
-
             stakeHolderNumbers.stream().forEach(stakeHolderNumber->{
                 String question = stakeHolderNumber + "." + questionNumber;
                 AtomicInteger count = new AtomicInteger(0);
                 AnswerInfoDto answerInfoDto = new AnswerInfoDto();
-                List<Integer> questionScores = new ArrayList<>();
+                AtomicInteger questionScores = new AtomicInteger();
 
                 scoreAnswers.stream()
                         .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
@@ -176,23 +171,23 @@ public class ReportServiceImpl implements ReportService {
                                     .filter(stakeholderCategory -> stakeholderCategory.getId().toString().equals(stakeHolderNumber))
                                     .findFirst().get();
                             answerInfoDto.setStakeholderCategory(stakeholder);
+                            answerInfoDto.setStakeholderName(stakeholder.getTitle());
+                            answerInfoDto.setQuestion("Q." + questionNumber);
                             answerInfoDto.setAnswerAmount(count.incrementAndGet());
-                            questionScores.add(scoreAnswer.getScore());
+                            questionScores.addAndGet(scoreAnswer.getScore());
                         }
                 );
 
-                //find scores for one question from one stakeholder category
-                answerInfoDto.setScores(questionScores);
                 if (!isNull(answerInfoDto.getAnswerAmount())) {
+                    //find scores for one question from one stakeholder category
+                    answerInfoDto.setScore(questionScores.doubleValue()/count.get());
+
                     //find answer info for one question
                     answerInfos.add(answerInfoDto);
                 }
             });
-
-            //prepare data
-            data.put(questionNumber, answerInfos);
         });
 
-        return data;
+        return answerInfos;
     }
 }

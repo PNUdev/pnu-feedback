@@ -1,7 +1,6 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
-import com.pnu.dev.pnufeedback.dto.Employee;
 import com.pnu.dev.pnufeedback.dto.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
@@ -13,12 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Slf4j
 @Controller
@@ -27,7 +23,6 @@ public class ReportController {
 
     private EducationalProgramRepository educationalProgramRepository;
     private ReportService reportService;
-    final ModelAndView model = new ModelAndView();
 
     @Autowired
     public ReportController(EducationalProgramRepository educationalProgramRepository,

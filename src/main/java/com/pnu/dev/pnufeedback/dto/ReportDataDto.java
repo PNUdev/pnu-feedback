@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 
 @Data
@@ -19,5 +18,5 @@ public class ReportDataDto {
     private EducationalProgram educationalProgram;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private Map<String, List<AnswerInfoDto>> data;
+    private List<AnswerInfoDto> data;
 }
