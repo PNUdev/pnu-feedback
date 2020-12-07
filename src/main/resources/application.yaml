@@ -13,6 +13,8 @@ spring:
     password: ${ADMIN_PASSWORD:admin}
   activemq:
     in-memory: true
+  data:
+    web.pageable.one-indexed-parameters: true
 jwt:
   secret: ${JWT_SECRET:secret}
 app:

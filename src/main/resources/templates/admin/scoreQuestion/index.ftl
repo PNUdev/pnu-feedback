@@ -1,6 +1,5 @@
 <#include "../include/header.ftl">
 
-
 <h2 class="text-center mt-3">Запитання для категорії "${stakeholderCategory.title}"</h2>
 <div class="my-3 px-5">
     <a href="/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/new">

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class OpenAnswer {
@@ -20,5 +20,7 @@ public class OpenAnswer {
     private String content;
 
     private boolean approved;
+
+    private boolean reviewed;
 
 }
