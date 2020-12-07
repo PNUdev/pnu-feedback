@@ -6,13 +6,9 @@ import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static java.util.Objects.nonNull;
 
 @Service
 public class ScoreQuestionServiceImpl implements ScoreQuestionService {
@@ -54,7 +50,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
 
         stakeholderCategoryService.findById(scoreQuestionForm.getStakeholderCategoryId());
 
-        if (isScoreQuestionNumberAvailable(null, scoreQuestionForm)) {
+        if (isScoreQuestionNumberAvailable(scoreQuestionForm)) {
             throw new ServiceException("Питання з таким номером вже існує в даній категорії стейкхолдерів");
         }
 
@@ -89,19 +85,19 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         return scoreQuestionRepository.save(updatedScoreQuestion);
     }
 
-    private boolean isScoreQuestionNumberAvailable(@Nullable Long scoreQuestionId,
-                                                   @NonNull ScoreQuestionForm scoreQuestionForm) {
-        if (nonNull(scoreQuestionId)) {
-            return scoreQuestionRepository.existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
-                    scoreQuestionId,
-                    scoreQuestionForm.getStakeholderCategoryId(),
-                    scoreQuestionForm.getQuestionNumber()
-            );
-        } else {
-            return scoreQuestionRepository.existsByStakeholderCategoryIdAndAndQuestionNumber(
-                    scoreQuestionForm.getStakeholderCategoryId(),
-                    scoreQuestionForm.getQuestionNumber()
-            );
-        }
+    private boolean isScoreQuestionNumberAvailable(ScoreQuestionForm scoreQuestionForm) {
+        return scoreQuestionRepository.existsByStakeholderCategoryIdAndAndQuestionNumber(
+                scoreQuestionForm.getStakeholderCategoryId(),
+                scoreQuestionForm.getQuestionNumber()
+        );
+
+    }
+
+    private boolean isScoreQuestionNumberAvailable(Long scoreQuestionId, ScoreQuestionForm scoreQuestionForm) {
+        return scoreQuestionRepository.existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(
+                scoreQuestionId,
+                scoreQuestionForm.getStakeholderCategoryId(),
+                scoreQuestionForm.getQuestionNumber()
+        );
     }
 }
