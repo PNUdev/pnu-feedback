@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportDataDto {
     private EducationalProgram educationalProgram;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private List<AnswerInfoDto> data;
 }

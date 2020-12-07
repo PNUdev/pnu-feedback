@@ -71,11 +71,15 @@
             <artifactId>commons-text</artifactId>
             <version>1.9</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
             <version>6.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.16.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

@@ -20,15 +20,16 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,14 +45,10 @@ import static java.util.Objects.isNull;
 @Service
 public class ReportServiceImpl implements ReportService {
 
-    private final static String TEMPLATE_PATH = "/reportTemplate.jrxml";
-    private final static String REPORT_FILE= "/report.pdf";
+    private final static String TEMPLATE_PATH = "/reports/report-template.jrxml";
+    private final static String REPORT_FILE = "/report.pdf";
     private final static DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
-            .append(DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-            .toFormatter();
+            .append(DateTimeFormatter.ofPattern("MM/dd/yyyy")).toFormatter();
 
     private EducationalProgramRepository educationalProgramRepository;
     private ScoreAnswerRepository scoreAnswerRepository;
@@ -73,12 +70,12 @@ public class ReportServiceImpl implements ReportService {
     public ReportDataDto getReportData(GenerateReportDto generateReportDto) {
         log.debug("Data analyzing has started!");
 
-        LocalDateTime startDateTime = LocalDateTime.parse(generateReportDto.getStartDate(), DATE_TIME_FORMATTER);
-        LocalDateTime endDateTime = LocalDateTime.parse(generateReportDto.getEndDate(), DATE_TIME_FORMATTER);
+        LocalDate startDateTime = LocalDate.parse(generateReportDto.getStartDate(), DATE_TIME_FORMATTER);
+        LocalDate endDateTime = LocalDate.parse(generateReportDto.getEndDate(), DATE_TIME_FORMATTER);
 
         EducationalProgram educationalProgram = educationalProgramRepository
                 .findById(Long.valueOf(generateReportDto.getEducationalProgramId()))
-                .orElseThrow(()-> new ServiceException("Educational program not found!"));
+                .orElseThrow(() -> new ServiceException("Educational program not found!"));
         List<Submission> submissions = submissionRepository
                 .findAllByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDateTime, endDateTime
@@ -96,43 +93,41 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void exportReport(ReportDataDto reportDataDto, HttpServletResponse response){
+    public void exportReport(ReportDataDto reportDataDto, HttpServletResponse response) {
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=" + REPORT_FILE);
 
-        try {
-            final InputStream stream = this.getClass().getResourceAsStream(TEMPLATE_PATH);
-            final JasperReport report = JasperCompileManager.compileReport(stream);
-            final JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(reportDataDto.getData());
+        try (ServletOutputStream servletOutputStream = response.getOutputStream()) {
 
-            final Map<String, Object> parameters = prepareParameters();
-            parameters.put("CHART_DATASET", source);
-            final JasperPrint print = JasperFillManager.fillReport(report, parameters);
+            //InputStream employeeReportStream = getClass().getResourceAsStream(TEMPLATE_PATH);
+            Resource resource = new ClassPathResource(TEMPLATE_PATH);
+            JasperReport report = JasperCompileManager.compileReport(resource.getInputStream());
 
-            JasperExportManager.exportReportToPdfStream(print, response.getOutputStream());
+            Map<String, Object> parameters = prepareParameters(reportDataDto);
+            JasperPrint print = JasperFillManager.fillReport(report, parameters);
 
-        }catch (JRException| IOException e){
+            JasperExportManager.exportReportToPdfStream(print, servletOutputStream);
+
+        } catch (JRException | IOException e) {
             log.debug("Error occurred during report generation!", e.getLocalizedMessage());
             throw new ServiceException(e.getLocalizedMessage());
-        }finally {
-            try {
-                response.getOutputStream().flush();
-                response.getOutputStream().close();
-            }catch (IOException e) {
-                log.debug("Error occurred during stream closing!", e.getLocalizedMessage());
-                throw new ServiceException(e.getLocalizedMessage());
-            }
         }
     }
 
-    private Map<String, Object> prepareParameters(){
-        final Map<String, Object> parameters = new HashMap<>();
-        parameters.put("createdBy", "mslob.com");
+    private Map<String, Object> prepareParameters(ReportDataDto reportDataDto) {
+        Map<String, Object> parameters = new HashMap<>();
+
+        JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(reportDataDto.getData());
+        parameters.put("CHART_DATASET", source);
+        parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgram().getTitle());
+        parameters.put("START_DATE", reportDataDto.getStartDate().toString());
+        parameters.put("END_DATE", reportDataDto.getEndDate().toString());
+
         return parameters;
     }
 
-    private List<AnswerInfoDto> getData(List<Submission> submissions){
+    private List<AnswerInfoDto> getData(List<Submission> submissions) {
         List<AnswerInfoDto> answerInfos = new ArrayList<>();
 
         List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
@@ -142,21 +137,21 @@ public class ReportServiceImpl implements ReportService {
         //get all question numbers
         List<String> questionNumbers = scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber-> questionNumber.substring(questionNumber.indexOf(".") + 1))
+                .map(questionNumber -> questionNumber.substring(questionNumber.indexOf(".") + 1))
                 .sorted()
                 .distinct()
                 .collect(Collectors.toList());
         //get all stakeHolder numbers
         List<String> stakeHolderNumbers = scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber-> questionNumber.substring(0, questionNumber.indexOf(".")))
+                .map(questionNumber -> questionNumber.substring(0, questionNumber.indexOf(".")))
                 .sorted()
                 .distinct().collect(Collectors.toList());
 
 
-        questionNumbers.stream().forEach(questionNumber->{
+        questionNumbers.stream().forEach(questionNumber -> {
 
-            stakeHolderNumbers.stream().forEach(stakeHolderNumber->{
+            stakeHolderNumbers.stream().forEach(stakeHolderNumber -> {
                 String question = stakeHolderNumber + "." + questionNumber;
                 AtomicInteger count = new AtomicInteger(0);
                 AnswerInfoDto answerInfoDto = new AnswerInfoDto();
@@ -166,21 +161,21 @@ public class ReportServiceImpl implements ReportService {
                         .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
                         .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
                         .forEach(scoreAnswer -> {
-                            //find stakeholder
-                            StakeholderCategory stakeholder = stakeholderCategories.stream()
-                                    .filter(stakeholderCategory -> stakeholderCategory.getId().toString().equals(stakeHolderNumber))
-                                    .findFirst().get();
-                            answerInfoDto.setStakeholderCategory(stakeholder);
-                            answerInfoDto.setStakeholderName(stakeholder.getTitle());
-                            answerInfoDto.setQuestion("Q." + questionNumber);
-                            answerInfoDto.setAnswerAmount(count.incrementAndGet());
-                            questionScores.addAndGet(scoreAnswer.getScore());
-                        }
-                );
+                                    //find stakeholder
+                                    StakeholderCategory stakeholder = stakeholderCategories.stream()
+                                            .filter(stakeholderCategory -> stakeholderCategory.getId().toString().equals(stakeHolderNumber))
+                                            .findFirst().get();
+                                    answerInfoDto.setStakeholderCategory(stakeholder);
+                                    answerInfoDto.setStakeholderName(stakeholder.getTitle());
+                                    answerInfoDto.setQuestion(mapQuestionNumber(questionNumber));
+                                    answerInfoDto.setAnswerAmount(count.incrementAndGet());
+                                    questionScores.addAndGet(scoreAnswer.getScore());
+                                }
+                        );
 
                 if (!isNull(answerInfoDto.getAnswerAmount())) {
                     //find scores for one question from one stakeholder category
-                    answerInfoDto.setScore(questionScores.doubleValue()/count.get());
+                    answerInfoDto.setScore(questionScores.doubleValue() / count.get());
 
                     //find answer info for one question
                     answerInfos.add(answerInfoDto);
@@ -188,6 +183,16 @@ public class ReportServiceImpl implements ReportService {
             });
         });
 
-        return answerInfos;
+        return answerInfos.stream()
+                .sorted(Comparator.comparing(AnswerInfoDto::getQuestion))
+                .collect(Collectors.toList());
+    }
+
+    private String mapQuestionNumber(String questionNumber) {
+        Integer number = Integer.parseInt(questionNumber);
+        Integer main = (number / 10) + 1;
+        Integer remainder = (number % 10);
+
+        return main + "." + remainder;
     }
 }

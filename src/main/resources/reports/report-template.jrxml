@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.9.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="842" pageHeight="600" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.style.isPdfEmbedded" value="true"/>
+	<property name="net.sf.jasperreports.style.pdfEncoding" value="UTF-8"/>
+	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+	<subDataset name="chartDataSet" uuid="119b7f0e-01ef-4e2b-b628-d76f51e83768">
+		<field name="stakeholderName" class="java.lang.String"/>
+		<field name="question" class="java.lang.String"/>
+		<field name="score" class="java.lang.Double"/>
+	</subDataset>
+	<parameter name="CHART_DATASET" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource" isForPrompting="false"/>
+	<parameter name="EDUCATIONAL_PROGRAM_NAME" class="java.lang.String"/>
+	<parameter name="START_DATE" class="java.lang.String"/>
+	<parameter name="END_DATE" class="java.lang.String"/>
+	<title>
+		<band height="50">
+			<textField>
+				<reportElement mode="Opaque" x="10" y="10" width="781" height="30" forecolor="#050505" backcolor="#87D0E0" uuid="7a533552-f010-4fb3-b944-44122d862e1f">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="16"  isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[  "Educational program: програма " + $P{EDUCATIONAL_PROGRAM_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageFooter>
+		<band height="50"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="50">
+			<textField>
+				<reportElement x="10" y="10" width="780" height="30" uuid="e501d7ca-7529-4949-8266-5cea386d33d9">
+					<property name="net.sf.jasperreports.style.isPdfEmbedded" value="true"/>
+					<property name="net.sf.jasperreports.style.pdfEncoding" value="UTF-8"/>
+					<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["Опитування проведено з " + $P{START_DATE} + " р. по " + $P{END_DATE} + " р. Центром забезпечення якості ДВНЗ «Прикарпатського національного університету імені Василя Стефаника»."]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="450" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="5" y="0" width="800" height="450" isRemoveLineWhenBlank="true" uuid="c8f4dc5d-47e7-489b-b27e-09976d90994a"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset resetType="Report">
+						<datasetRun subDataset="chartDataSet" uuid="abec2dce-b670-4e84-b71f-469d954dbcb5">
+							<dataSourceExpression><![CDATA[$P{CHART_DATASET}]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{stakeholderName}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{question}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{score}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+		</band>
+	</summary>
+</jasperReport>
