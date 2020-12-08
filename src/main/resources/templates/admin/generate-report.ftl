@@ -28,6 +28,11 @@
         </div>
         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
     </form>
+    <#if warningMessage??>
+        <div class="alert alert-danger" role="alert" id="dangerAlert">
+            ${warningMessage}
+        </div>
+    </#if>
 </div>
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
@@ -37,6 +42,7 @@
         $('.select-program').select2();
     });
 
+    //datetimepicker
     $('#datepicker-start').datepicker({
         showOtherMonths: true,
         maxDate: function () {
@@ -49,5 +55,10 @@
             return $('#datepicker-start').val();
         }
     });
+
+    //alert closing
+    setTimeout(function () {
+        $('#dangerAlert').alert('close');
+    }, 5000);
 </script>
 <#include "include/footer.ftl">

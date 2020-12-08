@@ -7,6 +7,7 @@ import com.pnu.dev.pnufeedback.domain.Submission;
 import com.pnu.dev.pnufeedback.dto.AnswerInfoDto;
 import com.pnu.dev.pnufeedback.dto.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
+import com.pnu.dev.pnufeedback.exception.EntityNotFoundException;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
@@ -37,14 +38,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.summingInt;
 
 
 @Slf4j
 @Service
 public class ReportServiceImpl implements ReportService {
 
+    private final static Integer CHART_SPLIT_SIZE = 45;
     private final static String TEMPLATE_PATH = "/reports/report-template.jrxml";
     private final static String REPORT_FILE = "/report.pdf";
     private final static DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
@@ -75,19 +79,36 @@ public class ReportServiceImpl implements ReportService {
 
         EducationalProgram educationalProgram = educationalProgramRepository
                 .findById(Long.valueOf(generateReportDto.getEducationalProgramId()))
-                .orElseThrow(() -> new ServiceException("Educational program not found!"));
+                .orElseThrow(
+                        () -> new ServiceException("Educational program not found!")
+                );
         List<Submission> submissions = submissionRepository
                 .findAllByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDateTime, endDateTime
                 );
 
-        List<AnswerInfoDto> data = getData(submissions);
+        if (submissions.isEmpty()) {
+            throw  new EntityNotFoundException("Dataset by specified dates is empty!");
+        }
+
+        List<Long> submissionIds = submissions.stream()
+                .map(Submission::getId)
+                .collect(Collectors.toList());
+        List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
+        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryRepository.findAll();
+
+        List<AnswerInfoDto> data = getData(scoreAnswers, stakeholderCategories);
+        String stakeholderStatistics = generateStakeHolderStatistics(data, stakeholderCategories.size());
 
         ReportDataDto reportDataDto = new ReportDataDto();
+        reportDataDto.setStakeholderStatistics(stakeholderStatistics);
         reportDataDto.setEducationalProgram(educationalProgram);
         reportDataDto.setStartDate(startDateTime);
         reportDataDto.setEndDate(endDateTime);
         reportDataDto.setData(data);
+        reportDataDto.setChartSplitSize(normalizeChartSplitSize(stakeholderCategories.size()));
+
+        log.debug("All data gathered from: [{}] to: [{}]!", startDateTime, endDateTime);
 
         return reportDataDto;
     }
@@ -100,12 +121,12 @@ public class ReportServiceImpl implements ReportService {
 
         try (ServletOutputStream servletOutputStream = response.getOutputStream()) {
 
-            //InputStream employeeReportStream = getClass().getResourceAsStream(TEMPLATE_PATH);
             Resource resource = new ClassPathResource(TEMPLATE_PATH);
             JasperReport report = JasperCompileManager.compileReport(resource.getInputStream());
 
+            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getData());
             Map<String, Object> parameters = prepareParameters(reportDataDto);
-            JasperPrint print = JasperFillManager.fillReport(report, parameters);
+            JasperPrint print = JasperFillManager.fillReport(report, parameters, beanColDataSource);
 
             JasperExportManager.exportReportToPdfStream(print, servletOutputStream);
 
@@ -118,36 +139,24 @@ public class ReportServiceImpl implements ReportService {
     private Map<String, Object> prepareParameters(ReportDataDto reportDataDto) {
         Map<String, Object> parameters = new HashMap<>();
 
-        JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(reportDataDto.getData());
-        parameters.put("CHART_DATASET", source);
         parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgram().getTitle());
         parameters.put("START_DATE", reportDataDto.getStartDate().toString());
         parameters.put("END_DATE", reportDataDto.getEndDate().toString());
+        parameters.put("STAKEHOLDER_STATISTICS", reportDataDto.getStakeholderStatistics());
+        parameters.put("CHART_SPLIT_SIZE", reportDataDto.getChartSplitSize());
 
         return parameters;
     }
 
-    private List<AnswerInfoDto> getData(List<Submission> submissions) {
+    private List<AnswerInfoDto> getData(
+            List<ScoreAnswer> scoreAnswers,
+            List<StakeholderCategory> stakeholderCategories
+    ) {
         List<AnswerInfoDto> answerInfos = new ArrayList<>();
-
-        List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
-        List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
-        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryRepository.findAll();
-
-        //get all question numbers
-        List<String> questionNumbers = scoreAnswers.stream()
-                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber -> questionNumber.substring(questionNumber.indexOf(".") + 1))
-                .sorted()
-                .distinct()
-                .collect(Collectors.toList());
-        //get all stakeHolder numbers
-        List<String> stakeHolderNumbers = scoreAnswers.stream()
-                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber -> questionNumber.substring(0, questionNumber.indexOf(".")))
-                .sorted()
-                .distinct().collect(Collectors.toList());
-
+        // Get all question numbers
+        List<String> questionNumbers = getQuestionNumbers(scoreAnswers);
+        // Get all stakeHolder numbers
+        List<String> stakeHolderNumbers = getStakeholderNumbers(scoreAnswers);
 
         questionNumbers.stream().forEach(questionNumber -> {
 
@@ -195,4 +204,45 @@ public class ReportServiceImpl implements ReportService {
 
         return main + "." + remainder;
     }
+
+    private String generateStakeHolderStatistics(List<AnswerInfoDto> data, Integer stakeholderAmount){
+        String statistics =  IntStream.range(0, stakeholderAmount)
+                .mapToObj(i->data.get(i))
+                .collect(
+                        Collectors.groupingBy(
+                                AnswerInfoDto::getStakeholderName,
+                                summingInt(AnswerInfoDto::getAnswerAmount)
+                        )
+                ).toString();
+
+        statistics = statistics.substring(1, statistics.length()-1);
+        return statistics;
+    }
+
+    private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers){
+        return scoreAnswers.stream()
+                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
+                .map(questionNumber -> questionNumber.substring(0, questionNumber.indexOf(".")))
+                .sorted()
+                .distinct().collect(Collectors.toList());
+    }
+
+    private List<String> getQuestionNumbers(List<ScoreAnswer> scoreAnswers){
+        return scoreAnswers.stream()
+                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
+                .map(questionNumber -> questionNumber.substring(questionNumber.indexOf(".") + 1))
+                .sorted()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private Integer normalizeChartSplitSize(Integer stakeholderAmount){
+        if (stakeholderAmount < CHART_SPLIT_SIZE) {
+            Integer remainder = CHART_SPLIT_SIZE % stakeholderAmount;
+            return remainder == 0 ? CHART_SPLIT_SIZE : CHART_SPLIT_SIZE - remainder;
+        }
+        return stakeholderAmount;
+    }
+
+
 }

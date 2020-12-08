@@ -16,6 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportDataDto {
     private EducationalProgram educationalProgram;
+    private String stakeholderStatistics;
+    private Integer chartSplitSize;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<AnswerInfoDto> data;
