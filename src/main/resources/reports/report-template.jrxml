@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 7.9.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="700" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="700"  whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+	<subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
+		<field name="stakeholder" class="java.lang.String"/>
+		<field name="content" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="ANSWER_DATASET" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="EDUCATIONAL_PROGRAM_NAME" class="java.lang.String"/>
 	<parameter name="STAKEHOLDER_STATISTICS" class="java.lang.String"/>
 	<parameter name="START_DATE" class="java.lang.String"/>
@@ -25,11 +29,13 @@
 	<group name="charSplitter">
 		<groupExpression><![CDATA[$V{REPORT_COUNT} - 1 - ( ($V{REPORT_COUNT} - 1) % $P{CHART_SPLIT_SIZE} )]]></groupExpression>
 		<groupFooter>
-			<band height="450">
+			<band height="470">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<barChart>
 					<chart>
-						<reportElement stretchType="RelativeToTallestObject" x="8" y="0" width="844" height="450" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932"/>
+						<reportElement stretchType="RelativeToTallestObject" x="7" y="40" width="844" height="430" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
+							<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						</reportElement>
 						<chartTitle>
 							<font fontName="Arial" size="14" isBold="false"/>
 							<titleExpression><![CDATA["Fig. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
@@ -84,7 +90,7 @@
 	<lastPageFooter>
 		<band height="50">
 			<textField>
-				<reportElement x="10" y="10" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
+				<reportElement positionType="Float" x="10" y="10" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
 				<textElement>
 					<font fontName="Tahoma" size="14"/>
 				</textElement>
@@ -92,4 +98,42 @@
 			</textField>
 		</band>
 	</lastPageFooter>
+	<summary>
+		<band height="80" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<componentElement>
+				<reportElement stretchType="ContainerBottom" x="11" y="30" width="839" height="50" forecolor="#1541ED" uuid="694297d6-664c-4048-bf0e-f29918135257">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="openAnswerDataSource" uuid="dd67c2eb-4792-4703-a993-cae35ae59199">
+						<dataSourceExpression><![CDATA[$P{ANSWER_DATASET}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="50" width="839">
+						<textField textAdjust="StretchHeight">
+							<reportElement x="0" y="0" width="839" height="50" isRemoveLineWhenBlank="true" forecolor="#391B8C" uuid="12c40f55-5270-41a7-b806-35cd43778ffe">
+								<property name="com.jaspersoft.studio.unit.height" value="px"/>
+							</reportElement>
+							<box leftPadding="10" rightPadding="10">
+								<pen lineWidth="1.0" lineColor="#241742"/>
+							</box>
+							<textElement textAlignment="Justified">
+								<font fontName="Tahoma" size="14"/>
+								<paragraph lineSpacing="Proportional" lineSpacingSize="2.0"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{stakeholder} + ":  " + $F{content}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<staticText>
+				<reportElement x="360" y="9" width="131" height="21" uuid="be5fd57c-accc-492e-a441-3f5364cf1d6c"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Open answers]]></text>
+			</staticText>
+		</band>
+	</summary>
 </jasperReport>

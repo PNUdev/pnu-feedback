@@ -1,6 +1,5 @@
-package com.pnu.dev.pnufeedback.dto;
+package com.pnu.dev.pnufeedback.dto.report;
 
-import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnswerInfoDto {
-    private StakeholderCategory stakeholderCategory;
+public class ReportAnswerInfoDto {
     private String stakeholderName;
     private String question;
     private Double score;

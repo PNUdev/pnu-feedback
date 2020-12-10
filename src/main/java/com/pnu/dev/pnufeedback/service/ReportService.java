@@ -1,6 +1,6 @@
 package com.pnu.dev.pnufeedback.service;
 
-import com.pnu.dev.pnufeedback.dto.ReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 
 import javax.servlet.http.HttpServletResponse;

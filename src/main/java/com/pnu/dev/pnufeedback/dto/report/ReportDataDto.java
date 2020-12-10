@@ -1,6 +1,5 @@
-package com.pnu.dev.pnufeedback.dto;
+package com.pnu.dev.pnufeedback.dto.report;
 
-import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportDataDto {
-    private EducationalProgram educationalProgram;
+    private String educationalProgramName;
     private String stakeholderStatistics;
     private Integer chartSplitSize;
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<AnswerInfoDto> data;
+    private List<ReportAnswerInfoDto> answerData;
+    private List<ReportOpenAnswerDto> openAnswerData;
 }

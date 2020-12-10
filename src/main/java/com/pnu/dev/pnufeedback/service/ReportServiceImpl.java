@@ -4,12 +4,14 @@ import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
-import com.pnu.dev.pnufeedback.dto.AnswerInfoDto;
-import com.pnu.dev.pnufeedback.dto.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
-import com.pnu.dev.pnufeedback.exception.EntityNotFoundException;
+import com.pnu.dev.pnufeedback.dto.report.ReportAnswerInfoDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
+import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
+import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
@@ -58,15 +60,17 @@ public class ReportServiceImpl implements ReportService {
     private ScoreAnswerRepository scoreAnswerRepository;
     private SubmissionRepository submissionRepository;
     private StakeholderCategoryRepository stakeholderCategoryRepository;
+    private OpenAnswerRepository openAnswerRepository;
 
     public ReportServiceImpl(EducationalProgramRepository educationalProgramRepository,
                              ScoreAnswerRepository scoreAnswerRepository,
                              SubmissionRepository submissionRepository,
-                             StakeholderCategoryRepository stakeholderCategoryRepository) {
+                             StakeholderCategoryRepository stakeholderCategoryRepository, OpenAnswerRepository openAnswerRepository) {
         this.educationalProgramRepository = educationalProgramRepository;
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
         this.stakeholderCategoryRepository = stakeholderCategoryRepository;
+        this.openAnswerRepository = openAnswerRepository;
     }
 
 
@@ -79,33 +83,37 @@ public class ReportServiceImpl implements ReportService {
 
         EducationalProgram educationalProgram = educationalProgramRepository
                 .findById(Long.valueOf(generateReportDto.getEducationalProgramId()))
-                .orElseThrow(
-                        () -> new ServiceException("Educational program not found!")
-                );
+                .orElseThrow(() -> new ServiceException("Educational program not found!"));
         List<Submission> submissions = submissionRepository
                 .findAllByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDateTime, endDateTime
                 );
 
         if (submissions.isEmpty()) {
-            throw  new EntityNotFoundException("Dataset by specified dates is empty!");
+            throw new EmptyReportException(
+                    String.format(
+                    "У системі ще немає опитувань з %s по %s",
+                    generateReportDto.getStartDate(),
+                    generateReportDto.getEndDate()
+            ));
         }
 
-        List<Long> submissionIds = submissions.stream()
-                .map(Submission::getId)
-                .collect(Collectors.toList());
+        List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryRepository.findAll();
 
-        List<AnswerInfoDto> data = getData(scoreAnswers, stakeholderCategories);
-        String stakeholderStatistics = generateStakeHolderStatistics(data, stakeholderCategories.size());
+
+        List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(submissionIds);
+        List<ReportAnswerInfoDto> answerData = getData(scoreAnswers, stakeholderCategories);
+        String stakeholderStatistics = generateStakeHolderStatistics(answerData, stakeholderCategories.size());
 
         ReportDataDto reportDataDto = new ReportDataDto();
         reportDataDto.setStakeholderStatistics(stakeholderStatistics);
-        reportDataDto.setEducationalProgram(educationalProgram);
+        reportDataDto.setEducationalProgramName(educationalProgram.getTitle());
         reportDataDto.setStartDate(startDateTime);
         reportDataDto.setEndDate(endDateTime);
-        reportDataDto.setData(data);
+        reportDataDto.setAnswerData(answerData);
+        reportDataDto.setOpenAnswerData(openAnswerData);
         reportDataDto.setChartSplitSize(normalizeChartSplitSize(stakeholderCategories.size()));
 
         log.debug("All data gathered from: [{}] to: [{}]!", startDateTime, endDateTime);
@@ -124,7 +132,7 @@ public class ReportServiceImpl implements ReportService {
             Resource resource = new ClassPathResource(TEMPLATE_PATH);
             JasperReport report = JasperCompileManager.compileReport(resource.getInputStream());
 
-            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getData());
+            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getAnswerData());
             Map<String, Object> parameters = prepareParameters(reportDataDto);
             JasperPrint print = JasperFillManager.fillReport(report, parameters, beanColDataSource);
 
@@ -139,20 +147,22 @@ public class ReportServiceImpl implements ReportService {
     private Map<String, Object> prepareParameters(ReportDataDto reportDataDto) {
         Map<String, Object> parameters = new HashMap<>();
 
-        parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgram().getTitle());
+        parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgramName());
         parameters.put("START_DATE", reportDataDto.getStartDate().toString());
         parameters.put("END_DATE", reportDataDto.getEndDate().toString());
         parameters.put("STAKEHOLDER_STATISTICS", reportDataDto.getStakeholderStatistics());
         parameters.put("CHART_SPLIT_SIZE", reportDataDto.getChartSplitSize());
+        parameters.put("OPEN_ANSWER_DATASET", reportDataDto.getOpenAnswerData());
+        parameters.put("ANSWER_DATASET", new JRBeanCollectionDataSource(reportDataDto.getOpenAnswerData()));
 
         return parameters;
     }
 
-    private List<AnswerInfoDto> getData(
+    private List<ReportAnswerInfoDto> getData(
             List<ScoreAnswer> scoreAnswers,
             List<StakeholderCategory> stakeholderCategories
     ) {
-        List<AnswerInfoDto> answerInfos = new ArrayList<>();
+        List<ReportAnswerInfoDto> answerInfos = new ArrayList<>();
         // Get all question numbers
         List<String> questionNumbers = getQuestionNumbers(scoreAnswers);
         // Get all stakeHolder numbers
@@ -163,7 +173,7 @@ public class ReportServiceImpl implements ReportService {
             stakeHolderNumbers.stream().forEach(stakeHolderNumber -> {
                 String question = stakeHolderNumber + "." + questionNumber;
                 AtomicInteger count = new AtomicInteger(0);
-                AnswerInfoDto answerInfoDto = new AnswerInfoDto();
+                ReportAnswerInfoDto answerInfoDto = new ReportAnswerInfoDto();
                 AtomicInteger questionScores = new AtomicInteger();
 
                 scoreAnswers.stream()
@@ -174,7 +184,6 @@ public class ReportServiceImpl implements ReportService {
                                     StakeholderCategory stakeholder = stakeholderCategories.stream()
                                             .filter(stakeholderCategory -> stakeholderCategory.getId().toString().equals(stakeHolderNumber))
                                             .findFirst().get();
-                                    answerInfoDto.setStakeholderCategory(stakeholder);
                                     answerInfoDto.setStakeholderName(stakeholder.getTitle());
                                     answerInfoDto.setQuestion(mapQuestionNumber(questionNumber));
                                     answerInfoDto.setAnswerAmount(count.incrementAndGet());
@@ -193,7 +202,7 @@ public class ReportServiceImpl implements ReportService {
         });
 
         return answerInfos.stream()
-                .sorted(Comparator.comparing(AnswerInfoDto::getQuestion))
+                .sorted(Comparator.comparing(ReportAnswerInfoDto::getQuestion))
                 .collect(Collectors.toList());
     }
 
@@ -205,13 +214,13 @@ public class ReportServiceImpl implements ReportService {
         return main + "." + remainder;
     }
 
-    private String generateStakeHolderStatistics(List<AnswerInfoDto> data, Integer stakeholderAmount){
+    private String generateStakeHolderStatistics(List<ReportAnswerInfoDto> data, Integer stakeholderAmount){
         String statistics =  IntStream.range(0, stakeholderAmount)
                 .mapToObj(i->data.get(i))
                 .collect(
                         Collectors.groupingBy(
-                                AnswerInfoDto::getStakeholderName,
-                                summingInt(AnswerInfoDto::getAnswerAmount)
+                                ReportAnswerInfoDto::getStakeholderName,
+                                summingInt(ReportAnswerInfoDto::getAnswerAmount)
                         )
                 ).toString();
 
