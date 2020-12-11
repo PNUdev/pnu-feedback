@@ -42,9 +42,12 @@ public class ReportController {
 
     @PostMapping
     public void generateReport(GenerateReportDto generateReportDto, HttpServletResponse response) {
+
         log.info("Report generation started!");
+
         ReportDataDto reportDataDto = reportService.getReportData(generateReportDto);
         reportService.exportReport(reportDataDto, response);
+
         log.info("File successfully generated");
     }
 }

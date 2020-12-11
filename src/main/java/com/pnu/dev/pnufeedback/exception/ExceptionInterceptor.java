@@ -16,6 +16,7 @@ public class ExceptionInterceptor {
         log.error("Service exception occurred!", serviceException);
 
         model.addAttribute("errorMessage", serviceException.getMessage());
+
         return "main/error";
     }
 
@@ -29,6 +30,7 @@ public class ExceptionInterceptor {
 
     @ExceptionHandler(EmptyReportException.class)
     public String handleException(EmptyReportException exception, RedirectAttributes redirectAttributes) {
+
         log.error("Exception occurred!", exception);
 
         redirectAttributes.addFlashAttribute("warningMessage", exception.getLocalizedMessage());

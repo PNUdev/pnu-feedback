@@ -12,6 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportOpenAnswerJasperDto {
+
     private String stakeholder;
+
     private List<ReportOpenAnswerContentJasperDto> content;
+
 }

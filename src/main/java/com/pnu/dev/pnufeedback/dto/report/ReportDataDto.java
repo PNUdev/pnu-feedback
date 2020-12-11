@@ -14,11 +14,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportDataDto {
+
     private String educationalProgramName;
+
     private String stakeholderStatistics;
+
     private Integer chartSplitSize;
+
     private LocalDate startDate;
+
     private LocalDate endDate;
-    private List<ReportAnswerInfoDto> answerData;
+
+    private List<ReportChartInfoJasperDto> answerData;
+
     private List<ReportOpenAnswerJasperDto> openAnswerData;
+
 }

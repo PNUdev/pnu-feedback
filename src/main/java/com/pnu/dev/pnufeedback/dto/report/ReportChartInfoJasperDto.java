@@ -9,9 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportAnswerInfoDto {
+public class ReportChartInfoJasperDto {
+
     private String stakeholderName;
+
     private String question;
+
     private Double score;
+
     private Integer answerAmount;
+
 }

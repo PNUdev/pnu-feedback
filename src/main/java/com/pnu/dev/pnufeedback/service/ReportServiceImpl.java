@@ -5,7 +5,7 @@ import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportAnswerInfoDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportChartInfoJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
@@ -79,6 +79,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportDataDto getReportData(GenerateReportDto generateReportDto) {
+
         log.debug("Data analyzing has started!");
 
         LocalDate startDateTime = LocalDate.parse(generateReportDto.getStartDate(), DATE_TIME_FORMATTER);
@@ -105,10 +106,9 @@ public class ReportServiceImpl implements ReportService {
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryRepository.findAll();
 
-
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(submissionIds);
-        List<ReportAnswerInfoDto> answerData = getData(scoreAnswers, stakeholderCategories);
-        String stakeholderStatistics = generateStakeHolderStatistics(answerData, stakeholderCategories.size());
+        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(scoreAnswers, stakeholderCategories);
+        String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData, stakeholderCategories.size());
 
         // Data filling up
         ReportDataDto reportDataDto = new ReportDataDto();
@@ -116,8 +116,8 @@ public class ReportServiceImpl implements ReportService {
         reportDataDto.setEducationalProgramName(educationalProgram.getTitle());
         reportDataDto.setStartDate(startDateTime);
         reportDataDto.setEndDate(endDateTime);
-        reportDataDto.setAnswerData(answerData);
-        reportDataDto.setOpenAnswerData(mapToJasperDto(openAnswerData));
+        reportDataDto.setAnswerData(chartAnswerData);
+        reportDataDto.setOpenAnswerData(mapToJasperOpenAnswerDto(openAnswerData));
         reportDataDto.setChartSplitSize(normalizeChartSplitSize(stakeholderCategories.size()));
 
         log.debug("All data gathered from: [{}] to: [{}]!", startDateTime, endDateTime);
@@ -143,12 +143,15 @@ public class ReportServiceImpl implements ReportService {
             JasperExportManager.exportReportToPdfStream(print, servletOutputStream);
 
         } catch (JRException | IOException e) {
+
             log.debug("Error occurred during report generation!", e.getLocalizedMessage());
+
             throw new ServiceException(e.getLocalizedMessage());
         }
     }
 
     private Map<String, Object> prepareParameters(ReportDataDto reportDataDto) {
+
         Map<String, Object> parameters = new HashMap<>();
 
         parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgramName());
@@ -162,11 +165,11 @@ public class ReportServiceImpl implements ReportService {
         return parameters;
     }
 
-    private List<ReportAnswerInfoDto> getData(
+    private List<ReportChartInfoJasperDto> getChartData(
             List<ScoreAnswer> scoreAnswers,
-            List<StakeholderCategory> stakeholderCategories
-    ) {
-        List<ReportAnswerInfoDto> answerInfos = new ArrayList<>();
+            List<StakeholderCategory> stakeholderCategories) {
+
+        List<ReportChartInfoJasperDto> answerInfos = new ArrayList<>();
         // Get all question numbers
         List<String> questionNumbers = getQuestionNumbers(scoreAnswers);
         // Get all stakeHolder numbers
@@ -177,7 +180,7 @@ public class ReportServiceImpl implements ReportService {
             stakeHolderNumbers.stream().forEach(stakeHolderNumber -> {
                 String question = stakeHolderNumber + "." + questionNumber;
                 AtomicInteger count = new AtomicInteger(0);
-                ReportAnswerInfoDto answerInfoDto = new ReportAnswerInfoDto();
+                ReportChartInfoJasperDto answerInfoDto = new ReportChartInfoJasperDto();
                 AtomicInteger questionScores = new AtomicInteger();
 
                 scoreAnswers.stream()
@@ -206,11 +209,12 @@ public class ReportServiceImpl implements ReportService {
         });
 
         return answerInfos.stream()
-                .sorted(Comparator.comparing(ReportAnswerInfoDto::getQuestion))
+                .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestion))
                 .collect(Collectors.toList());
     }
 
     private String mapQuestionNumber(String questionNumber) {
+
         Integer number = Integer.parseInt(questionNumber);
         Integer main = (number / 10) + 1;
         Integer remainder = (number % 10);
@@ -218,29 +222,34 @@ public class ReportServiceImpl implements ReportService {
         return main + "." + remainder;
     }
 
-    private String generateStakeHolderStatistics(List<ReportAnswerInfoDto> data, Integer stakeholderAmount){
+    private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data, Integer stakeholderAmount){
+
         String statistics =  IntStream.range(0, stakeholderAmount)
                 .mapToObj(i->data.get(i))
                 .collect(
                         Collectors.groupingBy(
-                                ReportAnswerInfoDto::getStakeholderName,
-                                summingInt(ReportAnswerInfoDto::getAnswerAmount)
+                                ReportChartInfoJasperDto::getStakeholderName,
+                                summingInt(ReportChartInfoJasperDto::getAnswerAmount)
                         )
                 ).toString();
 
         statistics = statistics.substring(1, statistics.length()-1);
+
         return statistics;
     }
 
     private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers){
+
         return scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
                 .map(questionNumber -> questionNumber.substring(0, questionNumber.indexOf(".")))
                 .sorted()
-                .distinct().collect(Collectors.toList());
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private List<String> getQuestionNumbers(List<ScoreAnswer> scoreAnswers){
+
         return scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
                 .map(questionNumber -> questionNumber.substring(questionNumber.indexOf(".") + 1))
@@ -250,14 +259,19 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private Integer normalizeChartSplitSize(Integer stakeholderAmount){
+
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
+
             Integer remainder = CHART_SPLIT_SIZE % stakeholderAmount;
+
             return remainder == 0 ? CHART_SPLIT_SIZE : CHART_SPLIT_SIZE - remainder;
         }
+
         return stakeholderAmount;
     }
 
-    private List<ReportOpenAnswerJasperDto> mapToJasperDto(List<ReportOpenAnswerDto> list){
+    private List<ReportOpenAnswerJasperDto> mapToJasperOpenAnswerDto(List<ReportOpenAnswerDto> list){
+
         return list.stream()
                 .collect(
                         Collectors.groupingBy(
