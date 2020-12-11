@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 7.9.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="700"  whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="700" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+	<style name="DefaultStyle" isDefault="true" pdfEncoding="CP1251" isPdfEmbedded="true" fontName="Calibri"/>
 	<subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
 		<field name="stakeholder" class="java.lang.String"/>
 		<field name="content" class="java.lang.String"/>
@@ -37,7 +38,7 @@
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						</reportElement>
 						<chartTitle>
-							<font fontName="Arial" size="14" isBold="false"/>
+							<font  size="14" isBold="false"/>
 							<titleExpression><![CDATA["Fig. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
 						</chartTitle>
 						<chartSubtitle/>
@@ -74,14 +75,14 @@
 					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="16" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["  Educational program: програма " + $P{EDUCATIONAL_PROGRAM_NAME}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="10" y="60" width="840" height="40" uuid="08e73aad-a2d1-4efc-a3ab-fd493b83cd1c"/>
 				<textElement>
-					<font fontName="Tahoma" size="14"/>
+					<font size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["By anonymous questionnaire interviewed: " + $P{STAKEHOLDER_STATISTICS} + ".  The results of the survey are shown in the histograms (Fig. 1.1-1.N)"]]></textFieldExpression>
 			</textField>
@@ -92,7 +93,7 @@
 			<textField>
 				<reportElement positionType="Float" x="10" y="10" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
 				<textElement>
-					<font fontName="Tahoma" size="14"/>
+					<font  size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Висновок The survey was conducted from "+ $P{START_DATE} +" to "+ $P{END_DATE} +" by the Center of Quality Assurance of the Vasyl Stefanyk Precarpathian National University"]]></textFieldExpression>
 			</textField>
@@ -119,7 +120,7 @@
 								<pen lineWidth="1.0" lineColor="#241742"/>
 							</box>
 							<textElement textAlignment="Justified">
-								<font fontName="Tahoma" size="14"/>
+								<font  size="14"/>
 								<paragraph lineSpacing="Proportional" lineSpacingSize="2.0"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$F{stakeholder} + ":  " + $F{content}]]></textFieldExpression>
