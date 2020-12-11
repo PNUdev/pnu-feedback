@@ -148,7 +148,7 @@
 				<textElement textAlignment="Center">
 					<font size="18" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Відкриті відповіді]]></text>
+				<text><![CDATA[Пропозиції]]></text>
 			</staticText>
 			<textField>
 				<reportElement positionType="Float" x="11" y="160" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
