@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -62,7 +63,9 @@ public class FeedbackSubmissionController {
     }
 
     @GetMapping
-    public String showFeedbackQuestionsPage(@RequestParam("token") String jwtToken, Model model) {
+    public String showFeedbackQuestionsPage(@RequestParam("token") String jwtToken,
+                                            HttpServletResponse response,
+                                            Model model) {
 
         JwtTokenPayload jwtTokenPayload = jwtTokenService.resolveTokenPayload(jwtToken);
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
@@ -75,6 +78,9 @@ public class FeedbackSubmissionController {
 
         model.addAttribute("scoreQuestions", scoreQuestions);
         model.addAttribute("educationalProgram", educationalProgram);
+
+        enrichResponseWithNoCacheHeaders(response);
+
         return "submission/feedback-submission";
     }
 
@@ -122,6 +128,12 @@ public class FeedbackSubmissionController {
                         .score(Integer.parseInt(entry.getValue()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private void enrichResponseWithNoCacheHeaders(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "-1");
     }
 
 }
