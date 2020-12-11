@@ -69,7 +69,7 @@
 
 <script>
     $(window).bind("pageshow", function () {
-        let form = $('#feedback-submission-form');
+        const form = $('#feedback-submission-form');
         form[0].reset();
     });
 </script>
