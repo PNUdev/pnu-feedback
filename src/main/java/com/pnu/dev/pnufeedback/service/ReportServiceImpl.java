@@ -7,7 +7,9 @@ import com.pnu.dev.pnufeedback.domain.Submission;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportAnswerInfoDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerJasperDto;
 import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
@@ -44,6 +46,7 @@ import java.util.stream.IntStream;
 
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.summingInt;
+import static java.util.stream.Collectors.toList;
 
 
 @Slf4j
@@ -107,13 +110,14 @@ public class ReportServiceImpl implements ReportService {
         List<ReportAnswerInfoDto> answerData = getData(scoreAnswers, stakeholderCategories);
         String stakeholderStatistics = generateStakeHolderStatistics(answerData, stakeholderCategories.size());
 
+        // Data filling up
         ReportDataDto reportDataDto = new ReportDataDto();
         reportDataDto.setStakeholderStatistics(stakeholderStatistics);
         reportDataDto.setEducationalProgramName(educationalProgram.getTitle());
         reportDataDto.setStartDate(startDateTime);
         reportDataDto.setEndDate(endDateTime);
         reportDataDto.setAnswerData(answerData);
-        reportDataDto.setOpenAnswerData(openAnswerData);
+        reportDataDto.setOpenAnswerData(mapToJasperDto(openAnswerData));
         reportDataDto.setChartSplitSize(normalizeChartSplitSize(stakeholderCategories.size()));
 
         log.debug("All data gathered from: [{}] to: [{}]!", startDateTime, endDateTime);
@@ -253,5 +257,24 @@ public class ReportServiceImpl implements ReportService {
         return stakeholderAmount;
     }
 
+    private List<ReportOpenAnswerJasperDto> mapToJasperDto(List<ReportOpenAnswerDto> list){
+        return list.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                ReportOpenAnswerDto::getStakeholder,
+                                Collectors.mapping(
+                                        item-> new ReportOpenAnswerContentJasperDto(item.getContent()),
+                                        toList()
+                                )
+                        )
+                )
+                .entrySet()
+                .stream()
+                .map(e->
+                        new ReportOpenAnswerJasperDto(e.getKey(), e.getValue())
+                )
+                .collect(Collectors.toList());
+
+    }
 
 }

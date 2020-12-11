@@ -5,12 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportOpenAnswerDto {
-    private String stakeholder;
-    private String content;
+public class ReportOpenAnswerContentJasperDto {
+    String content;
 }

@@ -20,5 +20,5 @@ public class ReportDataDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private List<ReportAnswerInfoDto> answerData;
-    private List<ReportOpenAnswerDto> openAnswerData;
+    private List<ReportOpenAnswerJasperDto> openAnswerData;
 }
