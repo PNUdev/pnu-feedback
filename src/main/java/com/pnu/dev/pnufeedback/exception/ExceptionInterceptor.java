@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionInterceptor {
 
-    @ExceptionHandler(ServiceException.class)
+    @ExceptionHandler({ServiceException.class})
     public String handleServiceAdminException(ServiceException serviceException, Model model) {
 
         log.error("Service exception occurred!", serviceException);

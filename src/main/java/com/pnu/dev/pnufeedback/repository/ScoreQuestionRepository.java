@@ -9,4 +9,9 @@ public interface ScoreQuestionRepository extends CrudRepository<ScoreQuestion, L
 
     List<ScoreQuestion> findAllByStakeholderCategoryId(Long stakeholderCategoryId);
 
+    boolean existsByStakeholderCategoryIdAndAndQuestionNumber(Long stakeholderCategoryId, String questionNumber);
+
+    boolean existsByIdNotAndStakeholderCategoryIdAndAndQuestionNumber(Long id,
+                                                                      Long stakeholderCategoryId,
+                                                                      String questionNumber);
 }

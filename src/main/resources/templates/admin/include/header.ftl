@@ -8,5 +8,7 @@
     <div>
         <a class="navbar-brand" href="/admin">Головна</a>
         <a class="navbar-brand" href="/admin/generate-token">Генерація посилання</a>
+        <a class="navbar-brand" href="/admin/stakeholder-categories">Категорії стейкхолдерів</a>
+        <a class="navbar-brand" href="/admin/educational-programs">Освітні програми</a>
     </div>
 </nav>

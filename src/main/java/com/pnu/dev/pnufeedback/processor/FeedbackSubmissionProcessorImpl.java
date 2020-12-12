@@ -64,6 +64,7 @@ public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProces
                     .submissionId(submission.getId())
                     .approved(false)
                     .content(sanitizedContent)
+                    .reviewed(false)
                     .build();
 
             openAnswerRepository.save(openAnswer);
