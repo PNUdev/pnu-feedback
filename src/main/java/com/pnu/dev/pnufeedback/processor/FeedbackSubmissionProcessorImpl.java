@@ -15,6 +15,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,6 +66,7 @@ public class FeedbackSubmissionProcessorImpl implements FeedbackSubmissionProces
                     .approved(false)
                     .content(sanitizedContent)
                     .reviewed(false)
+                    .updatedAt(LocalDateTime.now())
                     .build();
 
             openAnswerRepository.save(openAnswer);

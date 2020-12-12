@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -22,5 +24,7 @@ public class OpenAnswer {
     private boolean approved;
 
     private boolean reviewed;
+
+    private LocalDateTime updatedAt;
 
 }
