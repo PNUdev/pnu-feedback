@@ -75,6 +75,7 @@ public class FeedbackSubmissionController {
 
         model.addAttribute("scoreQuestions", scoreQuestions);
         model.addAttribute("educationalProgram", educationalProgram);
+
         return "submission/feedback-submission";
     }
 

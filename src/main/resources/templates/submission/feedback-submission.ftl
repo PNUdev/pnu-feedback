@@ -22,7 +22,7 @@
                 Освітня програма: ${educationalProgram.title}
             </div>
         </div>
-        <form method="POST">
+        <form method="POST" id="feedback-submission-form">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <#list scoreQuestions as scoreQuestion>
                 <div class="my-3 p-3 rounded bg-light">
@@ -67,5 +67,11 @@
     </div>
 </div>
 
+<script>
+    $(window).bind("pageshow", function () {
+        const form = $('#feedback-submission-form');
+        form[0].reset();
+    });
+</script>
 <#include "../include/footer.ftl">
 
