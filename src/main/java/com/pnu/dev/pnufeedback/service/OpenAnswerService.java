@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface OpenAnswerService {
 
-    Page<OpenAnswer> findAllForReview(Pageable pageable);
+    Page<OpenAnswer> findAllByReviewed(boolean reviewed, Pageable pageable);
 
-    long countUnreviewed();
+    long countByReviewed(boolean reviewed);
 
     OpenAnswer findById(Long id);
 

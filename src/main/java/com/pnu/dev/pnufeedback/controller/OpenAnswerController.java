@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.service.OpenAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,9 +26,21 @@ public class OpenAnswerController {
     }
 
     @GetMapping
-    public String findAllForReview(Model model, @PageableDefault(size = 10) Pageable pageable) {
-        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllForReview(pageable);
+    public String findAllUnreviewed(Model model, @PageableDefault(size = 10, sort = "updatedAt",
+            direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllByReviewed(false, pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
+        model.addAttribute("reviewed", false);
+
+        return "admin/openAnswer/index";
+    }
+
+    @GetMapping("/reviewed")
+    public String findAllReviewed(Model model, @PageableDefault(size = 10, sort = "updatedAt",
+            direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllByReviewed(true, pageable);
+        model.addAttribute("openAnswersPage", openAnswersPage);
+        model.addAttribute("reviewed", true);
 
         return "admin/openAnswer/index";
     }

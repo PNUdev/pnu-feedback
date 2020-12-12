@@ -26,7 +26,7 @@ public class AdminController {
     public String index(Model model) {
 
         long submissionsCount = submissionRepository.count();
-        long unreviewedOpenAnswersCount = openAnswerService.countUnreviewed();
+        long unreviewedOpenAnswersCount = openAnswerService.countByReviewed(true);
         model.addAttribute("submissionsCount", submissionsCount);
         model.addAttribute("unreviewedOpenAnswersCount", unreviewedOpenAnswersCount);
         return "admin/index";

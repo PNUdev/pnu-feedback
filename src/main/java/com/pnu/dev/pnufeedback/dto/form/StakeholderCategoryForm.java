@@ -1,6 +1,5 @@
 package com.pnu.dev.pnufeedback.dto.form;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

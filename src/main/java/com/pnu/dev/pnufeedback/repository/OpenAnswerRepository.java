@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface OpenAnswerRepository extends CrudRepository<OpenAnswer, Long> {
 
-    List<OpenAnswer> findAllByReviewedFalse(Pageable pageable);
+    List<OpenAnswer> findAllByReviewed(boolean reviewed, Pageable pageable);
 
-    long countAllByReviewedFalse();
+    long countAllByReviewed(boolean reviewed);
 }

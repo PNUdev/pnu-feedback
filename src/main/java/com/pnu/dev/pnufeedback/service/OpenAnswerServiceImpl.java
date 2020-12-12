@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class OpenAnswerServiceImpl implements OpenAnswerService {
 
@@ -20,15 +22,15 @@ public class OpenAnswerServiceImpl implements OpenAnswerService {
     }
 
     @Override
-    public Page<OpenAnswer> findAllForReview(Pageable pageable) {
-        return new PageImpl(openAnswerRepository.findAllByReviewedFalse(pageable),
+    public Page<OpenAnswer> findAllByReviewed(boolean reviewed, Pageable pageable) {
+        return new PageImpl(openAnswerRepository.findAllByReviewed(reviewed, pageable),
                 pageable,
-                countUnreviewed());
+                countByReviewed(reviewed));
     }
 
     @Override
-    public long countUnreviewed() {
-        return openAnswerRepository.countAllByReviewedFalse();
+    public long countByReviewed(boolean reviewed) {
+        return openAnswerRepository.countAllByReviewed(false);
     }
 
     @Override
@@ -45,6 +47,7 @@ public class OpenAnswerServiceImpl implements OpenAnswerService {
         OpenAnswer approvedOpenAnswer = openAnswerFromDb.toBuilder()
                 .approved(true)
                 .reviewed(true)
+                .updatedAt(LocalDateTime.now())
                 .build();
         openAnswerRepository.save(approvedOpenAnswer);
     }
@@ -56,6 +59,7 @@ public class OpenAnswerServiceImpl implements OpenAnswerService {
         OpenAnswer disapprovedOpenAnswer = openAnswerFromDb.toBuilder()
                 .approved(false)
                 .reviewed(true)
+                .updatedAt(LocalDateTime.now())
                 .build();
         openAnswerRepository.save(disapprovedOpenAnswer);
 
