@@ -1,6 +1,7 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.OpenAnswer;
+import com.pnu.dev.pnufeedback.dto.ReviewedFilter;
 import com.pnu.dev.pnufeedback.service.OpenAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/admin/open-answers")
@@ -28,21 +30,21 @@ public class OpenAnswerController {
     @GetMapping
     public String findAllUnreviewed(Model model, @PageableDefault(size = 10, sort = "updatedAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllByReviewed(false, pageable);
+        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllUnreviewed(pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
-        model.addAttribute("reviewed", false);
 
         return "admin/openAnswer/index";
     }
 
     @GetMapping("/reviewed")
-    public String findAllReviewed(Model model, @PageableDefault(size = 10, sort = "updatedAt",
+    public String findAllReviewed(@RequestParam(name = "filter", defaultValue = "ALL") ReviewedFilter reviewedFilter,
+                                  Model model, @PageableDefault(size = 10, sort = "updatedAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllByReviewed(true, pageable);
+        Page<OpenAnswer> openAnswersPage = openAnswerService.findAllReviewed(reviewedFilter, pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
-        model.addAttribute("reviewed", true);
+        model.addAttribute("reviewedFilter", reviewedFilter);
 
-        return "admin/openAnswer/index";
+        return "admin/openAnswer/reviewed";
     }
 
     @PostMapping("/approve/{id}")

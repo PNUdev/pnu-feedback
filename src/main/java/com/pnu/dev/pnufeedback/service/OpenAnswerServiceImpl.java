@@ -1,6 +1,7 @@
 package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.OpenAnswer;
+import com.pnu.dev.pnufeedback.dto.ReviewedFilter;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,31 @@ public class OpenAnswerServiceImpl implements OpenAnswerService {
     }
 
     @Override
-    public Page<OpenAnswer> findAllByReviewed(boolean reviewed, Pageable pageable) {
-        return new PageImpl(openAnswerRepository.findAllByReviewed(reviewed, pageable),
+    public Page<OpenAnswer> findAllUnreviewed(Pageable pageable) {
+        return new PageImpl(openAnswerRepository.findAllByReviewed(false, pageable),
                 pageable,
-                countByReviewed(reviewed));
+                countUnreviewed());
     }
 
     @Override
-    public long countByReviewed(boolean reviewed) {
+    public Page<OpenAnswer> findAllReviewed(ReviewedFilter reviewedFilter, Pageable pageable) {
+        if (reviewedFilter == ReviewedFilter.APPROVED) {
+            return new PageImpl(openAnswerRepository.findAllByReviewedAndApproved(true, true, pageable),
+                    pageable,
+                    openAnswerRepository.countAllByReviewedAndApproved(true, true));
+        }
+        if (reviewedFilter == ReviewedFilter.DISAPPROVED) {
+            return new PageImpl(openAnswerRepository.findAllByReviewedAndApproved(true, false, pageable),
+                    pageable,
+                    openAnswerRepository.countAllByReviewedAndApproved(true, false));
+        }
+        return new PageImpl(openAnswerRepository.findAllByReviewed(true, pageable),
+                pageable,
+                openAnswerRepository.countAllByReviewed(true));
+    }
+
+    @Override
+    public long countUnreviewed() {
         return openAnswerRepository.countAllByReviewed(false);
     }
 
