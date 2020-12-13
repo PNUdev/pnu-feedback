@@ -9,10 +9,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class GenerateTokenForm {
 
-    @NotNull
     private String educationalProgramId;
 
     @NotNull
     private String stakeholderCategoryId;
+
+    private boolean allowToChooseEducationalProgram;
 
 }

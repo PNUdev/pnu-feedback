@@ -24,7 +24,9 @@ public class JwtTokenPayloadValidator {
 
     public void validate(JwtTokenPayload jwtTokenPayload) {
 
-        if (!educationalProgramRepository.existsById(jwtTokenPayload.getEducationalProgramId())) {
+        if (!jwtTokenPayload.isAllowToChooseEducationalProgram() &&
+                !educationalProgramRepository.existsById(jwtTokenPayload.getEducationalProgramId())) {
+
             throw new ServiceException("Освітню програму не знайдено!");
         }
 

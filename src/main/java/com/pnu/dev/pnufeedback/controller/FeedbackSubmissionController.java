@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.dto.FeedbackSubmissionDto;
 import com.pnu.dev.pnufeedback.dto.JwtTokenPayload;
 import com.pnu.dev.pnufeedback.dto.ScoreAnswerDto;
+import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.JwtTokenService;
 import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.pnu.dev.pnufeedback.processor.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
+import static java.util.Objects.isNull;
 
 @Controller
 @RequestMapping("/feedback")
@@ -70,11 +72,19 @@ public class FeedbackSubmissionController {
         List<ScoreQuestion> scoreQuestions = scoreQuestionService
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
 
-        EducationalProgram educationalProgram = educationalProgramService
-                .findById(jwtTokenPayload.getEducationalProgramId());
+        boolean allowToChooseEducationalProgram = jwtTokenPayload.isAllowToChooseEducationalProgram();
+        model.addAttribute("allowToChooseEducationalProgram", allowToChooseEducationalProgram);
+
+        if (allowToChooseEducationalProgram) {
+            List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
+            model.addAttribute("allEducationalPrograms", educationalPrograms);
+        } else {
+            EducationalProgram educationalProgram = educationalProgramService
+                    .findById(jwtTokenPayload.getEducationalProgramId());
+            model.addAttribute("educationalProgram", educationalProgram);
+        }
 
         model.addAttribute("scoreQuestions", scoreQuestions);
-        model.addAttribute("educationalProgram", educationalProgram);
 
         return "submission/feedback-submission";
     }
@@ -92,10 +102,12 @@ public class FeedbackSubmissionController {
     @PostMapping
     public String submitFeedback(@RequestParam Map<String, String> parameterMap,
                                  @ModelAttribute("openAnswer") String openAnswer,
+                                 @ModelAttribute("educationalProgramId") String educationalProgramId,
                                  @RequestParam("token") String jwtToken,
                                  RedirectAttributes redirectAttributes) {
 
         JwtTokenPayload jwtTokenPayload = jwtTokenService.resolveTokenPayload(jwtToken);
+
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
         List<ScoreAnswerDto> scoreAnswers = fetchScoreAnswers(parameterMap);
@@ -103,7 +115,7 @@ public class FeedbackSubmissionController {
         FeedbackSubmissionDto feedbackSubmission = FeedbackSubmissionDto.builder()
                 .openAnswer(openAnswer)
                 .scoreAnswers(scoreAnswers)
-                .educationalProgramId(jwtTokenPayload.getEducationalProgramId())
+                .educationalProgramId(resolveEducationalProgramId(jwtTokenPayload, educationalProgramId))
                 .stakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId())
                 .submissionTime(LocalDateTime.now(ZoneId.of("Europe/Kiev")))
                 .build();
@@ -123,6 +135,19 @@ public class FeedbackSubmissionController {
                         .score(Integer.parseInt(entry.getValue()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Long resolveEducationalProgramId(JwtTokenPayload jwtTokenPayload, String educationalProgramIdParam) {
+
+        if (!jwtTokenPayload.isAllowToChooseEducationalProgram()) {
+            return jwtTokenPayload.getEducationalProgramId();
+        }
+
+        if (isNull(educationalProgramIdParam)) {
+            throw new ServiceException("Освітня програма має бути вказана");
+        }
+
+        return Long.parseLong(educationalProgramIdParam);
     }
 
 }

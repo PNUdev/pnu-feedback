@@ -15,6 +15,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .and()
                 .formLogin()
+                .loginPage("/login")
+                .defaultSuccessUrl("/admin")
                 .and()
                 .authorizeRequests()
                 .antMatchers("/admin/**")

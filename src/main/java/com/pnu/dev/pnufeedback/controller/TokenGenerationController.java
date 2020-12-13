@@ -9,6 +9,7 @@ import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,16 +45,16 @@ public class TokenGenerationController {
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
         model.addAttribute("stakeholderCategories", stakeholderCategories);
 
-        return "admin/generate-token";
+        return "admin/token/generate-token";
     }
 
     @PostMapping
-    public String generateToken(GenerateTokenForm generateTokenForm, Model model) {
+    public String generateToken(@Validated GenerateTokenForm generateTokenForm, Model model) {
 
         String jwtTokenLink = jwtTokenService.generateTokenLink(generateTokenForm);
         model.addAttribute("generatedTokenLink", jwtTokenLink);
 
-        return "admin/show-generated-token";
+        return "admin/token/show-generated-token";
     }
 
 }
