@@ -21,16 +21,16 @@
     <div class="mx-auto my-5 col-lg-9">
         <div class="p-3 rounded bg-light educational-program-label">
             <div class="text-center text-wrap mx-auto py-1 px-3 rounded border border-secondary">
-                <#if educationalProgram??>
-                    Освітня програма: ${educationalProgram.title}
-                <#else >
+                <#if allowToChooseEducationalProgram>
                     Опитування ПНУ імені В. Стефаника
+                <#else >
+                    Освітня програма: ${educationalProgram.title}
                 </#if>
             </div>
         </div>
         <form method="POST" id="feedback-submission-form">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-            <#if allEducationalPrograms??>
+            <#if allowToChooseEducationalProgram>
                 <div class="my-3 p-3 rounded bg-light">
                     <div class="m-2 p-1 rounded question-content">
                         Виберіть освітню програму
@@ -95,7 +95,7 @@
     });
 </script>
 
-<#if allEducationalPrograms??>
+<#if allowToChooseEducationalProgram>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script>

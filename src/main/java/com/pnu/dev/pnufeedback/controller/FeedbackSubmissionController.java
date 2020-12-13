@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.pnu.dev.pnufeedback.processor.FeedbackSubmissionProcessorImpl.SUBMISSIONS_QUEUE_TOPIC;
-import static com.pnu.dev.pnufeedback.util.MagicConstants.ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM;
 import static java.util.Objects.isNull;
 
 @Controller
@@ -73,9 +72,9 @@ public class FeedbackSubmissionController {
         List<ScoreQuestion> scoreQuestions = scoreQuestionService
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
 
-        Long educationalProgramId = jwtTokenPayload.getEducationalProgramId();
-
-        if (educationalProgramId == ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM) {
+        boolean allowToChooseEducationalProgram = jwtTokenPayload.isAllowToChooseEducationalProgram();
+        model.addAttribute("allowToChooseEducationalProgram", allowToChooseEducationalProgram);
+        if (allowToChooseEducationalProgram) {
             List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
 
             model.addAttribute("allEducationalPrograms", educationalPrograms);
@@ -111,10 +110,6 @@ public class FeedbackSubmissionController {
 
         JwtTokenPayload jwtTokenPayload = jwtTokenService.resolveTokenPayload(jwtToken);
 
-        if (jwtTokenPayload.getEducationalProgramId() == ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM) {
-            jwtTokenPayload = updateJwtTokenPayloadWithSelectedEducationalProgram(educationalProgramId, jwtTokenPayload);
-        }
-
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
         List<ScoreAnswerDto> scoreAnswers = fetchScoreAnswers(parameterMap);
@@ -122,7 +117,7 @@ public class FeedbackSubmissionController {
         FeedbackSubmissionDto feedbackSubmission = FeedbackSubmissionDto.builder()
                 .openAnswer(openAnswer)
                 .scoreAnswers(scoreAnswers)
-                .educationalProgramId(jwtTokenPayload.getEducationalProgramId())
+                .educationalProgramId(resolveEducationalProgramId(jwtTokenPayload, educationalProgramId))
                 .stakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId())
                 .submissionTime(LocalDateTime.now(ZoneId.of("Europe/Kiev")))
                 .build();
@@ -131,15 +126,6 @@ public class FeedbackSubmissionController {
 
         redirectAttributes.addFlashAttribute(SHOW_AFTER_SUBMITTED_ATTRIBUTE, true);
         return "redirect:/feedback/after-submit";
-    }
-
-    private JwtTokenPayload updateJwtTokenPayloadWithSelectedEducationalProgram(@ModelAttribute("educationalProgramId") String educationalProgramId, JwtTokenPayload jwtTokenPayload) {
-        if (isNull(educationalProgramId)) {
-            throw new ServiceException("Освітня програма має бути вказана");
-        }
-        return jwtTokenPayload.toBuilder()
-                .educationalProgramId(Long.parseLong(educationalProgramId))
-                .build();
     }
 
     private List<ScoreAnswerDto> fetchScoreAnswers(Map<String, String> parameterMap) {
@@ -151,6 +137,19 @@ public class FeedbackSubmissionController {
                         .score(Integer.parseInt(entry.getValue()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Long resolveEducationalProgramId(JwtTokenPayload jwtTokenPayload, String educationalProgramIdParam) {
+
+        if (!jwtTokenPayload.isAllowToChooseEducationalProgram()) {
+            return jwtTokenPayload.getEducationalProgramId();
+        }
+
+        if (isNull(educationalProgramIdParam)) {
+            throw new ServiceException("Освітня програма має бути вказана");
+        }
+
+        return Long.parseLong(educationalProgramIdParam);
     }
 
 }

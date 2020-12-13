@@ -15,4 +15,6 @@ public class JwtTokenPayload {
 
     private Long stakeholderCategoryId;
 
+    private boolean allowToChooseEducationalProgram;
+
 }

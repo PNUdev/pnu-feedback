@@ -10,12 +10,16 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import static java.util.Objects.nonNull;
+
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
 
-    private static final String EDUCATIONAL_PROGRAM_ID = "educationalProgramId";
+    private static final String EDUCATIONAL_PROGRAM_ID = "e";
 
-    private static final String STAKEHOLDER_CATEGORY_ID = "stakeholderCategoryId";
+    private static final String STAKEHOLDER_CATEGORY_ID = "s";
+
+    private static final String ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM_ID = "c";
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -29,6 +33,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         Claims claims = Jwts.claims();
         claims.put(EDUCATIONAL_PROGRAM_ID, generateTokenForm.getEducationalProgramId());
         claims.put(STAKEHOLDER_CATEGORY_ID, generateTokenForm.getStakeholderCategoryId());
+        claims.put(ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM_ID, generateTokenForm.isAllowToChooseEducationalProgram());
 
         String jwtToken = Jwts.builder()
                 .setClaims(claims)
@@ -49,16 +54,23 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
             String educationalProgramId = claims.get(EDUCATIONAL_PROGRAM_ID, String.class);
             String stakeholderCategoryId = claims.get(STAKEHOLDER_CATEGORY_ID, String.class);
+            Boolean allowToChooseEducationalProgram = claims
+                    .get(ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM_ID, Boolean.class);
 
             return JwtTokenPayload.builder()
-                    .educationalProgramId(Long.parseLong(educationalProgramId))
+                    .educationalProgramId(convertEducationalProgramId(educationalProgramId))
                     .stakeholderCategoryId(Long.parseLong(stakeholderCategoryId))
+                    .allowToChooseEducationalProgram(allowToChooseEducationalProgram)
                     .build();
 
         } catch (JwtException | IllegalArgumentException e) {
             throw new ServiceException("Невалідне посилання");
         }
 
+    }
+
+    private Long convertEducationalProgramId(String educationalProgramId) {
+        return nonNull(educationalProgramId) ? Long.parseLong(educationalProgramId) : null;
     }
 
 }
