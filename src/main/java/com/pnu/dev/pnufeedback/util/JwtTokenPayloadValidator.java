@@ -7,6 +7,8 @@ import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.pnu.dev.pnufeedback.util.MagicConstants.ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM;
+
 @Component
 public class JwtTokenPayloadValidator {
 
@@ -24,7 +26,10 @@ public class JwtTokenPayloadValidator {
 
     public void validate(JwtTokenPayload jwtTokenPayload) {
 
-        if (!educationalProgramRepository.existsById(jwtTokenPayload.getEducationalProgramId())) {
+        Long educationalProgramId = jwtTokenPayload.getEducationalProgramId();
+        if (educationalProgramId != ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM &&
+                !educationalProgramRepository.existsById(educationalProgramId)) {
+
             throw new ServiceException("Освітню програму не знайдено!");
         }
 

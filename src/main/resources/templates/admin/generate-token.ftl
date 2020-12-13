@@ -1,10 +1,13 @@
 <#include "include/header.ftl">
-
+<!-- Reflected in Java code as MagicConstants.ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM -->
+<#assign ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM='-33'/>
 <div class="col-md-10 mt-5 px-5 pb-2 pt-4 rounded bg-light mx-auto">
     <form method="POST">
         <div class="input-group mb-3">
             <select class="select-program col-md-12" name="educationalProgramId" required>
                 <option value="" disabled selected>Виберіть освітню програму</option>
+                <option value="${ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM}">Дозволити вибір при проходженні опитування
+                </option>
                 <#list educationalPrograms as educationalProgram>
                     <option value="${educationalProgram.id}">${educationalProgram.title}</option>
                 </#list>
