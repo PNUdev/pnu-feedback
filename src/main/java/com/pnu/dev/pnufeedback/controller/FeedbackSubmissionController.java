@@ -74,17 +74,15 @@ public class FeedbackSubmissionController {
 
         boolean allowToChooseEducationalProgram = jwtTokenPayload.isAllowToChooseEducationalProgram();
         model.addAttribute("allowToChooseEducationalProgram", allowToChooseEducationalProgram);
+
         if (allowToChooseEducationalProgram) {
             List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
-
             model.addAttribute("allEducationalPrograms", educationalPrograms);
         } else {
             EducationalProgram educationalProgram = educationalProgramService
                     .findById(jwtTokenPayload.getEducationalProgramId());
-
             model.addAttribute("educationalProgram", educationalProgram);
         }
-
 
         model.addAttribute("scoreQuestions", scoreQuestions);
 
