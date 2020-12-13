@@ -1,4 +1,4 @@
-<#include "include/header.ftl">
+<#include "../include/header.ftl">
 <!-- Reflected in Java code as MagicConstants.ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM -->
 <#assign ALLOW_TO_CHOOSE_EDUCATIONAL_PROGRAM='-33'/>
 <div class="col-md-10 mt-5 px-5 pb-2 pt-4 rounded bg-light mx-auto">
@@ -37,4 +37,4 @@
     });
 </script>
 
-<#include "include/footer.ftl">
+<#include "../include/footer.ftl">

@@ -1,4 +1,4 @@
-<#include "include/header.ftl">
+<#include "../include/header.ftl">
 
 <div class="col-md-10 mt-5 px-5 pb-2 pt-4 rounded bg-light mx-auto">
 
@@ -24,4 +24,4 @@
     }
 </script>
 
-<#include "include/footer.ftl">
+<#include "../include/footer.ftl">

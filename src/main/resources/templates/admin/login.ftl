@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Адміністрація</title>
+    <title>Moderator panel</title>
     <#include "../include/coreDependencies.ftl">
 </head>
 <body>

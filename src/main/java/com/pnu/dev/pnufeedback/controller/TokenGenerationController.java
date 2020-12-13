@@ -44,7 +44,7 @@ public class TokenGenerationController {
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
         model.addAttribute("stakeholderCategories", stakeholderCategories);
 
-        return "admin/generate-token";
+        return "admin/token/generate-token";
     }
 
     @PostMapping
@@ -53,7 +53,7 @@ public class TokenGenerationController {
         String jwtTokenLink = jwtTokenService.generateTokenLink(generateTokenForm);
         model.addAttribute("generatedTokenLink", jwtTokenLink);
 
-        return "admin/show-generated-token";
+        return "admin/token/show-generated-token";
     }
 
 }
