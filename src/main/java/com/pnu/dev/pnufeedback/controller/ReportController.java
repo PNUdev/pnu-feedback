@@ -3,8 +3,9 @@ package com.pnu.dev.pnufeedback.controller;
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
-import com.pnu.dev.pnufeedback.repository.EducationalProgramRepository;
-import com.pnu.dev.pnufeedback.service.ReportService;
+import com.pnu.dev.pnufeedback.service.EducationalProgramService;
+import com.pnu.dev.pnufeedback.service.ReportBuilderService;
+import com.pnu.dev.pnufeedback.service.ReportDataPreparationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,20 +22,24 @@ import java.util.List;
 @RequestMapping("/admin/generate-report")
 public class ReportController {
 
-    private EducationalProgramRepository educationalProgramRepository;
-    private ReportService reportService;
+    private ReportBuilderService reportBuilderService;
+    private ReportDataPreparationService reportDataPreparationService;
+    private EducationalProgramService educationalProgramService;
 
     @Autowired
-    public ReportController(EducationalProgramRepository educationalProgramRepository,
-                            ReportService reportService) {
-        this.educationalProgramRepository = educationalProgramRepository;
-        this.reportService = reportService;
+    public ReportController(
+            ReportBuilderService reportBuilderService,
+            ReportDataPreparationService reportDataPreparationService,
+            EducationalProgramService educationalProgramService) {
+        this.reportBuilderService = reportBuilderService;
+        this.reportDataPreparationService = reportDataPreparationService;
+        this.educationalProgramService = educationalProgramService;
     }
 
     @GetMapping
     public String showGenerateReportPage(Model model) {
 
-        List<EducationalProgram> educationalPrograms = educationalProgramRepository.findAll();
+        List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
         model.addAttribute("educationalPrograms", educationalPrograms);
 
         return "admin/generate-report";
@@ -45,8 +50,8 @@ public class ReportController {
 
         log.info("Report generation started!");
 
-        ReportDataDto reportDataDto = reportService.getReportData(generateReportDto);
-        reportService.exportReport(reportDataDto, response);
+        ReportDataDto reportDataDto = reportDataPreparationService.getReportData(generateReportDto);
+        reportBuilderService.exportReport(reportDataDto, response);
 
         log.info("File successfully generated");
     }
