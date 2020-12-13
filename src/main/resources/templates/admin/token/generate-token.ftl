@@ -13,7 +13,6 @@
                 <select class="select-program col-md-12" name="educationalProgramId" id="educationalProgramSelect"
                         required>
                     <option value="" disabled selected>Виберіть освітню програму</option>
-                    </option>
                     <#list educationalPrograms as educationalProgram>
                         <option value="${educationalProgram.id}">${educationalProgram.title}</option>
                     </#list>
@@ -45,6 +44,7 @@
         $('#allowToChooseEducationalProgram').change(function () {
             const educationalProgramSelect = $('#educationalProgramSelect')
             if (this.checked) {
+                educationalProgramSelect.val('').trigger('change');
                 educationalProgramSelect.prop('disabled', true);
                 educationalProgramSelect.prop('required', false);
             } else {
