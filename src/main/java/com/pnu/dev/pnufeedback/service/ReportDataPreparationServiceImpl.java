@@ -114,31 +114,31 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<String> stakeHolderNumbers = getStakeholderNumbers(scoreAnswers);
 
         List<ReportChartInfoJasperDto> answerInfos = questionNumbers.stream()
-                .flatMap(questionNumber -> stakeHolderNumbers.stream()
-                    .map(stakeHolderNumber -> {
+            .flatMap(questionNumber -> stakeHolderNumbers.stream()
+                .map(stakeHolderNumber -> {
 
-                        String question = stakeHolderNumber + "." + questionNumber;
-                        AtomicInteger questionScores = new AtomicInteger(0);
+                    String question = stakeHolderNumber + "." + questionNumber;
+                    AtomicInteger questionScores = new AtomicInteger(0);
 
-                        Long stakeholderAnswerCount = scoreAnswers.stream()
-                            .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
-                            .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
-                            .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
-                            .count();
+                    Long stakeholderAnswerCount = scoreAnswers.stream()
+                        .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
+                        .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
+                        .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
+                        .count();
 
-                        // Find stakeholder by title
-                        StakeholderCategory stakeholder = stakeholderCategories.stream()
-                                .filter(stakeholderCategory -> stakeholderCategory
-                                                .getId().toString().equals(stakeHolderNumber)
-                                )
-                                .findFirst().get();
+                    // Find stakeholder by title
+                    StakeholderCategory stakeholder = stakeholderCategories.stream()
+                        .filter(stakeholderCategory -> stakeholderCategory
+                            .getId().toString().equals(stakeHolderNumber)
+                        )
+                        .findFirst().get();
 
 
-                        return ReportChartInfoJasperDto.builder()
-                                .stakeholderName(stakeholder.getTitle())
-                                .question(mapQuestionNumber(questionNumber))
-                                .score(questionScores.doubleValue() / stakeholderAnswerCount)
-                                .answerAmount(stakeholderAnswerCount.intValue()).build();
+                    return ReportChartInfoJasperDto.builder()
+                        .stakeholderName(stakeholder.getTitle())
+                        .question(mapQuestionNumber(questionNumber))
+                        .score(questionScores.doubleValue() / stakeholderAnswerCount)
+                        .answerAmount(stakeholderAnswerCount.intValue()).build();
 
 
                 }))
@@ -157,27 +157,27 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return main + "." + remainder;
     }
 
-    private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data){
+    private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
 
         Map<String, Double> statisticsMap = data.stream()
-             .collect(
+            .collect(
                  Collectors.groupingBy(
-                     ReportChartInfoJasperDto::getStakeholderName,
-                     averagingInt(ReportChartInfoJasperDto::getAnswerAmount)
-                 )
-             );
+                      ReportChartInfoJasperDto::getStakeholderName,
+                           averagingInt(ReportChartInfoJasperDto::getAnswerAmount)
+                      )
+            );
 
         String keyStatistics = statisticsMap.entrySet().stream()
-                .map(e->e.getKey() + " = %s").collect(toList()).toString();
+                .map(e -> e.getKey() + " = %s").collect(toList()).toString();
         List<Integer> valueStatistics = statisticsMap.entrySet().stream()
-                .map(e->e.getValue().intValue()).collect(toList());
+                .map(e -> e.getValue().intValue()).collect(toList());
 
-        String statistics = keyStatistics.substring(1, keyStatistics.length()-1);
+        String statistics = keyStatistics.substring(1, keyStatistics.length() - 1);
 
         return String.format(statistics, valueStatistics.toArray());
     }
 
-    private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers){
+    private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers) {
 
         return scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
@@ -187,7 +187,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .collect(Collectors.toList());
     }
 
-    private List<String> getQuestionNumbers(List<ScoreAnswer> scoreAnswers){
+    private List<String> getQuestionNumbers(List<ScoreAnswer> scoreAnswers) {
 
         return scoreAnswers.stream()
                 .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
@@ -197,7 +197,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .collect(Collectors.toList());
     }
 
-    private Integer normalizeChartSplitSize(Integer stakeholderAmount){
+    private Integer normalizeChartSplitSize(Integer stakeholderAmount) {
 
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
 
@@ -209,21 +209,21 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return stakeholderAmount;
     }
 
-    private List<ReportOpenAnswerJasperDto> mapToJasperOpenAnswerDto(List<ReportOpenAnswerDto> list){
+    private List<ReportOpenAnswerJasperDto> mapToJasperOpenAnswerDto(List<ReportOpenAnswerDto> list) {
 
         return list.stream()
                 .collect(
                         Collectors.groupingBy(
                                 ReportOpenAnswerDto::getStakeholder,
                                 Collectors.mapping(
-                                        item-> new ReportOpenAnswerContentJasperDto(item.getContent()),
+                                        item -> new ReportOpenAnswerContentJasperDto(item.getContent()),
                                         toList()
                                 )
                         )
                 )
                 .entrySet()
                 .stream()
-                .map(e->
+                .map(e ->
                         new ReportOpenAnswerJasperDto(e.getKey(), e.getValue())
                 )
                 .collect(Collectors.toList());
