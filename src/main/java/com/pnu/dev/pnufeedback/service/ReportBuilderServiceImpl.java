@@ -1,5 +1,6 @@
 package com.pnu.dev.pnufeedback.service;
 
+import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,17 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
     private final static String TEMPLATE_PATH = "/reports/report-template.jrxml";
     private final static String REPORT_FILE = "/report.pdf";
 
+    private ReportDataPreparationService reportDataPreparationService;
+
+    public ReportBuilderServiceImpl(ReportDataPreparationService reportDataPreparationService) {
+        this.reportDataPreparationService = reportDataPreparationService;
+    }
+
 
     @Override
-    public void exportReport(ReportDataDto reportDataDto, HttpServletResponse response) {
+    public void exportReport(GenerateReportDto generateReportDto, HttpServletResponse response) {
+
+        ReportDataDto reportDataDto = reportDataPreparationService.getReportData(generateReportDto);
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=" + REPORT_FILE);

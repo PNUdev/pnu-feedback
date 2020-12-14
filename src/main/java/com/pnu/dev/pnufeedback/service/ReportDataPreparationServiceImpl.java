@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -114,40 +113,35 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<String> questionNumbers = getQuestionNumbers(scoreAnswers);
         List<String> stakeHolderNumbers = getStakeholderNumbers(scoreAnswers);
 
-        List<ReportChartInfoJasperDto> answerInfos = new ArrayList<>();
+        List<ReportChartInfoJasperDto> answerInfos = questionNumbers.stream()
+                .flatMap(questionNumber -> stakeHolderNumbers.stream()
+                    .map(stakeHolderNumber -> {
 
-        questionNumbers.forEach(questionNumber -> {
+                        String question = stakeHolderNumber + "." + questionNumber;
+                        AtomicInteger questionScores = new AtomicInteger(0);
 
-            stakeHolderNumbers.forEach(stakeHolderNumber -> {
+                        Long stakeholderAnswerCount = scoreAnswers.stream()
+                            .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
+                            .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
+                            .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
+                            .count();
 
-                String question = stakeHolderNumber + "." + questionNumber;
-                AtomicInteger questionScores = new AtomicInteger(0);
-
-                Long stakeholderAnswerCount = scoreAnswers.stream()
-                    .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
-                    .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
-                    .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
-                    .count();
-
-                // Find stakeholder by title
-                StakeholderCategory stakeholder = stakeholderCategories.stream()
-                        .filter(stakeholderCategory -> stakeholderCategory
-                                        .getId().toString().equals(stakeHolderNumber)
-                        )
-                        .findFirst().get();
+                        // Find stakeholder by title
+                        StakeholderCategory stakeholder = stakeholderCategories.stream()
+                                .filter(stakeholderCategory -> stakeholderCategory
+                                                .getId().toString().equals(stakeHolderNumber)
+                                )
+                                .findFirst().get();
 
 
-                ReportChartInfoJasperDto resultAnswerInfoDto = ReportChartInfoJasperDto.builder()
-                        .stakeholderName(stakeholder.getTitle())
-                        .question(mapQuestionNumber(questionNumber))
-                        .score(questionScores.doubleValue() / stakeholderAnswerCount)
-                        .answerAmount(stakeholderAnswerCount.intValue()).build();
+                        return ReportChartInfoJasperDto.builder()
+                                .stakeholderName(stakeholder.getTitle())
+                                .question(mapQuestionNumber(questionNumber))
+                                .score(questionScores.doubleValue() / stakeholderAnswerCount)
+                                .answerAmount(stakeholderAnswerCount.intValue()).build();
 
-                answerInfos.add(resultAnswerInfoDto);
 
-            });
-
-        });
+                })).collect(Collectors.toList());
 
         return answerInfos.stream()
                 .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestion))

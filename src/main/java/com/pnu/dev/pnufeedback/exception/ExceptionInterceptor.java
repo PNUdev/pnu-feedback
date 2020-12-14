@@ -35,7 +35,7 @@ public class ExceptionInterceptor {
 
         redirectAttributes.addFlashAttribute("warningMessage", exception.getLocalizedMessage());
 
-        return "redirect:/admin/generate-report";
+        return "redirect:/admin/report/generate-report";
     }
 
 }

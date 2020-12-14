@@ -2,10 +2,8 @@ package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.ReportBuilderService;
-import com.pnu.dev.pnufeedback.service.ReportDataPreparationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,16 +22,13 @@ import java.util.List;
 public class ReportController {
 
     private ReportBuilderService reportBuilderService;
-    private ReportDataPreparationService reportDataPreparationService;
     private EducationalProgramService educationalProgramService;
 
     @Autowired
     public ReportController(
             ReportBuilderService reportBuilderService,
-            ReportDataPreparationService reportDataPreparationService,
             EducationalProgramService educationalProgramService) {
         this.reportBuilderService = reportBuilderService;
-        this.reportDataPreparationService = reportDataPreparationService;
         this.educationalProgramService = educationalProgramService;
     }
 
@@ -43,7 +38,7 @@ public class ReportController {
         List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
         model.addAttribute("educationalPrograms", educationalPrograms);
 
-        return "admin/generate-report";
+        return "admin/report/generate-report";
     }
 
     @PostMapping
@@ -51,8 +46,7 @@ public class ReportController {
 
         log.info("Report generation started!");
 
-        ReportDataDto reportDataDto = reportDataPreparationService.getReportData(generateReportDto);
-        reportBuilderService.exportReport(reportDataDto, response);
+        reportBuilderService.exportReport(generateReportDto, response);
 
         log.info("File successfully generated");
     }
