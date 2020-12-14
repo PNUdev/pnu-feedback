@@ -141,11 +141,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                 .answerAmount(stakeholderAnswerCount.intValue()).build();
 
 
-                })).collect(Collectors.toList());
-
-        return answerInfos.stream()
+                }))
                 .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestion))
                 .collect(Collectors.toList());
+
+        return answerInfos;
     }
 
     private String mapQuestionNumber(String questionNumber) {
