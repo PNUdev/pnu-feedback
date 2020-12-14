@@ -169,13 +169,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
             );
 
         String keyStatistics = statisticsMap.entrySet().stream()
-                .map(e->e.getKey()).collect(joining(" = %s, "));
+                .map(e->e.getKey() + " - %s").collect(joining(", "));
         List<Integer> valueStatistics = statisticsMap.entrySet().stream()
                 .map(e -> e.getValue().intValue()).collect(Collectors.toList());
 
-        String statistics = keyStatistics.substring(1, keyStatistics.length() - 1);
-
-        return String.format(statistics, valueStatistics.toArray());
+        return String.format(keyStatistics, valueStatistics.toArray());
     }
 
     private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers) {
