@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -168,9 +169,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
             );
 
         String keyStatistics = statisticsMap.entrySet().stream()
-                .map(e -> e.getKey() + " = %s").collect(toList()).toString();
+                .map(e->e.getKey()).collect(joining(" = %s, "));
         List<Integer> valueStatistics = statisticsMap.entrySet().stream()
-                .map(e -> e.getValue().intValue()).collect(toList());
+                .map(e -> e.getValue().intValue()).collect(Collectors.toList());
 
         String statistics = keyStatistics.substring(1, keyStatistics.length() - 1);
 
