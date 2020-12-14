@@ -47,7 +47,7 @@ class DbSetupUtil {
         stakeholderCategoryRepository.saveAll(stakeholderCategories);
 
         List<ScoreQuestion> scoreQuestions = IntStream.range(1, 5)
-                .mapToObj(idx -> IntStream.range(1, 5)
+                .mapToObj(idx -> IntStream.range(1, 25)
                         .mapToObj(iidx -> ScoreQuestion.builder()
                                 .questionNumber("" + idx + "." + iidx)
                                 .stakeholderCategoryId((long) idx)

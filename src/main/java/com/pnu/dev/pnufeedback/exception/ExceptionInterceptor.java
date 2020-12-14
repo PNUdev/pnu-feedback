@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @ControllerAdvice
@@ -15,6 +16,7 @@ public class ExceptionInterceptor {
         log.error("Service exception occurred!", serviceException);
 
         model.addAttribute("errorMessage", serviceException.getMessage());
+
         return "main/error";
     }
 
@@ -24,6 +26,16 @@ public class ExceptionInterceptor {
         log.error("Exception occurred!", exception);
 
         return "redirect:/";
+    }
+
+    @ExceptionHandler(EmptyReportException.class)
+    public String handleException(EmptyReportException exception, RedirectAttributes redirectAttributes) {
+
+        log.error("Exception occurred!", exception);
+
+        redirectAttributes.addFlashAttribute("warningMessage", exception.getLocalizedMessage());
+
+        return "redirect:/admin/report/generate-report";
     }
 
 }
