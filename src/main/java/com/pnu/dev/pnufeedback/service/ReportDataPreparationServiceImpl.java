@@ -14,6 +14,7 @@ import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -45,16 +47,20 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private EducationalProgramService educationalProgramService;
     private StakeholderCategoryService stakeholderCategoryService;
 
+    private ScoreQuestionComparator scoreQuestionComparator;
+
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
                                             SubmissionRepository submissionRepository,
                                             OpenAnswerRepository openAnswerRepository,
                                             EducationalProgramService educationalProgramService,
-                                            StakeholderCategoryService stakeholderCategoryService) {
+                                            StakeholderCategoryService stakeholderCategoryService,
+                                            ScoreQuestionComparator scoreQuestionComparator) {
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
         this.openAnswerRepository = openAnswerRepository;
         this.educationalProgramService = educationalProgramService;
         this.stakeholderCategoryService = stakeholderCategoryService;
+        this.scoreQuestionComparator = scoreQuestionComparator;
     }
 
     @Override
@@ -89,7 +95,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
 
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(submissionIds);
-        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(scoreAnswers, stakeholderCategories);
+        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(scoreAnswers, stakeholderCategories, submissions);
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
         // Data filling up
@@ -107,55 +113,45 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return reportDataDto;
     }
 
-    private List<ReportChartInfoJasperDto> getChartData(
-            List<ScoreAnswer> scoreAnswers,
-            List<StakeholderCategory> stakeholderCategories) {
-
-        List<String> questionNumbers = getQuestionNumbers(scoreAnswers);
-        List<String> stakeHolderNumbers = getStakeholderNumbers(scoreAnswers);
-
-        List<ReportChartInfoJasperDto> answerInfos = questionNumbers.stream()
-            .flatMap(questionNumber -> stakeHolderNumbers.stream()
-                .map(stakeHolderNumber -> {
-
-                    String question = stakeHolderNumber + "." + questionNumber;
-                    AtomicInteger questionScores = new AtomicInteger(0);
-
-                    Long stakeholderAnswerCount = scoreAnswers.stream()
-                        .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
-                        .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(question))
-                        .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
-                        .count();
-
-                    // Find stakeholder by title
-                    StakeholderCategory stakeholder = stakeholderCategories.stream()
-                        .filter(stakeholderCategory -> stakeholderCategory
-                            .getId().toString().equals(stakeHolderNumber)
-                        )
-                        .findFirst().get();
+    private List<ReportChartInfoJasperDto> getChartData(List<ScoreAnswer> scoreAnswers,
+                                                        List<StakeholderCategory> stakeholderCategories,
+                                                        List<Submission> submissions) {
 
 
-                    return ReportChartInfoJasperDto.builder()
-                        .stakeholderName(stakeholder.getTitle())
-                        .question(mapQuestionNumber(questionNumber))
-                        .score(questionScores.doubleValue() / stakeholderAnswerCount)
-                        .answerAmount(stakeholderAnswerCount.intValue()).build();
 
+        return scoreAnswers.stream()
+                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
+                .sorted()
+                .distinct()
+                .flatMap(questionNumber -> stakeholderCategories.stream()
+                        .sorted(Comparator.comparing(StakeholderCategory::getId))
+                                .map(stakeholderCategory -> {
+
+                                        AtomicInteger questionScores = new AtomicInteger(0);
+
+                                        List<Long> categoryStakeholderSubmissionIds = submissions.stream()
+                                                .filter(submission -> submission.getStakeholderCategoryId()
+                                                        .equals(stakeholderCategory.getId())
+                                                ).map(submission -> submission.getId()).collect(toList());
+
+                                        Long stakeholderAnswerCount = scoreAnswers.stream()
+                                                .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
+                                                .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
+                                                .filter(scoreAnswer ->  categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
+                                                .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
+                                                .count();
+
+                                        return ReportChartInfoJasperDto.builder()
+                                                .stakeholderName(stakeholderCategory.getTitle())
+                                                .question(questionNumber)
+                                                .score(questionScores.doubleValue() / stakeholderAnswerCount)
+                                                .answerAmount(stakeholderAnswerCount.intValue()).build();
 
                 }))
+                .filter(reportChartInfoJasperDto -> reportChartInfoJasperDto.getAnswerAmount() != 0)
                 .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestion))
                 .collect(Collectors.toList());
 
-        return answerInfos;
-    }
-
-    private String mapQuestionNumber(String questionNumber) {
-
-        Integer number = Integer.parseInt(questionNumber);
-        Integer main = (number / 10) + 1;
-        Integer remainder = (number % 10);
-
-        return main + "." + remainder;
     }
 
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
@@ -176,25 +172,6 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return String.format(keyStatistics, valueStatistics.toArray());
     }
 
-    private List<String> getStakeholderNumbers(List<ScoreAnswer> scoreAnswers) {
-
-        return scoreAnswers.stream()
-                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber -> questionNumber.substring(0, questionNumber.indexOf(".")))
-                .sorted()
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private List<String> getQuestionNumbers(List<ScoreAnswer> scoreAnswers) {
-
-        return scoreAnswers.stream()
-                .map(scoreAnswer -> scoreAnswer.getQuestionNumber())
-                .map(questionNumber -> questionNumber.substring(questionNumber.indexOf(".") + 1))
-                .sorted()
-                .distinct()
-                .collect(Collectors.toList());
-    }
 
     private Integer normalizeChartSplitSize(Integer stakeholderAmount) {
 
