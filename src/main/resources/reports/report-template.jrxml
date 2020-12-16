@@ -43,7 +43,7 @@
 						</reportElement>
 						<chartTitle>
 							<font size="14" isBold="false"/>
-							<titleExpression><![CDATA["Мал. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
+							<titleExpression><![CDATA["Рис. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
 						</chartTitle>
 						<chartSubtitle/>
 						<chartLegend/>
