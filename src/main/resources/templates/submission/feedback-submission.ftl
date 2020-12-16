@@ -67,20 +67,20 @@
                                 ${scoreQuestion.content}
                             </div>
                             <hr/>
-                            <div class="mt-2">
-                                <#list scoreAnswerOptions as score, content>
-                                    <div class="form-check mt-2 d-flex">
-                                        <#assign inputId = "inlineRadio-${scoreQuestion.id}-${score}">
-                                        <input class="form-check-input align-self-center" type="radio"
-                                               name="${SCORE_QUESTION_PARAM_PREFIX}${scoreQuestion.questionNumber}"
-                                               id="${inputId}"
-                                               value="${score}" required>
-                                        <label class="ml-2 form-check-label align-self-center"
-                                               for="${inputId}">${content}</label>
-                                    </div>
-                                </#list>
-                            </div>
                         </div>
+                    </div>
+                    <div class="ml-3 pb-1">
+                        <#list scoreAnswerOptions as score, content>
+                            <div class="form-check mt-2 d-flex">
+                                <#assign inputId = "inlineRadio-${scoreQuestion.id}-${score}">
+                                <input class="form-check-input align-self-center" type="radio"
+                                       name="${SCORE_QUESTION_PARAM_PREFIX}${scoreQuestion.questionNumber}"
+                                       id="${inputId}"
+                                       value="${score}" required>
+                                <label class="ml-2 form-check-label align-self-center"
+                                       for="${inputId}">${content}</label>
+                            </div>
+                        </#list>
                     </div>
                 </div>
             </#list>
