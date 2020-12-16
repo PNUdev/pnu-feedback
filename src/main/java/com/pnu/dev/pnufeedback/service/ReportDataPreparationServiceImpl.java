@@ -4,9 +4,8 @@ import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
-import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
+import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportChartInfoJasperDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerJasperDto;
@@ -33,6 +32,9 @@ import static java.util.stream.Collectors.toList;
 public class ReportDataPreparationServiceImpl implements ReportDataPreparationService {
 
     private final static Integer CHART_SPLIT_SIZE = 45;
+    private final static Integer CHART_SPLIT_SIZE = 25;
+    private final static DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
+            .append(DateTimeFormatter.ofPattern("MM/dd/yyyy")).toFormatter();
 
     private ScoreAnswerRepository scoreAnswerRepository;
 
@@ -142,11 +144,6 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .collect(Collectors.toList());
 
     }
-
-    private List<Long> getSubmissionIds(List<Submission> submissions) {
-        return submissions.stream().map(Submission::getId).collect(Collectors.toList());
-    }
-
 
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
 
