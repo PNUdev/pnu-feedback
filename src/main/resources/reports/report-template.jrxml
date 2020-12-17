@@ -38,8 +38,7 @@
 				<barChart>
 					<chart>
 						<reportElement stretchType="RelativeToTallestObject" x="7" y="40" width="844" height="430" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
-							<property name="com.jaspersoft.studio.unit.y" value="5"/>
+							<property name="net.sf.jasperreports.chart.range.axis.tick.interval" value="0.5"/>
 						</reportElement>
 						<chartTitle>
 							<font size="14" isBold="false"/>
@@ -65,6 +64,9 @@
 						<valueAxisFormat>
 							<axisFormat/>
 						</valueAxisFormat>
+						<rangeAxisMaxValueExpression>
+							<![CDATA[new Integer(5)]]>
+						</rangeAxisMaxValueExpression>
 					</barPlot>
 				</barChart>
 			</band>
