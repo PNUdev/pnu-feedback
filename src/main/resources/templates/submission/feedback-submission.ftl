@@ -2,13 +2,22 @@
 
 <#assign SCORE_QUESTION_PARAM_PREFIX='questionNumber-'/>
 
+<#assign scoreAnswerOptions = {
+"1": "Повністю не погоджуюсь",
+"2": "Швидше не погоджуюсь",
+"3": "Важко відповісти",
+"4": "Швидше погоджуюсь",
+"5": "Повністю погоджуюсь"
+}>
+
 <style>
 
-    .question-content {
-        font-size: 1.2em;
+    input[type=radio] {
+        width: 1.1em;
+        height: 1.1em;
     }
 
-    .score-option {
+    .question-content {
         font-size: 1.2em;
     }
 
@@ -48,21 +57,28 @@
             <#list scoreQuestions as scoreQuestion>
                 <div class="my-3 p-3 rounded bg-light">
                     <div class="mb-2 row mx-auto">
-                        <div class="mr-2 p-1 rounded border border-secondary">
-                            ${scoreQuestion.questionNumber}
+                        <div>
+                            <div class="mr-3 mb-2 p-1 rounded border border-secondary">
+                                ${scoreQuestion.questionNumber}
+                            </div>
                         </div>
-                        <div class="my-auto text-wrap text-break question-content">
-                            ${scoreQuestion.content}
+                        <div>
+                            <div class="my-auto text-wrap text-break question-content">
+                                ${scoreQuestion.content}
+                            </div>
+                            <hr/>
                         </div>
                     </div>
-                    <div class="mx-auto mt-2">
-                        <#list 1..5 as score>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio"
+                    <div class="ml-3 pb-1">
+                        <#list scoreAnswerOptions as score, content>
+                            <div class="form-check mt-2 d-flex">
+                                <#assign inputId = "inlineRadio-${scoreQuestion.id}-${score}">
+                                <input class="form-check-input align-self-center" type="radio"
                                        name="${SCORE_QUESTION_PARAM_PREFIX}${scoreQuestion.questionNumber}"
-                                       id="inlineRadio-${score}"
+                                       id="${inputId}"
                                        value="${score}" required>
-                                <label class="form-check-label score-option" for="inlineRadio-${score}">${score}</label>
+                                <label class="ml-2 form-check-label align-self-center"
+                                       for="${inputId}">${content}</label>
                             </div>
                         </#list>
                     </div>
