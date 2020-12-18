@@ -8,4 +8,5 @@ import java.util.List;
 public interface ScoreAnswerRepository extends CrudRepository<ScoreAnswer, Long> {
 
     List<ScoreAnswer> findAllBySubmissionIdIn(List<Long> submissionIds);
+
 }

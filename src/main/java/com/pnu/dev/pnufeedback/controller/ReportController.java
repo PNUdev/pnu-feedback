@@ -1,8 +1,9 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
-import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
+import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
+import com.pnu.dev.pnufeedback.service.ExcelReportBuilderService;
 import com.pnu.dev.pnufeedback.service.ReportBuilderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,19 @@ import java.util.List;
 public class ReportController {
 
     private ReportBuilderService reportBuilderService;
+
+    private ExcelReportBuilderService excelReportBuilderService;
+
     private EducationalProgramService educationalProgramService;
 
     @Autowired
     public ReportController(
             ReportBuilderService reportBuilderService,
+            ExcelReportBuilderService excelReportBuilderService,
             EducationalProgramService educationalProgramService) {
+
         this.reportBuilderService = reportBuilderService;
+        this.excelReportBuilderService = excelReportBuilderService;
         this.educationalProgramService = educationalProgramService;
     }
 
@@ -41,13 +48,23 @@ public class ReportController {
         return "admin/report/generate-report";
     }
 
-    @PostMapping
-    public void generateReport(@Validated GenerateReportDto generateReportDto, HttpServletResponse response) {
+    @PostMapping("/pdf")
+    public void generateReportPdf(@Validated GenerateReportForm generateReportForm, HttpServletResponse response) {
 
-        log.info("Report generation started!");
+        log.info("PDF report generation started!");
 
-        reportBuilderService.exportReport(generateReportDto, response);
+        reportBuilderService.exportReport(generateReportForm, response);
 
-        log.info("File successfully generated");
+        log.info("PDF report successfully generated");
+    }
+
+    @PostMapping("/excel")
+    public void generateReportExcel(@Validated GenerateReportForm generateReportForm, HttpServletResponse response) {
+
+        log.info("Excel report generation started!");
+
+        excelReportBuilderService.exportReport(generateReportForm, response);
+
+        log.info("Excel report successfully generated");
     }
 }

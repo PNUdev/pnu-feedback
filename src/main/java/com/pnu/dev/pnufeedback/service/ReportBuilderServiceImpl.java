@@ -1,8 +1,10 @@
 package com.pnu.dev.pnufeedback.service;
 
-import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
+import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
+import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
+import com.pnu.dev.pnufeedback.util.GenerateReportDtoPreparer;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -31,14 +33,20 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
 
     private ReportDataPreparationService reportDataPreparationService;
 
-    public ReportBuilderServiceImpl(ReportDataPreparationService reportDataPreparationService) {
+    private GenerateReportDtoPreparer generateReportDtoPreparer;
+
+    public ReportBuilderServiceImpl(ReportDataPreparationService reportDataPreparationService,
+                                    GenerateReportDtoPreparer generateReportDtoPreparer) {
+
         this.reportDataPreparationService = reportDataPreparationService;
+        this.generateReportDtoPreparer = generateReportDtoPreparer;
     }
 
 
     @Override
-    public void exportReport(GenerateReportDto generateReportDto, HttpServletResponse response) {
+    public void exportReport(GenerateReportForm generateReportForm, HttpServletResponse response) {
 
+        GenerateReportDto generateReportDto = generateReportDtoPreparer.prepare(generateReportForm);
         ReportDataDto reportDataDto = reportDataPreparationService.getReportData(generateReportDto);
 
         response.setContentType("application/pdf");
