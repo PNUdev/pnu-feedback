@@ -1,6 +1,5 @@
 package com.pnu.dev.pnufeedback.service;
 
-import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
@@ -12,9 +11,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,15 +58,13 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
         try (OutputStream outputStream = response.getOutputStream(); Workbook workbook = new HSSFWorkbook()) {
 
-            EducationalProgram educationalProgram = educationalProgramService
-                    .findById(generateReportDto.getEducationalProgramId());
-
-            Sheet sheet = workbook.createSheet(educationalProgram.getTitle());
+            Sheet sheet = workbook.createSheet();
 
             List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
             Row stakeholderCategoriesRow = sheet.createRow(0);
 
             CellStyle cellBoldFontStyle = getCellBoldFontStyle(workbook);
+            CellStyle cellCenterPositionStyle = getCellCenterPositionStyle(workbook);
 
             // Write row with stakeholder category names
             IntStream.range(0, stakeholderCategories.size())
@@ -94,13 +93,25 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                 // Write average scores for the question
                 IntStream.range(0, stakeholderCategories.size())
                         .forEach(stakeholderCategoryIdx -> {
-                            Cell cell = questionStatisticsRow.createCell(stakeholderCategoryIdx + 1);
+                            Cell averageScoreCell = questionStatisticsRow
+                                    .createCell(stakeholderCategoryIdx + 1);
 
                             Long stakeholderCategoryId = stakeholderCategories.get(stakeholderCategoryIdx).getId();
 
-                            String cellValue = getQuestionStatisticsCellValue(
-                                    currentQuestionDetailedStatistic, stakeholderCategoryId);
-                            cell.setCellValue(cellValue);
+                            boolean haveResultForStakeholderCategory = currentQuestionDetailedStatistic
+                                    .getAverageScores()
+                                    .containsKey(stakeholderCategoryId);
+
+                            if (haveResultForStakeholderCategory) {
+                                Double averageScore = currentQuestionDetailedStatistic.getAverageScores()
+                                        .get(stakeholderCategoryId);
+
+                                averageScoreCell.setCellValue(averageScore);
+                            } else {
+                                averageScoreCell.setCellValue("---");
+                            }
+                            averageScoreCell.setCellStyle(cellCenterPositionStyle);
+
                         });
 
             });
@@ -115,25 +126,17 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
     }
 
-    private String getQuestionStatisticsCellValue(QuestionDetailedStatistics currentQuestionDetailedStatistic,
-                                                  Long stakeholderCategoryId) {
-
-        boolean haveResultForStakeholderCategory = currentQuestionDetailedStatistic.getAverageScores()
-                .containsKey(stakeholderCategoryId);
-
-        if (haveResultForStakeholderCategory) {
-            Double averageScore = currentQuestionDetailedStatistic.getAverageScores().get(stakeholderCategoryId);
-            return String.format("%.5f", averageScore);
-        }
-
-        return "--";
-    }
-
     private CellStyle getCellBoldFontStyle(Workbook workbook) {
         Font boldFont = workbook.createFont();
         boldFont.setBold(true);
         CellStyle cellStyleForBold = workbook.createCellStyle();
         cellStyleForBold.setFont(boldFont);
+        return cellStyleForBold;
+    }
+
+    private CellStyle getCellCenterPositionStyle(Workbook workbook) {
+        CellStyle cellStyleForBold = workbook.createCellStyle();
+        cellStyleForBold.setAlignment(HorizontalAlignment.CENTER);
         return cellStyleForBold;
     }
 
