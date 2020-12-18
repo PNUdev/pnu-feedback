@@ -1,5 +1,6 @@
 package com.pnu.dev.pnufeedback.service;
 
+import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
@@ -15,7 +16,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,9 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
         try (OutputStream outputStream = response.getOutputStream(); Workbook workbook = new HSSFWorkbook()) {
 
-            Sheet sheet = workbook.createSheet();
+            EducationalProgram educationalProgram = educationalProgramService
+                    .findById(generateReportDto.getEducationalProgramId());
+            Sheet sheet = workbook.createSheet(educationalProgram.getTitle());
 
             List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
             Row stakeholderCategoriesRow = sheet.createRow(0);
