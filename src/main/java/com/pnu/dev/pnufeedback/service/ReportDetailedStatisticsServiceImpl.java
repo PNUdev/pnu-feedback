@@ -102,18 +102,18 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
                 .get();
     }
 
-}
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class ScoreAnswerStatisticsDto {
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-class ScoreAnswerStatisticsDto {
+        private String questionNumber;
 
-    private String questionNumber;
+        private Long stakeholderCategoryId;
 
-    private Long stakeholderCategoryId;
+        private int score;
 
-    private int score;
+    }
 
 }
