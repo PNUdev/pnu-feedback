@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.QuestionDetailedStatistics;
+import com.pnu.dev.pnufeedback.dto.report.ReportDetailedStatistics;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.util.GenerateReportDtoPreparer;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -68,16 +70,27 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
             CellStyle cellBoldFontStyle = getCellBoldFontStyle(workbook);
             CellStyle cellCenterPositionStyle = getCellCenterPositionStyle(workbook);
 
+            ReportDetailedStatistics reportDetailedStatistics = reportDetailedStatisticsService
+                    .calculateReportDetailedStatistics(generateReportDto);
+
+            Map<Long, Long> submissionsCountByStakeholderCategory = reportDetailedStatistics
+                    .getSubmissionsCountByStakeholderCategory();
+
             // Write row with stakeholder category names
             IntStream.range(0, stakeholderCategories.size())
                     .forEach(idx -> {
                         Cell cell = stakeholderCategoriesRow.createCell(idx + 1);
-                        cell.setCellValue(stakeholderCategories.get(idx).getTitle());
+
+                        StakeholderCategory stakeholderCategory = stakeholderCategories.get(idx);
+                        Long submissionsCount = submissionsCountByStakeholderCategory
+                                .getOrDefault(stakeholderCategory.getId(), 0L);
+
+                        cell.setCellValue(String.format("%s (%s)", stakeholderCategory.getTitle(), submissionsCount));
                         cell.setCellStyle(cellBoldFontStyle);
                     });
 
-            List<QuestionDetailedStatistics> questionDetailedStatistics = reportDetailedStatisticsService
-                    .calculateReportDetailedStatistics(generateReportDto);
+            List<QuestionDetailedStatistics> questionDetailedStatistics = reportDetailedStatistics
+                    .getQuestionDetailedStatistics();
 
             // Write statistics for each question
             IntStream.range(0, questionDetailedStatistics.size()).forEach(rowIdx -> {
@@ -118,7 +131,7 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
             });
 
-            IntStream.range(0, stakeholderCategories.size()).forEach(sheet::autoSizeColumn);
+            IntStream.range(0, stakeholderCategories.size() + 1).forEach(sheet::autoSizeColumn);
 
             workbook.write(outputStream);
         } catch (Exception e) {

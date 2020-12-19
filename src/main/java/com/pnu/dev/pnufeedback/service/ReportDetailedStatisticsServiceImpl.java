@@ -4,6 +4,7 @@ import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.Submission;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.QuestionDetailedStatistics;
+import com.pnu.dev.pnufeedback.dto.report.ReportDetailedStatistics;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
+import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
@@ -38,7 +40,7 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
     }
 
     @Override
-    public List<QuestionDetailedStatistics> calculateReportDetailedStatistics(GenerateReportDto generateReportDto) {
+    public ReportDetailedStatistics calculateReportDetailedStatistics(GenerateReportDto generateReportDto) {
 
         List<Submission> submissions = submissionRepository
                 .findAllByEducationalProgramIdAndSubmissionTimeBetween(
@@ -48,13 +50,19 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
                 );
 
         if (submissions.isEmpty()) {
-            return Collections.emptyList();
+            return ReportDetailedStatistics.builder()
+                    .submissionsCountByStakeholderCategory(Collections.emptyMap())
+                    .questionDetailedStatistics(Collections.emptyList())
+                    .build();
         }
 
         List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
 
-        return scoreAnswers.stream()
+        Map<Long, Long> submissionsCountByStakeholderCategory = submissions.stream()
+                .collect(groupingBy(Submission::getStakeholderCategoryId, counting()));
+
+        List<QuestionDetailedStatistics> questionDetailedStatistics = scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
                 .sorted()
                 .distinct()
@@ -80,6 +88,10 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
                 })
                 .collect(Collectors.toList());
 
+        return ReportDetailedStatistics.builder()
+                .submissionsCountByStakeholderCategory(submissionsCountByStakeholderCategory)
+                .questionDetailedStatistics(questionDetailedStatistics)
+                .build();
     }
 
     private Long findStakeholderCategoryIdByScoreAnswer(List<Submission> submissions, ScoreAnswer scoreAnswer) {
