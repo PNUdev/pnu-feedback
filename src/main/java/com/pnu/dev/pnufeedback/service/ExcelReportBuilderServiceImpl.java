@@ -53,10 +53,11 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
     @Override
     public void exportReport(GenerateReportForm generateReportForm, HttpServletResponse response) {
 
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-Disposition", "attachment; filename=statistics.xls");
-
         GenerateReportDto generateReportDto = generateReportDtoPreparer.prepare(generateReportForm);
+
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", String.format("attachment; filename=%s--%s.xls",
+                generateReportDto.getStartDate(), generateReportDto.getEndDate()));
 
         try (OutputStream outputStream = response.getOutputStream(); Workbook workbook = new HSSFWorkbook()) {
 
