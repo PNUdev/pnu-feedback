@@ -95,7 +95,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .endDate(endDate)
                 .answerData(chartAnswerData)
                 .openAnswerData(mapToJasperOpenAnswerDto(openAnswerData))
-                .chartSplitSize(normalizeChartSplitSize(stakeholderCategories.size())).build();
+                .chartSplitSize(normalizeChartSplitSize(submissions)).build();
 
         log.debug("All data gathered from: [{}] to: [{}]!", startDate, endDate);
 
@@ -161,7 +161,10 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
 
-    private Integer normalizeChartSplitSize(Integer stakeholderAmount) {
+    private Integer normalizeChartSplitSize(List<Submission> submissions) {
+
+       Integer stakeholderAmount = ((Long)submissions.stream()
+               .map(s->s.getStakeholderCategoryId()).distinct().count()).intValue();
 
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
 
