@@ -6,7 +6,9 @@ import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.QuestionDetailedStatistics;
 import com.pnu.dev.pnufeedback.dto.report.ReportDetailedStatistics;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
+import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionNumberComparator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,12 +32,20 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
 
     private ScoreAnswerRepository scoreAnswerRepository;
 
+    private ScoreQuestionRepository scoreQuestionRepository;
+
+    private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
+
     @Autowired
     public ReportDetailedStatisticsServiceImpl(SubmissionRepository submissionRepository,
-                                               ScoreAnswerRepository scoreAnswerRepository) {
+                                               ScoreAnswerRepository scoreAnswerRepository,
+                                               ScoreQuestionRepository scoreQuestionRepository,
+                                               ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
 
         this.submissionRepository = submissionRepository;
         this.scoreAnswerRepository = scoreAnswerRepository;
+        this.scoreQuestionRepository = scoreQuestionRepository;
+        this.scoreQuestionNumberComparator = scoreQuestionNumberComparator;
     }
 
     @Override
@@ -49,23 +58,16 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
                         generateReportDto.getEndDate()
                 );
 
-        if (submissions.isEmpty()) {
-            return ReportDetailedStatistics.builder()
-                    .submissionsCountByStakeholderCategory(Collections.emptyMap())
-                    .questionDetailedStatistics(Collections.emptyList())
-                    .build();
-        }
-
         List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(submissionIds);
 
         Map<Long, Long> submissionsCountByStakeholderCategory = submissions.stream()
                 .collect(groupingBy(Submission::getStakeholderCategoryId, counting()));
 
-        List<QuestionDetailedStatistics> questionDetailedStatistics = scoreAnswers.stream()
-                .map(ScoreAnswer::getQuestionNumber)
-                .sorted()
-                .distinct()
+        List<String> questionNumbers = scoreQuestionRepository.findAllAvailableQuestionNumbers();
+
+        List<QuestionDetailedStatistics> questionDetailedStatistics = questionNumbers.stream()
+                .sorted(scoreQuestionNumberComparator)
                 .map(questionNumber -> {
 
                     Map<Long, Double> averageScores = scoreAnswers.stream()
