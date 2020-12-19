@@ -1,7 +1,7 @@
 <#include "../include/header.ftl">
 
 <div class="col-md-10 mt-5 px-5 pb-2 pt-4 rounded bg-light mx-auto">
-    <form method="POST">
+    <form method="GET">
         <div class="input-group mb-3">
             <select class="select-program col-md-12" name="educationalProgramId" required>
                 <option value="" disabled selected>Виберіть освітню програму</option>

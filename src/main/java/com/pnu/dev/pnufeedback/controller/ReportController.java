@@ -48,7 +48,7 @@ public class ReportController {
         return "admin/report/generate-report";
     }
 
-    @PostMapping("/pdf")
+    @GetMapping("/pdf")
     public void generateReportPdf(@Validated GenerateReportForm generateReportForm, HttpServletResponse response) {
 
         log.info("PDF report generation started!");
@@ -58,7 +58,7 @@ public class ReportController {
         log.info("PDF report successfully generated");
     }
 
-    @PostMapping("/excel")
+    @GetMapping("/excel")
     public void generateReportExcel(@Validated GenerateReportForm generateReportForm, HttpServletResponse response) {
 
         log.info("Excel report generation started!");
