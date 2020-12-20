@@ -71,6 +71,7 @@ public class FeedbackSubmissionController {
 
         List<ScoreQuestion> scoreQuestions = scoreQuestionService
                 .findAllByStakeholderCategoryId(jwtTokenPayload.getStakeholderCategoryId());
+        model.addAttribute("scoreQuestions", scoreQuestions);
 
         boolean allowToChooseEducationalProgram = jwtTokenPayload.isAllowToChooseEducationalProgram();
         model.addAttribute("allowToChooseEducationalProgram", allowToChooseEducationalProgram);
@@ -83,8 +84,6 @@ public class FeedbackSubmissionController {
                     .findById(jwtTokenPayload.getEducationalProgramId());
             model.addAttribute("educationalProgram", educationalProgram);
         }
-
-        model.addAttribute("scoreQuestions", scoreQuestions);
 
         return "submission/feedback-submission";
     }

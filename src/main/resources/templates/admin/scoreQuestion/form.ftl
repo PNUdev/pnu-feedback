@@ -1,6 +1,6 @@
 <#include "../include/header.ftl">
 <#assign formSubmissionUrl = scoreQuestion???then('/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/update/${scoreQuestion.id}',
-                                                    '/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/new') >
+'/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/new') >
 
 <div class="mx-auto mt-5 p-5 rounded bg-light col-md-9">
     <form method="POST" action="${formSubmissionUrl}">
@@ -22,7 +22,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">Питання</span>
             </div>
-            <input type="text" class="form-control" name="content" value="${(scoreQuestion.content)!}" required>
+            <textarea class="form-control" name="content" required>${(scoreQuestion.content)!}</textarea>
         </div>
 
         <div class="p-3">
