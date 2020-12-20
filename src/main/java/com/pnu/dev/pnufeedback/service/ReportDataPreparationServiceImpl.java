@@ -158,12 +158,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                       )
             );
 
-        String keyStatistics = statisticsMap.entrySet().stream()
-                .map(e -> e.getKey() + " - %s").collect(joining(", "));
-        Object[] valueStatistics = statisticsMap.entrySet().stream()
-                .map(e -> e.getValue().intValue()).toArray();
-
-        return String.format(keyStatistics, valueStatistics);
+        return statisticsMap.entrySet().stream()
+                .map(e -> String.format("%s - %s", e.getKey(), e.getValue().intValue()))
+                .collect(joining(", "));
     }
 
 

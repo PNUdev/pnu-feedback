@@ -108,11 +108,11 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
                 // Write average scores for the question
                 IntStream.range(0, stakeholderCategories.size())
-                        .forEach(stakeholderCategoryIdx -> {
+                        .forEach(cellIdx -> {
                             Cell averageScoreCell = questionStatisticsRow
-                                    .createCell(stakeholderCategoryIdx + 1);
+                                    .createCell(cellIdx + 1);
 
-                            Long stakeholderCategoryId = stakeholderCategories.get(stakeholderCategoryIdx).getId();
+                            Long stakeholderCategoryId = stakeholderCategories.get(cellIdx).getId();
 
                             boolean haveResultForStakeholderCategory = currentQuestionDetailedStatistic
                                     .getAverageScores()
