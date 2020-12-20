@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportOpenAnswerDto {
 
-    private String stakeholder;
+    private String stakeholderCategoryTitle;
 
-    private String content;
+    private String openAnswerContent;
 
 }

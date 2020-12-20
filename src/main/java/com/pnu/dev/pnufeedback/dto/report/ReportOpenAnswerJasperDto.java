@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportOpenAnswerJasperDto {
 
-    private String stakeholder;
+    private String stakeholderCategoryTitle;
 
-    private List<ReportOpenAnswerContentJasperDto> content;
+    private List<ReportOpenAnswerContentJasperDto> openAnswerList;
 
 }

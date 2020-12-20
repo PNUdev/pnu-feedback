@@ -57,7 +57,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
             Resource resource = new ClassPathResource(TEMPLATE_PATH);
             JasperReport report = JasperCompileManager.compileReport(resource.getInputStream());
 
-            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getAnswerData());
+            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getScoreAnswerData());
             Map<String, Object> parameters = prepareParameters(reportDataDto);
             JasperPrint print = JasperFillManager.fillReport(report, parameters, beanColDataSource);
 
@@ -80,8 +80,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         parameters.put("END_DATE", reportDataDto.getEndDate().toString());
         parameters.put("STAKEHOLDER_STATISTICS", reportDataDto.getStakeholderStatistics());
         parameters.put("CHART_SPLIT_SIZE", reportDataDto.getChartSplitSize());
-        parameters.put("OPEN_ANSWER_DATASET", reportDataDto.getOpenAnswerData());
-        parameters.put("ANSWER_DATASET", new JRBeanCollectionDataSource(reportDataDto.getOpenAnswerData()));
+        parameters.put("OPEN_ANSWER_DATASET", new JRBeanCollectionDataSource(reportDataDto.getOpenAnswerData()));
 
         return parameters;
     }
