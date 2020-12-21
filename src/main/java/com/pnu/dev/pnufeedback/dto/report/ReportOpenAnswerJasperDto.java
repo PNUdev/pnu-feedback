@@ -15,6 +15,6 @@ public class ReportOpenAnswerJasperDto {
 
     private String stakeholderCategoryTitle;
 
-    private List<ReportOpenAnswerContentJasperDto> openAnswerList;
+    private List<ReportOpenAnswerContentJasperDto> reportOpenAnswerContents;
 
 }

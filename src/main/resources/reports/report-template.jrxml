@@ -4,7 +4,7 @@
 	<style name="default-style" isDefault="true" fontName="Calibri" pdfEncoding="CP1251" isPdfEmbedded="true"/>
 	<subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
 		<field name="stakeholderCategoryTitle" class="java.lang.String"/>
-		<field name="openAnswerList" class="java.util.List"/>
+		<field name="reportOpenAnswerContents" class="java.util.List"/>
 	</subDataset>
 	<subDataset name="openAnswerNestedDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
 		<field name="openAnswerContent" class="java.lang.String"/>
@@ -124,7 +124,7 @@
 							<reportElement x="180" y="0" width="659" height="50" uuid="7d4e965f-761f-4778-ab35-857a72f1edcb"/>
 							<jr:list printOrder="Vertical">
 								<datasetRun subDataset="openAnswerNestedDataSource" uuid="f03d42dd-5b7c-4dae-9c96-ff5f87093e6a">
-									<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{openAnswerList})]]></dataSourceExpression>
+									<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{reportOpenAnswerContents})]]></dataSourceExpression>
 								</datasetRun>
 								<jr:listContents height="50" width="659">
 									<textField>
