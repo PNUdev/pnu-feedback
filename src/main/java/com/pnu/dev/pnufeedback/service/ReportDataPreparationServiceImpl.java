@@ -4,11 +4,12 @@ import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
-import com.pnu.dev.pnufeedback.dto.form.GenerateReportDto;
+import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportChartInfoJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
 import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerJasperDto;
+import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerReportDataDto;
 import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +34,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class ReportDataPreparationServiceImpl implements ReportDataPreparationService {
 
-    private final static Integer CHART_SPLIT_SIZE = 45;
     private final static Integer CHART_SPLIT_SIZE = 25;
-    private final static DateTimeFormatter DATE_TIME_FORMATTER = new DateTimeFormatterBuilder()
-            .append(DateTimeFormatter.ofPattern("MM/dd/yyyy")).toFormatter();
 
     private ScoreAnswerRepository scoreAnswerRepository;
 
@@ -59,7 +59,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
     @Override
-    public ReportDataDto getReportData(GenerateReportDto generateReportDto) {
+    public ScoreAnswerReportDataDto getReportData(GenerateReportDto generateReportDto) {
 
         log.debug("Data analyzing has started!");
 
@@ -88,12 +88,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions);
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
-        ReportDataDto reportDataDto = ReportDataDto.builder()
+        ScoreAnswerReportDataDto reportDataDto = ScoreAnswerReportDataDto.builder()
                 .stakeholderStatistics(stakeholderStatistics)
                 .educationalProgramName(educationalProgram.getTitle())
                 .startDate(startDate)
                 .endDate(endDate)
-                .answerData(chartAnswerData)
+                .scoreAnswerReportData(chartAnswerData)
                 .openAnswerData(mapToJasperOpenAnswerDto(openAnswerData))
                 .chartSplitSize(normalizeChartSplitSize(submissions)).build();
 
@@ -133,14 +133,14 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                                 .count();
 
                                         return ReportChartInfoJasperDto.builder()
-                                                .stakeholderName(stakeholderCategory.getTitle())
-                                                .question(questionNumber)
-                                                .score(questionScores.doubleValue() / stakeholderAnswerCount)
-                                                .answerAmount(stakeholderAnswerCount.intValue()).build();
+                                                .stakeholderCategoryTitle(stakeholderCategory.getTitle())
+                                                .questionNumber(questionNumber)
+                                                .averageScore(questionScores.doubleValue() / stakeholderAnswerCount)
+                                                .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
 
                 }))
-                .filter(reportChartInfoJasperDto -> reportChartInfoJasperDto.getAnswerAmount() != 0)
-                .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestion))
+                .filter(reportChartInfoJasperDto -> reportChartInfoJasperDto.getScoreAnswerCount() != 0)
+                .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestionNumber))
                 .collect(Collectors.toList());
 
     }
@@ -150,8 +150,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         Map<String, Double> statisticsMap = data.stream()
             .collect(
                  Collectors.groupingBy(
-                      ReportChartInfoJasperDto::getStakeholderName,
-                           averagingInt(ReportChartInfoJasperDto::getAnswerAmount)
+                      ReportChartInfoJasperDto::getStakeholderCategoryTitle,
+                           averagingInt(ReportChartInfoJasperDto::getScoreAnswerCount)
                       )
             );
 
@@ -181,9 +181,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return list.stream()
                 .collect(
                         Collectors.groupingBy(
-                                ReportOpenAnswerDto::getStakeholder,
+                                ReportOpenAnswerDto::getStakeholderCategoryTitle,
                                 Collectors.mapping(
-                                        item -> new ReportOpenAnswerContentJasperDto(item.getContent()),
+                                        item -> new ReportOpenAnswerContentJasperDto(item.getOpenAnswerContent()),
                                         toList()
                                 )
                         )
@@ -195,5 +195,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 )
                 .collect(Collectors.toList());
 
+    }
+
+    private List<Long> getSubmissionIds(List<Submission> submissions) {
+        return submissions.stream().map(Submission::getId).collect(Collectors.toList());
     }
 }

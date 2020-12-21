@@ -1,10 +1,10 @@
 package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerReportDataDto;
 
 public interface ReportDataPreparationService {
 
-    ReportDataDto getReportData(GenerateReportDto generateReportDto);
+    ScoreAnswerReportDataDto getReportData(GenerateReportDto generateReportDto);
 
 }
