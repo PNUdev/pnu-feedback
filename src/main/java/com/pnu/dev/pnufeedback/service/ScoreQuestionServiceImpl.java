@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class ScoreQuestionServiceImpl implements ScoreQuestionService {
@@ -48,6 +49,8 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
     @Override
     public ScoreQuestion create(ScoreQuestionForm scoreQuestionForm) {
 
+        validateScoreQuestionNumber(scoreQuestionForm.getQuestionNumber());
+
         stakeholderCategoryService.findById(scoreQuestionForm.getStakeholderCategoryId());
 
         if (isScoreQuestionNumberAvailable(scoreQuestionForm)) {
@@ -68,6 +71,8 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
 
         ScoreQuestion scoreQuestionFromDb = scoreQuestionRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Питання не знайдено"));
+
+        validateScoreQuestionNumber(scoreQuestionForm.getQuestionNumber());
 
         stakeholderCategoryService.findById(scoreQuestionForm.getStakeholderCategoryId());
 
@@ -99,5 +104,11 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                 scoreQuestionForm.getStakeholderCategoryId(),
                 scoreQuestionForm.getQuestionNumber()
         );
+    }
+
+    private void validateScoreQuestionNumber(String scoreQuestionNumber) {
+        if (!Pattern.matches("^\\d+(\\.\\d+)*$", scoreQuestionNumber)) {
+            throw new ServiceException("Номер запитання не відповіє патерну");
+        }
     }
 }
