@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportOpenAnswerContentJasperDto {
 
-    String openAnswerContent;
+    private String openAnswerContent;
 
 }
