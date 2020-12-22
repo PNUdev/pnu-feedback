@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +61,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         ScoreQuestion scoreQuestion = ScoreQuestion.builder()
                 .questionNumber(scoreQuestionForm.getQuestionNumber())
                 .stakeholderCategoryId(scoreQuestionForm.getStakeholderCategoryId())
-                .content(scoreQuestionForm.getContent())
+                .content(StringEscapeUtils.escapeHtml4(scoreQuestionForm.getContent()))
                 .build();
 
         return scoreQuestionRepository.save(scoreQuestion);
@@ -84,7 +85,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
                 .id(scoreQuestionFromDb.getId())
                 .stakeholderCategoryId(scoreQuestionForm.getStakeholderCategoryId())
                 .questionNumber(scoreQuestionForm.getQuestionNumber())
-                .content(scoreQuestionForm.getContent())
+                .content(StringEscapeUtils.escapeHtml4(scoreQuestionForm.getContent()))
                 .build();
 
         return scoreQuestionRepository.save(updatedScoreQuestion);
@@ -108,7 +109,7 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
 
     private void validateScoreQuestionNumber(String scoreQuestionNumber) {
         if (!Pattern.matches("^\\d+(\\.\\d+)*$", scoreQuestionNumber)) {
-            throw new ServiceException("Номер запитання не відповіє патерну");
+            throw new ServiceException("Номер запитання не відповіє шаблону");
         }
     }
 }

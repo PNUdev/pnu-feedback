@@ -13,7 +13,7 @@
     <table class="table table-striped mx-3">
         <thead>
         <tr>
-            <th scope="col">Номер запитання</th>
+            <th scope="col">Номер</th>
             <th>Запитання</th>
             <th></th>
         </tr>
@@ -21,13 +21,21 @@
         <tbody>
         <#list scoreQuestions as scoreQuestion >
             <tr>
-                <th scope="row" class="px-3">${scoreQuestion.questionNumber}</th>
-                <td>${scoreQuestion.content}</td>
-                <td>
-                    <a href="/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/edit/${scoreQuestion.id}"
-                       role="button"
-                       class="btn btn-warning btn-sm m-1 w-40">Редагувати</a>
-                </td>
+                <th scope="row" colspan="3">
+                    <div class="row">
+                        <div class="col-1">
+                            ${scoreQuestion.questionNumber}
+                        </div>
+                        <div class="col-9">
+                            ${scoreQuestion.content}
+                        </div>
+                        <div class="col-2 align-middle">
+                            <a href="/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/edit/${scoreQuestion.id}"
+                               role="button"
+                               class="btn btn-warning btn-sm m-1 w-40">Редагувати</a>
+                        </div>
+                    </div>
+                </th>
             </tr>
         </#list>
     </table>
