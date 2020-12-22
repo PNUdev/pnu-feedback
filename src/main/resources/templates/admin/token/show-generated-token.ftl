@@ -8,7 +8,7 @@
         <div class="btn btn-light" onclick="copyToClipboard()" id="copy-button">Копіювати</div>
     </div>
     <div class="col-md-12 mt-3 d-flex justify-content-center">
-        <a href="/admin/generate-token">Назад до генерації посилання</a>
+        <a href="/${adminPanelUrl}/generate-token">Назад до генерації посилання</a>
     </div>
 
 </div>

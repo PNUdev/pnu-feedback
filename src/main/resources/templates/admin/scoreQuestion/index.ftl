@@ -2,7 +2,7 @@
 
 <h2 class="text-center mt-3">Запитання для категорії "${stakeholderCategory.title}"</h2>
 <div class="my-3 px-5">
-    <a href="/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/new">
+    <a href="/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/new">
         <div class="btn btn-lg btn-primary">Додати питання</div>
     </a>
 </div>
@@ -24,7 +24,7 @@
                 <th scope="row" class="px-3">${scoreQuestion.questionNumber}</th>
                 <td>${scoreQuestion.content}</td>
                 <td>
-                    <a href="/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/edit/${scoreQuestion.id}"
+                    <a href="/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/edit/${scoreQuestion.id}"
                        role="button"
                        class="btn btn-warning btn-sm m-1 w-40">Редагувати</a>
                 </td>

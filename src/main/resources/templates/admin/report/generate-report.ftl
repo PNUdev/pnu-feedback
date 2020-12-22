@@ -25,10 +25,10 @@
 
         <div class="my-4 row mx-auto">
             <div>
-                <button class="btn btn-primary" formaction="/admin/generate-report/pdf">Згенерувати PDF звіт</button>
+                <button class="btn btn-primary" formaction="/${adminPanelUrl}/generate-report/pdf">Згенерувати PDF звіт</button>
             </div>
             <div class="ml-2">
-                <button class="btn btn-primary" formaction="/admin/generate-report/excel">Згенерувати Excel звіт
+                <button class="btn btn-primary" formaction="/${adminPanelUrl}/generate-report/excel">Згенерувати Excel звіт
                 </button>
             </div>
         </div>

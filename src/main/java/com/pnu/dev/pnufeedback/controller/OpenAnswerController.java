@@ -4,6 +4,7 @@ import com.pnu.dev.pnufeedback.domain.OpenAnswer;
 import com.pnu.dev.pnufeedback.dto.ReviewedFilter;
 import com.pnu.dev.pnufeedback.service.OpenAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/admin/open-answers")
+@RequestMapping("/${app.adminPanelUrl}/open-answers")
 public class OpenAnswerController {
 
     private final OpenAnswerService openAnswerService;
+
+    @Value("${app.adminPanelUrl}")
+    private String adminPanelUrl;
 
     @Autowired
     public OpenAnswerController(OpenAnswerService openAnswerService) {
@@ -51,13 +55,13 @@ public class OpenAnswerController {
     public String approve(@PathVariable Long id) {
         openAnswerService.approve(id);
 
-        return "redirect:/admin/open-answers";
+        return String.format("redirect:/%s/open-answers", adminPanelUrl);
     }
 
     @PostMapping("/disapprove/{id}")
     public String disapprove(@PathVariable Long id) {
         openAnswerService.disapprove(id);
 
-        return "redirect:/admin/open-answers";
+        return String.format("redirect:/%s/open-answers", adminPanelUrl);
     }
 }

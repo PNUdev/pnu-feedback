@@ -7,6 +7,7 @@ import com.pnu.dev.pnufeedback.dto.form.ScoreQuestionForm;
 import com.pnu.dev.pnufeedback.service.ScoreQuestionService;
 import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/stakeholder-categories/{stakeholderCategoryId}/score-questions")
+@RequestMapping("/${app.adminPanelUrl}/stakeholder-categories/{stakeholderCategoryId}/score-questions")
 public class ScoreQuestionController {
 
     private final ScoreQuestionService scoreQuestionService;
 
     private final StakeholderCategoryService stakeholderCategoryService;
+
+    @Value("${app.adminPanelUrl}")
+    private String adminPanelUrl;
 
     @Autowired
     public ScoreQuestionController(ScoreQuestionService scoreQuestionService, StakeholderCategoryService stakeholderCategoryService) {
@@ -67,15 +71,15 @@ public class ScoreQuestionController {
     public String create(@Validated ScoreQuestionForm scoreQuestionForm) {
 
         ScoreQuestion scoreQuestion = scoreQuestionService.create(scoreQuestionForm);
-        return String.format("redirect:/admin/stakeholder-categories/%s/score-questions",
-                scoreQuestion.getStakeholderCategoryId());
+        return String.format("redirect:/%s/stakeholder-categories/%s/score-questions",
+                adminPanelUrl, scoreQuestion.getStakeholderCategoryId());
     }
 
     @PostMapping("/update/{id}")
     public String update(@PathVariable("id") Long id, @Validated ScoreQuestionForm scoreQuestionForm) {
 
         ScoreQuestion scoreQuestion = scoreQuestionService.update(id, scoreQuestionForm);
-        return String.format("redirect:/admin/stakeholder-categories/%s/score-questions",
-                scoreQuestion.getStakeholderCategoryId());
+        return String.format("redirect:/%s/stakeholder-categories/%s/score-questions",
+                adminPanelUrl, scoreQuestion.getStakeholderCategoryId());
     }
 }

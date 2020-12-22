@@ -2,7 +2,7 @@
 
 <div class="container">
 
-    <a href="/admin/stakeholder-categories/new">
+    <a href="/${adminPanelUrl}/stakeholder-categories/new">
         <div class="btn btn-primary btn-lg btn-block my-4">Додати категорію стейкхолдерів</div>
     </a>
 
@@ -17,12 +17,12 @@
                         <p class="h4">${stakeholderCategory.title}</p>
                     </th>
                     <td>
-                        <a href="/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions">
+                        <a href="/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions">
                             <div class="btn btn-secondary mx-4">
                                 Переглянути питання
                             </div>
                         </a>
-                        <a href="/admin/stakeholder-categories/edit/${stakeholderCategory.id}">
+                        <a href="/${adminPanelUrl}/stakeholder-categories/edit/${stakeholderCategory.id}">
                             <div class="btn btn-warning">
                                 Редагувати
                             </div>

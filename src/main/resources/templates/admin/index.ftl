@@ -13,7 +13,7 @@
                 <p class="h3">Непереглянутих відкритих відповідей: ${unreviewedOpenAnswersCount}</p>
             </th>
             <td>
-                <a href="/admin/open-answers">
+                <a href="/${adminPanelUrl}/open-answers">
                     <div class="btn btn-secondary mx-4">
                         Переглянути
                     </div>

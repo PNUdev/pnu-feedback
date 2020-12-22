@@ -19,3 +19,4 @@ jwt:
   secret: ${JWT_SECRET:secret}
 app:
   baseUrl: ${APP_BASE_URL:http://localhost:8080}
+  adminPanelUrl: ${ADMIN_PANEL_URL:admin}
