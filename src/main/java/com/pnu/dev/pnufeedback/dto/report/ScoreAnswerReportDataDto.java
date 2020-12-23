@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportDataDto {
+public class ScoreAnswerReportDataDto {
 
     private String educationalProgramName;
 
@@ -25,7 +25,7 @@ public class ReportDataDto {
 
     private LocalDate endDate;
 
-    private List<ReportChartInfoJasperDto> answerData;
+    private List<ReportChartInfoJasperDto> scoreAnswerReportData;
 
     private List<ReportOpenAnswerJasperDto> openAnswerData;
 

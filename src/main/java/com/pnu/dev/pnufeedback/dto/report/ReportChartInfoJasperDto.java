@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportChartInfoJasperDto {
 
-    private String stakeholderName;
+    private String stakeholderCategoryTitle;
 
-    private String question;
+    private String questionNumber;
 
-    private Double score;
+    private Double averageScore;
 
-    private Integer answerAmount;
+    private Integer scoreAnswerCount;
 
 }

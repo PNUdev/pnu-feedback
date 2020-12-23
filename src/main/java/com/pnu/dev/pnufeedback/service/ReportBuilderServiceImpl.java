@@ -2,7 +2,7 @@ package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerReportDataDto;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.util.GenerateReportDtoPreparer;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
     public void exportReport(GenerateReportForm generateReportForm, HttpServletResponse response) {
 
         GenerateReportDto generateReportDto = generateReportDtoPreparer.prepare(generateReportForm);
-        ReportDataDto reportDataDto = reportDataPreparationService.getReportData(generateReportDto);
+        ScoreAnswerReportDataDto scoreAnswerReportDataDto = reportDataPreparationService.getReportData(generateReportDto);
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=" + REPORT_FILE);
@@ -57,8 +57,9 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
             Resource resource = new ClassPathResource(TEMPLATE_PATH);
             JasperReport report = JasperCompileManager.compileReport(resource.getInputStream());
 
-            JRBeanCollectionDataSource beanColDataSource = new JRBeanCollectionDataSource(reportDataDto.getAnswerData());
-            Map<String, Object> parameters = prepareParameters(reportDataDto);
+            JRBeanCollectionDataSource beanColDataSource =
+                    new JRBeanCollectionDataSource(scoreAnswerReportDataDto.getScoreAnswerReportData());
+            Map<String, Object> parameters = prepareParameters(scoreAnswerReportDataDto);
             JasperPrint print = JasperFillManager.fillReport(report, parameters, beanColDataSource);
 
             JasperExportManager.exportReportToPdfStream(print, servletOutputStream);
@@ -71,17 +72,16 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         }
     }
 
-    private Map<String, Object> prepareParameters(ReportDataDto reportDataDto) {
+    private Map<String, Object> prepareParameters(ScoreAnswerReportDataDto scoreAnswerReportDataDto) {
 
         Map<String, Object> parameters = new HashMap<>();
 
-        parameters.put("EDUCATIONAL_PROGRAM_NAME", reportDataDto.getEducationalProgramName());
-        parameters.put("START_DATE", reportDataDto.getStartDate().toString());
-        parameters.put("END_DATE", reportDataDto.getEndDate().toString());
-        parameters.put("STAKEHOLDER_STATISTICS", reportDataDto.getStakeholderStatistics());
-        parameters.put("CHART_SPLIT_SIZE", reportDataDto.getChartSplitSize());
-        parameters.put("OPEN_ANSWER_DATASET", reportDataDto.getOpenAnswerData());
-        parameters.put("ANSWER_DATASET", new JRBeanCollectionDataSource(reportDataDto.getOpenAnswerData()));
+        parameters.put("EDUCATIONAL_PROGRAM_NAME", scoreAnswerReportDataDto.getEducationalProgramName());
+        parameters.put("START_DATE", scoreAnswerReportDataDto.getStartDate().toString());
+        parameters.put("END_DATE", scoreAnswerReportDataDto.getEndDate().toString());
+        parameters.put("STAKEHOLDER_STATISTICS", scoreAnswerReportDataDto.getStakeholderStatistics());
+        parameters.put("CHART_SPLIT_SIZE", scoreAnswerReportDataDto.getChartSplitSize());
+        parameters.put("OPEN_ANSWER_DATASET", new JRBeanCollectionDataSource(scoreAnswerReportDataDto.getOpenAnswerData()));
 
         return parameters;
     }
