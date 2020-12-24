@@ -15,8 +15,8 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">Номер питання</span>
             </div>
-            <input type="text" class="form-control" name="questionNumber" value="${(scoreQuestion.questionNumber)!}"
-                   required>
+            <input type="text" class="form-control" name="questionNumber" placeholder="(1), (1.1), (1.1.1) ..."
+                   value="${(scoreQuestion.questionNumber)!}" required>
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">

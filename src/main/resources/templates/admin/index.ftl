@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <th scope="row">
-                <p class="h3">Непереглянутих відкритих відповідей: ${unreviewedOpenAnswersCount}</p>
+                <p class="h3">Непереглянутих пропозицій: ${unreviewedOpenAnswersCount}</p>
             </th>
             <td>
                 <a href="/${adminPanelUrl}/open-answers">
