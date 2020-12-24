@@ -2,7 +2,7 @@
 
 <div class="container">
 
-    <a href="/admin/educational-programs/new">
+    <a href="/${adminPanelUrl}/educational-programs/new">
         <div class="btn btn-primary btn-lg btn-block my-4">Додати освітню програму</div>
     </a>
 
@@ -17,7 +17,7 @@
                         <p class="h5">${educationalProgram.title}</p>
                     </th>
                     <td>
-                        <a href="/admin/educational-programs/edit/${educationalProgram.id}">
+                        <a href="/${adminPanelUrl}/educational-programs/edit/${educationalProgram.id}">
                             <div class="btn btn-warning">
                                 Редагувати
                             </div>

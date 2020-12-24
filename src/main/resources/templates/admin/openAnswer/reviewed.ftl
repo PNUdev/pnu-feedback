@@ -11,16 +11,16 @@
     <h5 class="text-center mb-3">
         |
         <#if reviewedFilter != "ALL">
-            <a href="/admin/open-answers/reviewed?filter=ALL">Всі переглянуті</a> |
+            <a href="/${adminPanelUrl}/open-answers/reviewed?filter=ALL">Всі переглянуті</a> |
         </#if>
         <#if reviewedFilter != "APPROVED">
-            <a href="/admin/open-answers/reviewed?filter=APPROVED">Підтверджені</a> |
+            <a href="/${adminPanelUrl}/open-answers/reviewed?filter=APPROVED">Підтверджені</a> |
         </#if>
         <#if reviewedFilter != "DISAPPROVED">
-            <a href="/admin/open-answers/reviewed?filter=DISAPPROVED">Відхилені</a> |
+            <a href="/${adminPanelUrl}/open-answers/reviewed?filter=DISAPPROVED">Відхилені</a> |
         </#if>
         <br>
-        <a href="/admin/open-answers">Непереглянуті</a>
+        <a href="/${adminPanelUrl}/open-answers">Непереглянуті</a>
     </h5>
 </h2>
 <#if !openAnswersPage?has_content >
@@ -38,7 +38,7 @@
                         <#if !openAnswer.approved>
                             <div class="col">
                                 <form class="form-inline d-flex justify-content-center"
-                                      action="/admin/open-answers/approve/${openAnswer.id}"
+                                      action="/${adminPanelUrl}/open-answers/approve/${openAnswer.id}"
                                       method="post">
                                     <div class="d-flex justify-content-center align-middle p-1">
                                         <button class="btn btn-outline-danger btn-sm m-1" disabled>Відхилено
@@ -53,7 +53,7 @@
                         <#if openAnswer.approved>
                             <div class="col">
                                 <form class="form-inline d-flex justify-content-center"
-                                      action="/admin/open-answers/disapprove/${openAnswer.id}"
+                                      action="/${adminPanelUrl}/open-answers/disapprove/${openAnswer.id}"
                                       method="post">
                                     <div class="d-flex justify-content-center p-1">
                                         <button class="btn btn-outline-success btn-sm m-1" disabled>Підтверджено
@@ -74,7 +74,7 @@
     <div class="row">
         <ul class="pagination mx-auto">
             <#list 1..openAnswersPage.totalPages as pageNumber>
-                <form action="/admin/open-answers/reviewed?filter=${reviewedFilter}" method="get">
+                <form action="/${adminPanelUrl}/open-answers/reviewed?filter=${reviewedFilter}" method="get">
                     <li class="page-item">
                         <button type="submit"
                                 <#if pageNumber - 1 == openAnswersPage.number>style="background-color: gray" </#if>

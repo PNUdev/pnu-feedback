@@ -4,6 +4,7 @@ import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.dto.form.EducationalProgramForm;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/educational-programs")
+@RequestMapping("/${app.adminPanelUrl}/educational-programs")
 public class EducationalProgramController {
 
     private final EducationalProgramService educationalProgramService;
+
+    @Value("${app.adminPanelUrl}")
+    private String adminPanelUrl;
 
     @Autowired
     public EducationalProgramController(EducationalProgramService educationalProgramService) {
@@ -52,7 +56,7 @@ public class EducationalProgramController {
 
         educationalProgramService.create(educationalProgramForm);
 
-        return "redirect:/admin/educational-programs";
+        return String.format("redirect:/%s/educational-programs", adminPanelUrl);
     }
 
     @PostMapping("/update/{id}")
@@ -60,6 +64,6 @@ public class EducationalProgramController {
 
         educationalProgramService.update(id, educationalProgramForm);
 
-        return "redirect:/admin/educational-programs";
+        return String.format("redirect:/%s/educational-programs", adminPanelUrl);
     }
 }

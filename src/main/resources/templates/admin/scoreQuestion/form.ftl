@@ -1,6 +1,6 @@
 <#include "../include/header.ftl">
-<#assign formSubmissionUrl = scoreQuestion???then('/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/update/${scoreQuestion.id}',
-'/admin/stakeholder-categories/${stakeholderCategory.id}/score-questions/new') >
+<#assign formSubmissionUrl = scoreQuestion???then('/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/update/${scoreQuestion.id}',
+'/${adminPanelUrl}/stakeholder-categories/${stakeholderCategory.id}/score-questions/new') >
 
 <div class="mx-auto mt-5 p-5 rounded bg-light col-md-9">
     <form method="POST" action="${formSubmissionUrl}">

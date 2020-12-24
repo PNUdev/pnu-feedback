@@ -29,6 +29,7 @@ import java.util.Map;
 public class ReportBuilderServiceImpl implements ReportBuilderService {
 
     private final static String TEMPLATE_PATH = "/reports/report-template.jrxml";
+
     private final static String REPORT_FILE = "/report.pdf";
 
     private ReportDataPreparationService reportDataPreparationService;

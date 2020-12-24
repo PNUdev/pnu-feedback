@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/generate-token")
+@RequestMapping("/${app.adminPanelUrl}/generate-token")
 public class TokenGenerationController {
 
     private EducationalProgramService educationalProgramService;

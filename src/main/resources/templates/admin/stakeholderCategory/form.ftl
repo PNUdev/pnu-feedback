@@ -1,5 +1,5 @@
 <#include "../include/header.ftl">
-<#assign formSubmissionUrl = stakeholderCategory???then('/admin/stakeholder-categories/update/${stakeholderCategory.id}','/admin/stakeholder-categories/new') >
+<#assign formSubmissionUrl = stakeholderCategory???then('/${adminPanelUrl}/stakeholder-categories/update/${stakeholderCategory.id}','/${adminPanelUrl}/stakeholder-categories/new') >
 
 <div class="mx-auto mt-5 p-5 rounded bg-light col-md-9">
     <form method="POST" action="${formSubmissionUrl}">

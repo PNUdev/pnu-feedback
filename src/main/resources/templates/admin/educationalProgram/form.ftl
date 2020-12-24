@@ -1,5 +1,5 @@
 <#include "../include/header.ftl">
-<#assign formSubmissionUrl = educationalProgram???then('/admin/educational-programs/update/${educationalProgram.id}','/admin/educational-programs/new') >
+<#assign formSubmissionUrl = educationalProgram???then('/${adminPanelUrl}/educational-programs/update/${educationalProgram.id}','/${adminPanelUrl}/educational-programs/new') >
 
 <div class="mx-auto mt-5 p-5 rounded bg-light col-md-9">
     <form method="POST" action="${formSubmissionUrl}">

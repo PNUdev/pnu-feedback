@@ -2,9 +2,9 @@
 <h2 class="text-center mt-3">
     Пропозиції
     <h5 class="text-center mb-3">
-        <a href="/admin/open-answers/reviewed?filter=APPROVED">Підтверджені</a> |
-        <a href="/admin/open-answers/reviewed?filter=ALL">Всі переглянуті</a> |
-        <a href="/admin/open-answers/reviewed?filter=DISAPPROVED">Відхилені</a>
+        <a href="/${adminPanelUrl}/open-answers/reviewed?filter=APPROVED">Підтверджені</a> |
+        <a href="/${adminPanelUrl}/open-answers/reviewed?filter=ALL">Всі переглянуті</a> |
+        <a href="/${adminPanelUrl}/open-answers/reviewed?filter=DISAPPROVED">Відхилені</a>
     </h5>
 </h2>
 <#if !openAnswersPage?has_content >
@@ -21,7 +21,7 @@
                     <div class="row">
                         <div class="col">
                             <form class="form-inline d-flex justify-content-center"
-                                  action="/admin/open-answers/approve/${openAnswer.id}"
+                                  action="/${adminPanelUrl}/open-answers/approve/${openAnswer.id}"
                                   method="post">
                                 <div class="d-flex justify-content-center align-middle p-1">
                                     <button class="btn btn-success btn-sm m-1">Підтвердити</button>
@@ -32,7 +32,7 @@
                         </div>
                         <div class="col">
                             <form class="form-inline d-flex justify-content-center"
-                                  action="/admin/open-answers/disapprove/${openAnswer.id}"
+                                  action="/${adminPanelUrl}/open-answers/disapprove/${openAnswer.id}"
                                   method="post">
                                 <div class="d-flex justify-content-center p-1">
                                     <button class="btn btn-danger btn-sm m-1">Відхилити</button>
@@ -50,7 +50,7 @@
     <div class="row">
         <ul class="pagination mx-auto">
             <#list 1..openAnswersPage.totalPages as pageNumber>
-                <form action="/admin/open-answers" method="get">
+                <form action="/${adminPanelUrl}/open-answers" method="get">
                     <li class="page-item">
                         <button type="submit"
                                 <#if pageNumber - 1 == openAnswersPage.number>style="background-color: gray" </#if>

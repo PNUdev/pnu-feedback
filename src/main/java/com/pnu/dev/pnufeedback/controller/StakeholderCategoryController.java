@@ -4,6 +4,7 @@ import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.StakeholderCategoryForm;
 import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/stakeholder-categories")
+@RequestMapping("/${app.adminPanelUrl}/stakeholder-categories")
 public class StakeholderCategoryController {
 
     private final StakeholderCategoryService stakeholderCategoryService;
+
+    @Value("${app.adminPanelUrl}")
+    private String adminPanelUrl;
 
     @Autowired
     public StakeholderCategoryController(StakeholderCategoryService stakeholderCategoryService) {
@@ -51,7 +55,7 @@ public class StakeholderCategoryController {
 
         stakeholderCategoryService.create(stakeholderCategoryForm);
 
-        return "redirect:/admin/stakeholder-categories";
+        return String.format("redirect:/%s/stakeholder-categories", adminPanelUrl);
     }
 
     @PostMapping("/update/{id}")
@@ -59,6 +63,6 @@ public class StakeholderCategoryController {
 
         stakeholderCategoryService.update(id, stakeholderCategoryForm);
 
-        return "redirect:/admin/stakeholder-categories";
+        return String.format("redirect:/%s/stakeholder-categories", adminPanelUrl);
     }
 }
