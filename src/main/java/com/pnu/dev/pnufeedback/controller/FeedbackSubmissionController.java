@@ -109,10 +109,6 @@ public class FeedbackSubmissionController {
 
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
-        if (jwtTokenPayload.isAllowToChooseEducationalProgram()) {
-
-        }
-
         List<ScoreAnswerDto> scoreAnswers = fetchScoreAnswers(parameterMap);
 
         FeedbackSubmissionDto feedbackSubmission = FeedbackSubmissionDto.builder()
