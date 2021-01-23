@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
         log.debug("Data analyzing has started!");
 
-        LocalDate startDate = generateReportDto.getStartDate();
-        LocalDate endDate = generateReportDto.getEndDate();
+        LocalDateTime startDate = generateReportDto.getStartDate();
+        LocalDateTime endDate = generateReportDto.getEndDate();
 
         EducationalProgram educationalProgram = educationalProgramService
                 .findById(generateReportDto.getEducationalProgramId());
@@ -78,7 +79,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
             );
         }
 
-        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
+        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
 
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
                 getSubmissionIds(submissions)
@@ -89,8 +90,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         ScoreAnswerReportDataDto reportDataDto = ScoreAnswerReportDataDto.builder()
                 .stakeholderStatistics(stakeholderStatistics)
                 .educationalProgramName(educationalProgram.getTitle())
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(startDate.toLocalDate())
+                .endDate(endDate.toLocalDate())
                 .scoreAnswerReportData(chartAnswerData)
                 .openAnswerData(mapToJasperOpenAnswerDto(openAnswerData))
                 .chartSplitSize(normalizeChartSplitSize(submissions)).build();

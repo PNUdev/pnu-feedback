@@ -65,7 +65,7 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                     .findById(generateReportDto.getEducationalProgramId());
             Sheet sheet = workbook.createSheet(educationalProgram.getTitle());
 
-            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
+            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
             Row stakeholderCategoriesRow = sheet.createRow(0);
 
             CellStyle cellBoldFontStyle = getCellBoldFontStyle(workbook);

@@ -17,4 +17,6 @@ public class StakeholderCategory {
 
     private String title;
 
+    private boolean showInReport;
+
 }

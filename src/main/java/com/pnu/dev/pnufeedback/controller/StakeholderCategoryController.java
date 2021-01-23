@@ -21,8 +21,7 @@ import java.util.List;
 public class StakeholderCategoryController {
 
     private final StakeholderCategoryService stakeholderCategoryService;
-
-    @Value("${app.adminPanelUrl}")
+    
     private final String redirectUrl;
 
     @Autowired

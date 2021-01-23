@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.dto.form.StakeholderCategoryForm;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.repository.StakeholderCategoryRepository;
+import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,17 +21,26 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
     private final ScoreQuestionRepository scoreQuestionRepository;
 
+    private final SubmissionRepository submissionRepository;
+
     @Autowired
     public StakeholderCategoryServiceImpl(StakeholderCategoryRepository stakeholderCategoryRepository,
-                                          ScoreQuestionRepository scoreQuestionRepository) {
+                                          ScoreQuestionRepository scoreQuestionRepository,
+                                          SubmissionRepository submissionRepository) {
 
         this.stakeholderCategoryRepository = stakeholderCategoryRepository;
         this.scoreQuestionRepository = scoreQuestionRepository;
+        this.submissionRepository = submissionRepository;
     }
 
     @Override
     public List<StakeholderCategory> findAll() {
         return stakeholderCategoryRepository.findAll(SORT_BY_TITLE_ASC);
+    }
+
+    @Override
+    public List<StakeholderCategory> findAllToShowInReport() {
+        return stakeholderCategoryRepository.findAllByShowInReportTrue(SORT_BY_TITLE_ASC);
     }
 
     @Override
@@ -47,6 +57,7 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
 
         StakeholderCategory stakeholderCategory = StakeholderCategory.builder()
                 .title(stakeholderCategoryForm.getTitle())
+                .showInReport(stakeholderCategoryForm.isShowInReport())
                 .build();
         stakeholderCategoryRepository.save(stakeholderCategory);
     }
@@ -60,6 +71,7 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
         StakeholderCategory stakeholderCategoryFromDb = findById(id);
         StakeholderCategory updatedStakeholderCategory = stakeholderCategoryFromDb.toBuilder()
                 .title(stakeholderCategoryForm.getTitle())
+                .showInReport(stakeholderCategoryForm.isShowInReport())
                 .build();
         stakeholderCategoryRepository.save(updatedStakeholderCategory);
     }
@@ -71,7 +83,7 @@ public class StakeholderCategoryServiceImpl implements StakeholderCategoryServic
             throw new ServiceException("Неможливо видалити категорію стейкхолдерів, оскільки вона містить запитання");
         }
 
-        if (scoreQuestionRepository.existsByStakeholderCategoryId(id)) {
+        if (submissionRepository.existsByStakeholderCategoryId(id)) {
             throw new ServiceException("Неможливо видалити категорію стейкхолдерів," +
                     " оскільки вона вже була використана у опитуванні");
         }
