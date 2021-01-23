@@ -16,6 +16,11 @@
                     <div class="pt-3">
                         <button class="btn btn-primary">Оновити</button>
                     </div>
+                    <div class="mx-2 pt-3">
+                        <a href="/${adminPanelUrl}/educational-programs/delete/${educationalProgram.id}">
+                            <div class="btn btn-danger">Видалити</div>
+                        </a>
+                    </div>
                 </div>
             <#else >
                 <button class="btn btn-primary">Додати освітню програму</button>

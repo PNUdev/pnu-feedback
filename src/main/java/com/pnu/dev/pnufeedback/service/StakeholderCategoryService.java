@@ -14,4 +14,7 @@ public interface StakeholderCategoryService {
     void create(StakeholderCategoryForm educationalProgramForm);
 
     void update(Long id, StakeholderCategoryForm educationalProgramForm);
+
+    void delete(Long id);
+
 }

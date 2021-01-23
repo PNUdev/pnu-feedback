@@ -15,4 +15,6 @@ public interface EducationalProgramService {
 
     void update(Long id, EducationalProgramForm educationalProgramForm);
 
+    void delete(Long id);
+
 }

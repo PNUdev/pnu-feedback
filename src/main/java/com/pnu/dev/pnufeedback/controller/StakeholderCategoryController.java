@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -22,11 +23,14 @@ public class StakeholderCategoryController {
     private final StakeholderCategoryService stakeholderCategoryService;
 
     @Value("${app.adminPanelUrl}")
-    private String adminPanelUrl;
+    private final String redirectUrl;
 
     @Autowired
-    public StakeholderCategoryController(StakeholderCategoryService stakeholderCategoryService) {
+    public StakeholderCategoryController(StakeholderCategoryService stakeholderCategoryService,
+                                         @Value("${app.adminPanelUrl}") String adminPanelUrl) {
+
         this.stakeholderCategoryService = stakeholderCategoryService;
+        this.redirectUrl = String.format("redirect:/%s/stakeholder-categories", adminPanelUrl);
     }
 
     @GetMapping
@@ -50,12 +54,22 @@ public class StakeholderCategoryController {
         return "admin/stakeholderCategory/form";
     }
 
+    @GetMapping("/delete/{id}") // the {id} should be in the url
+    public String deleteConfirmation(Model model,
+                                     @RequestHeader(value = "referer", defaultValue = "/") String returnBackUrl) {
+
+        model.addAttribute("message", "Ви точно хочете видалити категорію стейкхолдерів?");
+        model.addAttribute("returnBackUrl", returnBackUrl);
+
+        return "admin/common/deleteConfirmation";
+    }
+
     @PostMapping("/new")
     public String create(@Validated StakeholderCategoryForm stakeholderCategoryForm) {
 
         stakeholderCategoryService.create(stakeholderCategoryForm);
 
-        return String.format("redirect:/%s/stakeholder-categories", adminPanelUrl);
+        return redirectUrl;
     }
 
     @PostMapping("/update/{id}")
@@ -63,6 +77,14 @@ public class StakeholderCategoryController {
 
         stakeholderCategoryService.update(id, stakeholderCategoryForm);
 
-        return String.format("redirect:/%s/stakeholder-categories", adminPanelUrl);
+        return redirectUrl;
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Long id) {
+
+        stakeholderCategoryService.delete(id);
+
+        return redirectUrl;
     }
 }

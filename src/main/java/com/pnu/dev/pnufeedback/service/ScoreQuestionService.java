@@ -15,4 +15,6 @@ public interface ScoreQuestionService {
 
     ScoreQuestion update(Long id, ScoreQuestionForm scoreQuestionForm);
 
+    ScoreQuestion delete(Long id);
+
 }

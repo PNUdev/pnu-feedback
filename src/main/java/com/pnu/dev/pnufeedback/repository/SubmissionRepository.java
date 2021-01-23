@@ -10,4 +10,9 @@ public interface SubmissionRepository extends CrudRepository<Submission, Long> {
 
     List<Submission> findAllByEducationalProgramIdAndSubmissionTimeBetween(
             Long educationalProgramId, LocalDate startDate, LocalDate endDate);
+
+    boolean existsByEducationalProgramId(Long educationalProgramId);
+
+    boolean existsByStakeholderCategoryId(Long stakeholderCategoryId);
+
 }

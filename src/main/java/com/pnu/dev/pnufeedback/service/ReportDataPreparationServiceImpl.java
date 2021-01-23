@@ -18,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +162,10 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private Integer normalizeChartSplitSize(List<Submission> submissions) {
 
        Integer stakeholderAmount = ((Long)submissions.stream()
-               .map(s->s.getStakeholderCategoryId()).distinct().count()).intValue();
+               .map(Submission::getStakeholderCategoryId)
+               .distinct()
+               .count())
+               .intValue();
 
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
 
@@ -190,8 +191,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 )
                 .entrySet()
                 .stream()
-                .map(e ->
-                        new ReportOpenAnswerJasperDto(e.getKey(), e.getValue())
+                .map(entry ->
+                        new ReportOpenAnswerJasperDto(entry.getKey(), entry.getValue())
                 )
                 .collect(Collectors.toList());
 

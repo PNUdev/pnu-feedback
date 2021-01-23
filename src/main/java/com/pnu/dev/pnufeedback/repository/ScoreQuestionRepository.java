@@ -18,4 +18,7 @@ public interface ScoreQuestionRepository extends CrudRepository<ScoreQuestion, L
 
     @Query("SELECT DISTINCT question_number FROM score_question")
     List<String> findAllAvailableQuestionNumbers();
+
+    boolean existsByStakeholderCategoryId(Long stakeholderCategoryId);
+
 }

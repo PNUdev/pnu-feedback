@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -30,7 +31,9 @@ public class ScoreQuestionController {
     private String adminPanelUrl;
 
     @Autowired
-    public ScoreQuestionController(ScoreQuestionService scoreQuestionService, StakeholderCategoryService stakeholderCategoryService) {
+    public ScoreQuestionController(ScoreQuestionService scoreQuestionService,
+                                   StakeholderCategoryService stakeholderCategoryService) {
+
         this.scoreQuestionService = scoreQuestionService;
         this.stakeholderCategoryService = stakeholderCategoryService;
     }
@@ -67,19 +70,40 @@ public class ScoreQuestionController {
         return "admin/scoreQuestion/form";
     }
 
+    @GetMapping("/delete/{id}") // the {id} should be in the url
+    public String deleteConfirmation(Model model,
+                                     @RequestHeader(value = "referer", defaultValue = "/") String returnBackUrl) {
+
+        model.addAttribute("message", "Ви точно хочете видалити запитання?");
+        model.addAttribute("returnBackUrl", returnBackUrl);
+
+        return "admin/common/deleteConfirmation";
+    }
+
     @PostMapping("/new")
     public String create(@Validated ScoreQuestionForm scoreQuestionForm) {
 
         ScoreQuestion scoreQuestion = scoreQuestionService.create(scoreQuestionForm);
-        return String.format("redirect:/%s/stakeholder-categories/%s/score-questions",
-                adminPanelUrl, scoreQuestion.getStakeholderCategoryId());
+        return getRedirectUrl(scoreQuestion);
     }
 
     @PostMapping("/update/{id}")
     public String update(@PathVariable("id") Long id, @Validated ScoreQuestionForm scoreQuestionForm) {
 
         ScoreQuestion scoreQuestion = scoreQuestionService.update(id, scoreQuestionForm);
+        return getRedirectUrl(scoreQuestion);
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Long id) {
+
+        ScoreQuestion scoreQuestion = scoreQuestionService.delete(id);
+        return getRedirectUrl(scoreQuestion);
+    }
+
+    private String getRedirectUrl(ScoreQuestion scoreQuestion) {
         return String.format("redirect:/%s/stakeholder-categories/%s/score-questions",
                 adminPanelUrl, scoreQuestion.getStakeholderCategoryId());
     }
+
 }
