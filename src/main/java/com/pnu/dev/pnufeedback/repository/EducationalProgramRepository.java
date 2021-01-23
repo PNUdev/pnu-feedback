@@ -14,4 +14,6 @@ public interface EducationalProgramRepository extends CrudRepository<Educational
 
     boolean existsByIdNotAndTitle(Long id, String title);
 
+    boolean existsById(Long id);
+
 }

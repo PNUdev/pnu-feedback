@@ -76,4 +76,9 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
 
     }
 
+    @Override
+    public boolean existsById(Long id) {
+        return educationalProgramRepository.existsById(id);
+    }
+
 }

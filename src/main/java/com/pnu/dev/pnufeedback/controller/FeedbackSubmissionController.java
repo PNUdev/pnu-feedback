@@ -109,6 +109,10 @@ public class FeedbackSubmissionController {
 
         jwtTokenPayloadValidator.validate(jwtTokenPayload);
 
+        if (jwtTokenPayload.isAllowToChooseEducationalProgram()) {
+
+        }
+
         List<ScoreAnswerDto> scoreAnswers = fetchScoreAnswers(parameterMap);
 
         FeedbackSubmissionDto feedbackSubmission = FeedbackSubmissionDto.builder()
@@ -143,10 +147,16 @@ public class FeedbackSubmissionController {
         }
 
         if (isNull(educationalProgramIdParam)) {
-            throw new ServiceException("Освітня програма має бути вказана");
+            throw new ServiceException("Освітня програма має бути вказана!");
         }
 
-        return Long.parseLong(educationalProgramIdParam);
+        Long educationalProgramId = Long.parseLong(educationalProgramIdParam);
+
+        if (!educationalProgramService.existsById(educationalProgramId)) {
+            throw new ServiceException("Освітню програму не знайдено!");
+        }
+
+        return educationalProgramId;
     }
 
 }

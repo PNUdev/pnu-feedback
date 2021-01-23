@@ -13,4 +13,6 @@ public interface StakeholderCategoryRepository extends CrudRepository<Stakeholde
     boolean existsByTitle(String title);
 
     boolean existsByIdNotAndTitle(Long id, String title);
+
+    boolean existsById(Long id);
 }
