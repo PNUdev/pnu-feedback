@@ -15,13 +15,13 @@ import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
@@ -118,25 +118,25 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                         .sorted(Comparator.comparing(StakeholderCategory::getId))
                         .map(stakeholderCategory -> {
 
-                            AtomicInteger questionScores = new AtomicInteger(0);
-
                             List<Long> categoryStakeholderSubmissionIds = submissions.stream()
                                     .filter(submission -> submission.getStakeholderCategoryId()
                                             .equals(stakeholderCategory.getId())
                                     ).map(Submission::getId)
                                     .collect(toList());
 
+                            MutableInt questionScoresSum = new MutableInt(0);
+
                             Long stakeholderAnswerCount = scoreAnswers.stream()
                                     .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
                                     .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
                                     .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
-                                    .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
+                                    .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
                                     .questionNumber(questionNumber)
-                                    .averageScore(questionScores.doubleValue() / stakeholderAnswerCount)
+                                    .averageScore(questionScoresSum.doubleValue() / stakeholderAnswerCount)
                                     .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
 
                         }))
