@@ -17,5 +17,8 @@ public class GenerateReportForm {
 
     @NotNull
     private String endDate;
+
+    private boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport;
+
 }
 

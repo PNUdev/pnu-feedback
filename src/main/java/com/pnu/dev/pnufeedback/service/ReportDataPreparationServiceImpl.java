@@ -17,7 +17,6 @@ import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -84,7 +83,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
                 getSubmissionIds(submissions)
         );
-        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions);
+        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
+                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
+
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
         ScoreAnswerReportDataDto reportDataDto = ScoreAnswerReportDataDto.builder()
@@ -102,7 +103,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
     private List<ReportChartInfoJasperDto> getChartData(List<StakeholderCategory> stakeholderCategories,
-                                                        List<Submission> submissions) {
+                                                        List<Submission> submissions,
+                                                        boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport) {
 
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(
                 getSubmissionIds(submissions)
@@ -138,7 +140,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                                 .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
 
                 }))
-                .filter(reportChartInfoJasperDto -> reportChartInfoJasperDto.getScoreAnswerCount() != 0)
+                .filter(reportChartInfoJasperDto -> includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
+                        || reportChartInfoJasperDto.getScoreAnswerCount() != 0)
                 .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestionNumber))
                 .collect(Collectors.toList());
 
