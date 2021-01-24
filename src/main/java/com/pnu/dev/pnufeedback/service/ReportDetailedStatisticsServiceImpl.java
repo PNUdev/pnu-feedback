@@ -56,7 +56,7 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
                 );
 
         if (submissions.isEmpty()) {
-            throw new EmptyReportException(String.format("У системі ще немає опитувань з %s по %s",
+            throw new EmptyReportException(String.format("У системі ще немає жодних результатів опитувань з %s по %s",
                     generateReportDto.getStartDate(), generateReportDto.getEndDate())
             );
         }

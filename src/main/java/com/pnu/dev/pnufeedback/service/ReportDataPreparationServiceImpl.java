@@ -80,7 +80,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
         if (submissions.isEmpty()) {
             throw new EmptyReportException(
-                    String.format("У системі ще немає опитувань з %s по %s", startDate, endDate)
+                    String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
             );
         }
 
