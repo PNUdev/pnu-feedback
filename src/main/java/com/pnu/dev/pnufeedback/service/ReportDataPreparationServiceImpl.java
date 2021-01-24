@@ -14,6 +14,7 @@ import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionNumberComparator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.springframework.stereotype.Service;
@@ -44,16 +45,21 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private StakeholderCategoryService stakeholderCategoryService;
 
+    private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
+
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
                                             SubmissionRepository submissionRepository,
                                             OpenAnswerRepository openAnswerRepository,
                                             EducationalProgramService educationalProgramService,
-                                            StakeholderCategoryService stakeholderCategoryService) {
+                                            StakeholderCategoryService stakeholderCategoryService,
+                                            ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
+
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
         this.openAnswerRepository = openAnswerRepository;
         this.educationalProgramService = educationalProgramService;
         this.stakeholderCategoryService = stakeholderCategoryService;
+        this.scoreQuestionNumberComparator = scoreQuestionNumberComparator;
     }
 
     @Override
@@ -112,16 +118,16 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
         return scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
-                .sorted()
                 .distinct()
+                .sorted(scoreQuestionNumberComparator)
                 .flatMap(questionNumber -> stakeholderCategories.stream()
                         .sorted(Comparator.comparing(StakeholderCategory::getId))
                         .map(stakeholderCategory -> {
 
                             List<Long> categoryStakeholderSubmissionIds = submissions.stream()
                                     .filter(submission -> submission.getStakeholderCategoryId()
-                                            .equals(stakeholderCategory.getId())
-                                    ).map(Submission::getId)
+                                            .equals(stakeholderCategory.getId()))
+                                    .map(Submission::getId)
                                     .collect(toList());
 
                             MutableInt questionScoresSum = new MutableInt(0);
@@ -142,7 +148,6 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                         }))
                 .filter(reportChartInfoJasperDto -> includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
                         || reportChartInfoJasperDto.getScoreAnswerCount() != 0)
-                .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestionNumber))
                 .collect(Collectors.toList());
 
     }
