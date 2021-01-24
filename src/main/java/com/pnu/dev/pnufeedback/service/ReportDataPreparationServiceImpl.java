@@ -69,7 +69,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .findById(generateReportDto.getEducationalProgramId());
 
         List<Submission> submissions = submissionRepository
-                .findAllByEducationalProgramIdAndSubmissionTimeBetween(
+                .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDate, endDate
                 );
 

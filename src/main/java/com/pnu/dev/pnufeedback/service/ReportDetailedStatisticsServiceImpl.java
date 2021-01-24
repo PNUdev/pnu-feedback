@@ -48,7 +48,7 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
     public ReportDetailedStatistics calculateReportDetailedStatistics(GenerateReportDto generateReportDto) {
 
         List<Submission> submissions = submissionRepository
-                .findAllByEducationalProgramIdAndSubmissionTimeBetween(
+                .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         generateReportDto.getEducationalProgramId(),
                         generateReportDto.getStartDate(),
                         generateReportDto.getEndDate()
