@@ -10,6 +10,17 @@
             <input type="text" class="form-control" name="title" value="${(educationalProgram.title)!}" required>
         </div>
 
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" name="allowedToBeSelectedByUser" type="checkbox"
+                       id="allowedToBeSelectedByUser"
+                        ${((educationalProgram.allowedToBeSelectedByUser)!false)?string('checked','')}>
+                <label class="form-check-label" for="allowedToBeSelectedByUser">
+                    <b>Показувати серед опцій, у режимі вибору освітньої програми під час проходження опитування</b>
+                </label>
+            </div>
+        </div>
+
         <div class="p-3">
             <#if educationalProgram??>
                 <div class="row">

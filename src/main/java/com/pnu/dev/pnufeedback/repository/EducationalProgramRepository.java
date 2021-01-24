@@ -10,10 +10,12 @@ public interface EducationalProgramRepository extends CrudRepository<Educational
 
     List<EducationalProgram> findAll(Sort sort);
 
+    List<EducationalProgram> findAllByAllowedToBeSelectedByUserTrue();
+
     boolean existsByTitle(String title);
 
     boolean existsByIdNotAndTitle(Long id, String title);
 
-    boolean existsById(Long id);
+    boolean existsByIdAndAllowedToBeSelectedByUserTrue(Long id);
 
 }

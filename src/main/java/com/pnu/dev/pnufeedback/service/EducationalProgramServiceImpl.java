@@ -34,6 +34,11 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
     }
 
     @Override
+    public List<EducationalProgram> findAllAllowedToBeSelectedByUser() {
+        return educationalProgramRepository.findAllByAllowedToBeSelectedByUserTrue();
+    }
+
+    @Override
     public EducationalProgram findById(Long id) {
         return educationalProgramRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Освітня програма не знайдена"));
@@ -47,6 +52,7 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
 
         EducationalProgram educationalProgram = EducationalProgram.builder()
                 .title(educationalProgramForm.getTitle())
+                .allowedToBeSelectedByUser(educationalProgramForm.isAllowedToBeSelectedByUser())
                 .build();
         educationalProgramRepository.save(educationalProgram);
     }
@@ -60,7 +66,9 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
         EducationalProgram educationalProgramFromDb = findById(id);
         EducationalProgram updatedEducationalProgram = educationalProgramFromDb.toBuilder()
                 .title(educationalProgramForm.getTitle())
+                .allowedToBeSelectedByUser(educationalProgramForm.isAllowedToBeSelectedByUser())
                 .build();
+
         educationalProgramRepository.save(updatedEducationalProgram);
     }
 
@@ -77,8 +85,8 @@ public class EducationalProgramServiceImpl implements EducationalProgramService 
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return educationalProgramRepository.existsById(id);
+    public boolean existsByIdAndIsAllowedToBeSelectedByUser(Long id) {
+        return educationalProgramRepository.existsByIdAndAllowedToBeSelectedByUserTrue(id);
     }
 
 }

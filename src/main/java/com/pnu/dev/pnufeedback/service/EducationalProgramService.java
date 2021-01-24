@@ -9,6 +9,8 @@ public interface EducationalProgramService {
 
     List<EducationalProgram> findAll();
 
+    List<EducationalProgram> findAllAllowedToBeSelectedByUser();
+
     EducationalProgram findById(Long id);
 
     void create(EducationalProgramForm educationalProgramForm);
@@ -17,6 +19,6 @@ public interface EducationalProgramService {
 
     void delete(Long id);
 
-    boolean existsById(Long id);
+    boolean existsByIdAndIsAllowedToBeSelectedByUser(Long id);
 
 }
