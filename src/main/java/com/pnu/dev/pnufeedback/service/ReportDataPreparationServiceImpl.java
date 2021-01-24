@@ -116,30 +116,30 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .distinct()
                 .flatMap(questionNumber -> stakeholderCategories.stream()
                         .sorted(Comparator.comparing(StakeholderCategory::getId))
-                                .map(stakeholderCategory -> {
+                        .map(stakeholderCategory -> {
 
-                                        AtomicInteger questionScores = new AtomicInteger(0);
+                            AtomicInteger questionScores = new AtomicInteger(0);
 
-                                        List<Long> categoryStakeholderSubmissionIds = submissions.stream()
-                                                .filter(submission -> submission.getStakeholderCategoryId()
-                                                        .equals(stakeholderCategory.getId())
-                                                ).map(Submission::getId)
-                                                .collect(toList());
+                            List<Long> categoryStakeholderSubmissionIds = submissions.stream()
+                                    .filter(submission -> submission.getStakeholderCategoryId()
+                                            .equals(stakeholderCategory.getId())
+                                    ).map(Submission::getId)
+                                    .collect(toList());
 
-                                        Long stakeholderAnswerCount = scoreAnswers.stream()
-                                                .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
-                                                .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
-                                                .filter(scoreAnswer ->  categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
-                                                .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
-                                                .count();
+                            Long stakeholderAnswerCount = scoreAnswers.stream()
+                                    .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
+                                    .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
+                                    .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
+                                    .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
+                                    .count();
 
-                                        return ReportChartInfoJasperDto.builder()
-                                                .stakeholderCategoryTitle(stakeholderCategory.getTitle())
-                                                .questionNumber(questionNumber)
-                                                .averageScore(questionScores.doubleValue() / stakeholderAnswerCount)
-                                                .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
+                            return ReportChartInfoJasperDto.builder()
+                                    .stakeholderCategoryTitle(stakeholderCategory.getTitle())
+                                    .questionNumber(questionNumber)
+                                    .averageScore(questionScores.doubleValue() / stakeholderAnswerCount)
+                                    .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
 
-                }))
+                        }))
                 .filter(reportChartInfoJasperDto -> includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
                         || reportChartInfoJasperDto.getScoreAnswerCount() != 0)
                 .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestionNumber))
@@ -150,12 +150,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
 
         Map<String, Double> statisticsMap = data.stream()
-            .collect(
-                 Collectors.groupingBy(
-                      ReportChartInfoJasperDto::getStakeholderCategoryTitle,
-                           averagingInt(ReportChartInfoJasperDto::getScoreAnswerCount)
-                      )
-            );
+                .collect(
+                        Collectors.groupingBy(
+                                ReportChartInfoJasperDto::getStakeholderCategoryTitle,
+                                averagingInt(ReportChartInfoJasperDto::getScoreAnswerCount)
+                        )
+                );
 
         return statisticsMap.entrySet().stream()
                 .map(e -> String.format("%s - %s", e.getKey(), e.getValue().intValue()))
@@ -165,11 +165,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private Integer normalizeChartSplitSize(List<Submission> submissions) {
 
-       Integer stakeholderAmount = ((Long)submissions.stream()
-               .map(Submission::getStakeholderCategoryId)
-               .distinct()
-               .count())
-               .intValue();
+        Integer stakeholderAmount = ((Long) submissions.stream()
+                .map(Submission::getStakeholderCategoryId)
+                .distinct()
+                .count())
+                .intValue();
 
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
 
