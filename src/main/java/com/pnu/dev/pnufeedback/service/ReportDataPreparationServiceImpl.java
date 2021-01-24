@@ -126,7 +126,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
                             MutableInt questionScoresSum = new MutableInt(0);
 
-                            Long stakeholderAnswerCount = scoreAnswers.stream()
+                            Long stakeholderAnswersCount = scoreAnswers.stream()
                                     .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
                                     .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
                                     .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
@@ -136,8 +136,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
                                     .questionNumber(questionNumber)
-                                    .averageScore(questionScoresSum.doubleValue() / stakeholderAnswerCount)
-                                    .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
+                                    .averageScore(questionScoresSum.doubleValue() / stakeholderAnswersCount)
+                                    .scoreAnswerCount(stakeholderAnswersCount.intValue()).build();
 
                         }))
                 .filter(reportChartInfoJasperDto -> includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
