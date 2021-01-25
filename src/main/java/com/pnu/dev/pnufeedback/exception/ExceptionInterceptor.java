@@ -6,15 +6,19 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @ControllerAdvice
 public class ExceptionInterceptor {
 
     @ExceptionHandler({ServiceException.class})
-    public String handleServiceAdminException(ServiceException serviceException, Model model) {
+    public String handleServiceAdminException(ServiceException serviceException, Model model,
+                                              HttpServletRequest servletRequest) {
 
         log.error("Service exception occurred! Message: {}", serviceException.getMessage());
 
+        model.addAttribute("previousLocation", servletRequest.getHeader("referer"));
         model.addAttribute("errorMessage", serviceException.getMessage());
 
         return "main/error";
