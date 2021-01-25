@@ -13,7 +13,7 @@ public class ExceptionInterceptor {
     @ExceptionHandler({ServiceException.class})
     public String handleServiceAdminException(ServiceException serviceException, Model model) {
 
-        log.error("Service exception occurred!", serviceException);
+        log.error("Service exception occurred! Message: {}", serviceException.getMessage());
 
         model.addAttribute("errorMessage", serviceException.getMessage());
 
@@ -31,9 +31,9 @@ public class ExceptionInterceptor {
     @ExceptionHandler(EmptyReportException.class)
     public String handleException(EmptyReportException exception, RedirectAttributes redirectAttributes) {
 
-        log.error("Exception occurred!", exception);
+        log.error("Empty report exception occurred. Message: {}", exception.getMessage());
 
-        redirectAttributes.addFlashAttribute("warningMessage", exception.getLocalizedMessage());
+        redirectAttributes.addFlashAttribute("warningMessage", exception.getMessage());
 
         return "redirect:/admin/generate-report";
     }

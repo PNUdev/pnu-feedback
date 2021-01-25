@@ -11,4 +11,7 @@ public class StakeholderCategoryForm {
 
     @NotBlank(message = "Назва категорії стейкхолдерів повинна бути вказана")
     private String title;
+
+    private boolean showInReport;
+
 }

@@ -77,7 +77,7 @@ public class FeedbackSubmissionController {
         model.addAttribute("allowToChooseEducationalProgram", allowToChooseEducationalProgram);
 
         if (allowToChooseEducationalProgram) {
-            List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
+            List<EducationalProgram> educationalPrograms = educationalProgramService.findAllAllowedToBeSelectedByUser();
             model.addAttribute("allEducationalPrograms", educationalPrograms);
         } else {
             EducationalProgram educationalProgram = educationalProgramService
@@ -143,10 +143,16 @@ public class FeedbackSubmissionController {
         }
 
         if (isNull(educationalProgramIdParam)) {
-            throw new ServiceException("Освітня програма має бути вказана");
+            throw new ServiceException("Освітня програма має бути вказана!");
         }
 
-        return Long.parseLong(educationalProgramIdParam);
+        Long educationalProgramId = Long.parseLong(educationalProgramIdParam);
+
+        if (!educationalProgramService.existsByIdAndIsAllowedToBeSelectedByUser(educationalProgramId)) {
+            throw new ServiceException("Освітню програму не знайдено або вона не доступна для вибору!");
+        }
+
+        return educationalProgramId;
     }
 
 }

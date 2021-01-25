@@ -1,5 +1,7 @@
-<html>
+<!doctype html>
+<html lang="uk">
 <head>
+    <meta charset="UTF-8">
     <#include "../../include/coreDependencies.ftl" >
     <title>Moderator panel</title>
 </head>

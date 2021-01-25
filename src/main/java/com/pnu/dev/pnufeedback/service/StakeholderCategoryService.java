@@ -9,9 +9,14 @@ public interface StakeholderCategoryService {
 
     List<StakeholderCategory> findAll();
 
+    List<StakeholderCategory> findAllToShowInReport();
+
     StakeholderCategory findById(Long id);
 
     void create(StakeholderCategoryForm educationalProgramForm);
 
     void update(Long id, StakeholderCategoryForm educationalProgramForm);
+
+    void delete(Long id);
+
 }

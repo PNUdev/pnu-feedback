@@ -1,0 +1,1 @@
+CREATE INDEX score_question_stakeholder_category_id_idx ON score_question(stakeholder_category_id);

@@ -5,6 +5,7 @@ import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
 import com.pnu.dev.pnufeedback.dto.report.QuestionDetailedStatistics;
 import com.pnu.dev.pnufeedback.dto.report.ReportDetailedStatistics;
 import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerStatisticsDto;
+import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreQuestionRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
@@ -48,23 +49,29 @@ public class ReportDetailedStatisticsServiceImpl implements ReportDetailedStatis
     public ReportDetailedStatistics calculateReportDetailedStatistics(GenerateReportDto generateReportDto) {
 
         List<Submission> submissions = submissionRepository
-                .findAllByEducationalProgramIdAndSubmissionTimeBetween(
+                .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         generateReportDto.getEducationalProgramId(),
                         generateReportDto.getStartDate(),
                         generateReportDto.getEndDate()
                 );
+
+        if (submissions.isEmpty()) {
+            throw new EmptyReportException(String.format("У системі ще немає жодних результатів опитувань з %s по %s",
+                    generateReportDto.getStartDate(), generateReportDto.getEndDate())
+            );
+        }
 
         List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
 
         Map<Long, Long> submissionsCountByStakeholderCategory = submissions.stream()
                 .collect(groupingBy(Submission::getStakeholderCategoryId, counting()));
 
-        List<String> questionNumbers = scoreQuestionRepository.findAllAvailableQuestionNumbers();
-
         List<ScoreAnswerStatisticsDto> scoreAnswerStatisticsDtos = scoreAnswerRepository
                 .findAllScoreAnswerStatisticsBySubmissionIdIn(submissionIds);
 
-        List<QuestionDetailedStatistics> questionDetailedStatistics = questionNumbers.stream()
+        List<QuestionDetailedStatistics> questionDetailedStatistics = scoreAnswerStatisticsDtos.stream()
+                .map(ScoreAnswerStatisticsDto::getQuestionNumber)
+                .distinct()
                 .sorted(scoreQuestionNumberComparator)
                 .map(questionNumber -> {
 

@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -21,12 +22,14 @@ public class EducationalProgramController {
 
     private final EducationalProgramService educationalProgramService;
 
-    @Value("${app.adminPanelUrl}")
-    private String adminPanelUrl;
+    private final String redirectUrl;
 
     @Autowired
-    public EducationalProgramController(EducationalProgramService educationalProgramService) {
+    public EducationalProgramController(EducationalProgramService educationalProgramService,
+                                        @Value("${app.adminPanelUrl}") String adminPanelUrl) {
+
         this.educationalProgramService = educationalProgramService;
+        this.redirectUrl = String.format("redirect:/%s/educational-programs", adminPanelUrl);
     }
 
     @GetMapping
@@ -35,7 +38,6 @@ public class EducationalProgramController {
         model.addAttribute("educationalPrograms", educationalPrograms);
         return "admin/educationalProgram/index";
     }
-
 
     @GetMapping("/new")
     public String createForm() {
@@ -51,12 +53,22 @@ public class EducationalProgramController {
         return "admin/educationalProgram/form";
     }
 
+    @GetMapping("/delete/{id}") // the {id} should be in the url
+    public String deleteConfirmation(Model model,
+                                     @RequestHeader(value = "referer", defaultValue = "/") String returnBackUrl) {
+
+        model.addAttribute("message", "Ви точно хочете видалити освітню програму?");
+        model.addAttribute("returnBackUrl", returnBackUrl);
+
+        return "admin/common/deleteConfirmation";
+    }
+
     @PostMapping("/new")
     public String create(@Validated EducationalProgramForm educationalProgramForm) {
 
         educationalProgramService.create(educationalProgramForm);
 
-        return String.format("redirect:/%s/educational-programs", adminPanelUrl);
+        return redirectUrl;
     }
 
     @PostMapping("/update/{id}")
@@ -64,6 +76,15 @@ public class EducationalProgramController {
 
         educationalProgramService.update(id, educationalProgramForm);
 
-        return String.format("redirect:/%s/educational-programs", adminPanelUrl);
+        return redirectUrl;
     }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Long id) {
+
+        educationalProgramService.delete(id);
+
+        return redirectUrl;
+    }
+
 }

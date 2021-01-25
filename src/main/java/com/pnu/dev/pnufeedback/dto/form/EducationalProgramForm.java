@@ -12,4 +12,6 @@ public class EducationalProgramForm {
     @NotBlank(message = "Назва освітної програми повинна бути вказана")
     private String title;
 
+    private boolean allowedToBeSelectedByUser;
+
 }

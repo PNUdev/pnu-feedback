@@ -55,6 +55,9 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
         GenerateReportDto generateReportDto = generateReportDtoPreparer.prepare(generateReportForm);
 
+        ReportDetailedStatistics reportDetailedStatistics = reportDetailedStatisticsService
+                .calculateReportDetailedStatistics(generateReportDto);
+
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", String.format("attachment; filename=%s--%s.xls",
                 generateReportDto.getStartDate(), generateReportDto.getEndDate()));
@@ -65,14 +68,11 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                     .findById(generateReportDto.getEducationalProgramId());
             Sheet sheet = workbook.createSheet(educationalProgram.getTitle());
 
-            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
+            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
             Row stakeholderCategoriesRow = sheet.createRow(0);
 
             CellStyle cellBoldFontStyle = getCellBoldFontStyle(workbook);
             CellStyle cellCenterPositionStyle = getCellCenterPositionStyle(workbook);
-
-            ReportDetailedStatistics reportDetailedStatistics = reportDetailedStatisticsService
-                    .calculateReportDetailedStatistics(generateReportDto);
 
             Map<Long, Long> submissionsCountByStakeholderCategory = reportDetailedStatistics
                     .getSubmissionsCountByStakeholderCategory();

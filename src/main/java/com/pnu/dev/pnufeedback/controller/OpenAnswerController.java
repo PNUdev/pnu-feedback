@@ -23,12 +23,14 @@ public class OpenAnswerController {
 
     private final OpenAnswerService openAnswerService;
 
-    @Value("${app.adminPanelUrl}")
-    private String adminPanelUrl;
+    private final String redirectUrl;
 
     @Autowired
-    public OpenAnswerController(OpenAnswerService openAnswerService) {
+    public OpenAnswerController(OpenAnswerService openAnswerService,
+                                @Value("${app.adminPanelUrl}") String adminPanelUrl) {
+
         this.openAnswerService = openAnswerService;
+        this.redirectUrl = String.format("redirect:/%s/open-answers", adminPanelUrl);
     }
 
     @GetMapping
@@ -55,13 +57,13 @@ public class OpenAnswerController {
     public String approve(@PathVariable Long id) {
         openAnswerService.approve(id);
 
-        return String.format("redirect:/%s/open-answers", adminPanelUrl);
+        return redirectUrl;
     }
 
     @PostMapping("/disapprove/{id}")
     public String disapprove(@PathVariable Long id) {
         openAnswerService.disapprove(id);
 
-        return String.format("redirect:/%s/open-answers", adminPanelUrl);
+        return redirectUrl;
     }
 }

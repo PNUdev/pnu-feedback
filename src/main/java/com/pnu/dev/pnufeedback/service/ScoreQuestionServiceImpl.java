@@ -91,6 +91,15 @@ public class ScoreQuestionServiceImpl implements ScoreQuestionService {
         return scoreQuestionRepository.save(updatedScoreQuestion);
     }
 
+    @Override
+    public ScoreQuestion delete(Long id) {
+
+        ScoreQuestion scoreQuestion = findById(id);
+        scoreQuestionRepository.deleteById(id);
+
+        return scoreQuestion;
+    }
+
     private boolean isScoreQuestionNumberAvailable(ScoreQuestionForm scoreQuestionForm) {
         return scoreQuestionRepository.existsByStakeholderCategoryIdAndAndQuestionNumber(
                 scoreQuestionForm.getStakeholderCategoryId(),

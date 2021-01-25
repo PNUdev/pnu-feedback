@@ -10,11 +10,26 @@
             <input type="text" class="form-control" name="title" value="${(stakeholderCategory.title)!}" required>
         </div>
 
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" name="showInReport" type="checkbox" id="showInReport"
+                        ${((stakeholderCategory.showInReport)!false)?string('checked','')}>
+                <label class="form-check-label" for="showInReport">
+                    <b>Показувати у звіті</b>
+                </label>
+            </div>
+        </div>
+
         <div class="p-3">
             <#if stakeholderCategory??>
                 <div class="row">
                     <div class="pt-3">
                         <button class="btn btn-primary">Оновити</button>
+                    </div>
+                    <div class="mx-2 pt-3">
+                        <a href="/${adminPanelUrl}/stakeholder-categories/delete/${stakeholderCategory.id}">
+                            <div class="btn btn-danger">Видалити</div>
+                        </a>
                     </div>
                 </div>
             <#else >

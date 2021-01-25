@@ -21,8 +21,10 @@ public class GenerateReportDtoPreparer {
 
         return GenerateReportDto.builder()
                 .educationalProgramId(Long.parseLong(generateReportForm.getEducationalProgramId()))
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(startDate.atStartOfDay())
+                .endDate(endDate.plusDays(1).atStartOfDay())
+                .includeStakeholderCategoriesWithZeroSubmissionsToPdfReport(
+                        generateReportForm.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport())
                 .build();
     }
 

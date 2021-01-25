@@ -23,6 +23,16 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <div class="form-check">
+                <input class="form-check-input" name="includeStakeholderCategoriesWithZeroSubmissionsToPdfReport"
+                       type="checkbox" id="includeStakeholderCategoriesWithZeroSubmissionsToPdfReport">
+                <label class="form-check-label" for="includeStakeholderCategoriesWithZeroSubmissionsToPdfReport">
+                    <b>Показувати у PDF звіті категорії стейкхолдерів, що не залишили жодного відгуку</b>
+                </label>
+            </div>
+        </div>
+
         <div class="my-4 row mx-auto">
             <div>
                 <button class="btn btn-primary" formaction="/${adminPanelUrl}/generate-report/pdf">Згенерувати PDF звіт</button>

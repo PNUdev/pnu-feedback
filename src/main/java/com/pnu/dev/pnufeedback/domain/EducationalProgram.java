@@ -17,4 +17,6 @@ public class EducationalProgram {
 
     private String title;
 
+    private boolean allowedToBeSelectedByUser;
+
 }

@@ -10,7 +10,12 @@ public interface StakeholderCategoryRepository extends CrudRepository<Stakeholde
 
     List<StakeholderCategory> findAll(Sort sort);
 
+    List<StakeholderCategory> findAllByShowInReportTrue(Sort sort);
+
     boolean existsByTitle(String title);
 
     boolean existsByIdNotAndTitle(Long id, String title);
+
+    boolean existsById(Long id);
+
 }

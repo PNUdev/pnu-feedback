@@ -14,16 +14,15 @@ import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionNumberComparator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
@@ -46,16 +45,21 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private StakeholderCategoryService stakeholderCategoryService;
 
+    private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
+
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
                                             SubmissionRepository submissionRepository,
                                             OpenAnswerRepository openAnswerRepository,
                                             EducationalProgramService educationalProgramService,
-                                            StakeholderCategoryService stakeholderCategoryService) {
+                                            StakeholderCategoryService stakeholderCategoryService,
+                                            ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
+
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
         this.openAnswerRepository = openAnswerRepository;
         this.educationalProgramService = educationalProgramService;
         this.stakeholderCategoryService = stakeholderCategoryService;
+        this.scoreQuestionNumberComparator = scoreQuestionNumberComparator;
     }
 
     @Override
@@ -63,36 +67,38 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
         log.debug("Data analyzing has started!");
 
-        LocalDate startDate = generateReportDto.getStartDate();
-        LocalDate endDate = generateReportDto.getEndDate();
+        LocalDateTime startDate = generateReportDto.getStartDate();
+        LocalDateTime endDate = generateReportDto.getEndDate();
 
         EducationalProgram educationalProgram = educationalProgramService
                 .findById(generateReportDto.getEducationalProgramId());
 
         List<Submission> submissions = submissionRepository
-                .findAllByEducationalProgramIdAndSubmissionTimeBetween(
+                .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDate, endDate
                 );
 
         if (submissions.isEmpty()) {
             throw new EmptyReportException(
-                    String.format("У системі ще немає опитувань з %s по %s", startDate, endDate)
+                    String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
             );
         }
 
-        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAll();
+        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
 
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
                 getSubmissionIds(submissions)
         );
-        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions);
+        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
+                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
+
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
         ScoreAnswerReportDataDto reportDataDto = ScoreAnswerReportDataDto.builder()
                 .stakeholderStatistics(stakeholderStatistics)
                 .educationalProgramName(educationalProgram.getTitle())
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(startDate.toLocalDate())
+                .endDate(endDate.toLocalDate())
                 .scoreAnswerReportData(chartAnswerData)
                 .openAnswerData(mapToJasperOpenAnswerDto(openAnswerData))
                 .chartSplitSize(normalizeChartSplitSize(submissions)).build();
@@ -103,7 +109,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
     private List<ReportChartInfoJasperDto> getChartData(List<StakeholderCategory> stakeholderCategories,
-                                                        List<Submission> submissions) {
+                                                        List<Submission> submissions,
+                                                        boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport) {
 
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(
                 getSubmissionIds(submissions)
@@ -111,36 +118,36 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
         return scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
-                .sorted()
                 .distinct()
+                .sorted(scoreQuestionNumberComparator)
                 .flatMap(questionNumber -> stakeholderCategories.stream()
                         .sorted(Comparator.comparing(StakeholderCategory::getId))
-                                .map(stakeholderCategory -> {
+                        .map(stakeholderCategory -> {
 
-                                        AtomicInteger questionScores = new AtomicInteger(0);
+                            List<Long> categoryStakeholderSubmissionIds = submissions.stream()
+                                    .filter(submission -> submission.getStakeholderCategoryId()
+                                            .equals(stakeholderCategory.getId()))
+                                    .map(Submission::getId)
+                                    .collect(toList());
 
-                                        List<Long> categoryStakeholderSubmissionIds = submissions.stream()
-                                                .filter(submission -> submission.getStakeholderCategoryId()
-                                                        .equals(stakeholderCategory.getId())
-                                                ).map(Submission::getId)
-                                                .collect(toList());
+                            MutableInt questionScoresSum = new MutableInt(0);
 
-                                        Long stakeholderAnswerCount = scoreAnswers.stream()
-                                                .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
-                                                .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
-                                                .filter(scoreAnswer ->  categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
-                                                .map(scoreAnswer -> questionScores.addAndGet(scoreAnswer.getScore()))
-                                                .count();
+                            Long stakeholderAnswersCount = scoreAnswers.stream()
+                                    .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
+                                    .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
+                                    .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
+                                    .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
+                                    .count();
 
-                                        return ReportChartInfoJasperDto.builder()
-                                                .stakeholderCategoryTitle(stakeholderCategory.getTitle())
-                                                .questionNumber(questionNumber)
-                                                .averageScore(questionScores.doubleValue() / stakeholderAnswerCount)
-                                                .scoreAnswerCount(stakeholderAnswerCount.intValue()).build();
+                            return ReportChartInfoJasperDto.builder()
+                                    .stakeholderCategoryTitle(stakeholderCategory.getTitle())
+                                    .questionNumber(questionNumber)
+                                    .averageScore(questionScoresSum.doubleValue() / stakeholderAnswersCount)
+                                    .scoreAnswerCount(stakeholderAnswersCount.intValue()).build();
 
-                }))
-                .filter(reportChartInfoJasperDto -> reportChartInfoJasperDto.getScoreAnswerCount() != 0)
-                .sorted(Comparator.comparing(ReportChartInfoJasperDto::getQuestionNumber))
+                        }))
+                .filter(reportChartInfoJasperDto -> includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
+                        || reportChartInfoJasperDto.getScoreAnswerCount() != 0)
                 .collect(Collectors.toList());
 
     }
@@ -148,12 +155,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
 
         Map<String, Double> statisticsMap = data.stream()
-            .collect(
-                 Collectors.groupingBy(
-                      ReportChartInfoJasperDto::getStakeholderCategoryTitle,
-                           averagingInt(ReportChartInfoJasperDto::getScoreAnswerCount)
-                      )
-            );
+                .collect(
+                        Collectors.groupingBy(
+                                ReportChartInfoJasperDto::getStakeholderCategoryTitle,
+                                averagingInt(ReportChartInfoJasperDto::getScoreAnswerCount)
+                        )
+                );
 
         return statisticsMap.entrySet().stream()
                 .map(e -> String.format("%s - %s", e.getKey(), e.getValue().intValue()))
@@ -163,8 +170,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private Integer normalizeChartSplitSize(List<Submission> submissions) {
 
-       Integer stakeholderAmount = ((Long)submissions.stream()
-               .map(s->s.getStakeholderCategoryId()).distinct().count()).intValue();
+        Integer stakeholderAmount = ((Long) submissions.stream()
+                .map(Submission::getStakeholderCategoryId)
+                .distinct()
+                .count())
+                .intValue();
 
         if (stakeholderAmount < CHART_SPLIT_SIZE) {
 
@@ -190,8 +200,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 )
                 .entrySet()
                 .stream()
-                .map(e ->
-                        new ReportOpenAnswerJasperDto(e.getKey(), e.getValue())
+                .map(entry ->
+                        new ReportOpenAnswerJasperDto(entry.getKey(), entry.getValue())
                 )
                 .collect(Collectors.toList());
 

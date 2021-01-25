@@ -9,10 +9,16 @@ public interface EducationalProgramService {
 
     List<EducationalProgram> findAll();
 
+    List<EducationalProgram> findAllAllowedToBeSelectedByUser();
+
     EducationalProgram findById(Long id);
 
     void create(EducationalProgramForm educationalProgramForm);
 
     void update(Long id, EducationalProgramForm educationalProgramForm);
+
+    void delete(Long id);
+
+    boolean existsByIdAndIsAllowedToBeSelectedByUser(Long id);
 
 }
