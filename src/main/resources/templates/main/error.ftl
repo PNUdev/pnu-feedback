@@ -13,9 +13,9 @@
     </div>
     <div class="col-md-12 mt-3 d-flex justify-content-center">
         <#if previousLocation?? >
-            <a href="${previousLocation}" class="h5">Повернутися назад</a>
+            <a href="${previousLocation}" class="h4">Повернутися назад</a>
         <#else >
-            <a href="/" class="h4">Головна сторінка</a>
+            <a href="/" class="h5">Головна сторінка</a>
         </#if>
     </div>
 </div>
