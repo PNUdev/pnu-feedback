@@ -77,20 +77,15 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDate, endDate
                 );
-
-        if (submissions.isEmpty()) {
-            throw new EmptyReportException(
-                    String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
-            );
-        }
+        checkIfNotEmpty(submissions, startDate, endDate);
 
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
-
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
                 getSubmissionIds(submissions)
         );
         List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
                 generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
+        checkIfNotEmpty(openAnswerData, startDate, endDate);
 
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
@@ -209,5 +204,13 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private List<Long> getSubmissionIds(List<Submission> submissions) {
         return submissions.stream().map(Submission::getId).collect(Collectors.toList());
+    }
+
+    private <T> void checkIfNotEmpty(List<T> data, LocalDateTime startDate, LocalDateTime endDate) {
+        if (data.isEmpty()) {
+            throw new EmptyReportException(
+                    String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
+            );
+        }
     }
 }
