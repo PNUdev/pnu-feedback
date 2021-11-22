@@ -91,7 +91,7 @@
 				<textElement>
 					<font size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} == "" ? "Шляхом анонімного анкетування не отримано оцінок." : ("Шляхом анонімного анкетування опитано: " + $P{STAKEHOLDER_STATISTICS} + ".  Результати опитувань наведені на гістограмах.")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} == "" ? "" : ("Шляхом анонімного анкетування опитано: " + $P{STAKEHOLDER_STATISTICS} + ".  Результати опитувань наведені на гістограмах.")]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
