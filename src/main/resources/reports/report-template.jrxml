@@ -154,6 +154,13 @@
 				<text><![CDATA[Пропозиції]]></text>
 			</staticText>
 			<textField>
+				<reportElement positionType="Float" x="11" y="80" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{OPEN_ANSWER_DATASET}.getRecordCount() == 0 ? "Ще немає пропозицій" : ""]]></textFieldExpression>
+			</textField>
+			<textField>
 				<reportElement positionType="Float" x="11" y="160" width="839" height="40" uuid="e501d7ca-7529-4949-8266-5cea386d33d9"/>
 				<textElement>
 					<font size="14"/>
