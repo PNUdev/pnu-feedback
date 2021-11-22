@@ -77,7 +77,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDate, endDate
                 );
-        checkIfNotEmpty(submissions, startDate, endDate);
+        checkIfNoSubmissions(submissions, startDate, endDate);
 
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
@@ -85,7 +85,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         );
         List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
                 generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
-        checkIfNotEmpty(openAnswerData, startDate, endDate);
+        checkIfNoActiveOpenAnswerNorAnswers(openAnswerData, chartAnswerData, startDate, endDate);
 
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
@@ -130,7 +130,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                             Long stakeholderAnswersCount = scoreAnswers.stream()
                                     .sorted(Comparator.comparing(ScoreAnswer::getQuestionNumber))
                                     .filter(scoreAnswer -> scoreAnswer.getQuestionNumber().equals(questionNumber))
-                                    .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(scoreAnswer.getSubmissionId()))
+                                    .filter(scoreAnswer -> categoryStakeholderSubmissionIds.contains(
+                                            scoreAnswer.getSubmissionId()))
                                     .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
@@ -206,8 +207,18 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return submissions.stream().map(Submission::getId).collect(Collectors.toList());
     }
 
-    private <T> void checkIfNotEmpty(List<T> data, LocalDateTime startDate, LocalDateTime endDate) {
+    private void checkIfNoSubmissions(List<Submission> data, LocalDateTime startDate, LocalDateTime endDate) {
         if (data.isEmpty()) {
+            throw new EmptyReportException(
+                    String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
+            );
+        }
+    }
+
+    private void checkIfNoActiveOpenAnswerNorAnswers(
+            List<ReportOpenAnswerDto> openAnswers, List<ReportChartInfoJasperDto> answers, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        if (answers.isEmpty() && openAnswers.isEmpty()) {
             throw new EmptyReportException(
                     String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
             );
