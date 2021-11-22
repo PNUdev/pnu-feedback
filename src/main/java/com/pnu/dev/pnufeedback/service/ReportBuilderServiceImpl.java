@@ -30,7 +30,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
 
     private final static String TEMPLATE_PATH = "/reports/report-template.jrxml";
 
-    private final static String REPORT_FILE = "/report.pdf";
+    private final static String REPORT_FILE = "/report-[%s--%s].pdf";
 
     private ReportDataPreparationService reportDataPreparationService;
 
@@ -51,7 +51,8 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         ScoreAnswerReportDataDto scoreAnswerReportDataDto = reportDataPreparationService.getReportData(generateReportDto);
 
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=" + REPORT_FILE);
+        response.setHeader("Content-Disposition", "attachment; filename=" +
+                String.format(REPORT_FILE, generateReportForm.getStartDate(), generateReportForm.getEndDate()));
 
         try (ServletOutputStream servletOutputStream = response.getOutputStream()) {
 
