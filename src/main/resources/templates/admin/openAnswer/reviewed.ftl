@@ -40,7 +40,7 @@
                             <span>${openAnswer.updatedAt.format(formatter)}</span>
                         </div>
                     </div>
-                    <div class="block col-2">
+                    <div class="block col-9">
                         <i class="fa fa-graduation-cap fa-lg"></i>
                         <span>${openAnswer.educationalProgramTitle}</span>
                     </div>
