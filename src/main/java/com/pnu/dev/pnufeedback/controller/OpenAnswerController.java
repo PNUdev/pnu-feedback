@@ -38,7 +38,7 @@ public class OpenAnswerController {
     }
 
     @GetMapping
-    public String findAllUnreviewed(Model model, @PageableDefault(size = 2, sort = "updatedAt",
+    public String findAllUnreviewed(Model model, @PageableDefault(size = 10, sort = "updatedAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<OpenAnswerDto> openAnswersPage = openAnswerService.findAllUnreviewed(pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
