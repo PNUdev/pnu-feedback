@@ -24,6 +24,10 @@
                             <span>${openAnswer.updatedAt.format(formatter)}</span>
                         </div>
                     </div>
+                    <div class="block col-2">
+                        <i class="fa fa-graduation-cap fa-lg"></i>
+                        <span>${openAnswer.educationalProgramTitle}</span>
+                    </div>
                     <form class="form-inline d-flex justify-content-center" method="post">
                         <div class="d-flex justify-content-center align-middle p-1">
                             <button class="btn btn-success btn-sm m-1"

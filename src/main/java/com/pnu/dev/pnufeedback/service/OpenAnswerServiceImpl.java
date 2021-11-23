@@ -1,6 +1,7 @@
 package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.OpenAnswer;
+import com.pnu.dev.pnufeedback.dto.OpenAnswerDto;
 import com.pnu.dev.pnufeedback.dto.ReviewedFilter;
 import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
@@ -23,25 +24,27 @@ public class OpenAnswerServiceImpl implements OpenAnswerService {
     }
 
     @Override
-    public Page<OpenAnswer> findAllUnreviewed(Pageable pageable) {
-        return new PageImpl(openAnswerRepository.findAllByReviewed(false, pageable),
+    public Page<OpenAnswerDto> findAllUnreviewed(Pageable pageable) {
+        return new PageImpl(openAnswerRepository.findAllByReviewed(false, pageable.getPageSize(), pageable.getOffset()),
                 pageable,
                 countUnreviewed());
     }
 
     @Override
-    public Page<OpenAnswer> findAllReviewed(ReviewedFilter reviewedFilter, Pageable pageable) {
+    public Page<OpenAnswerDto> findAllReviewed(ReviewedFilter reviewedFilter, Pageable pageable) {
         if (reviewedFilter == ReviewedFilter.APPROVED) {
-            return new PageImpl(openAnswerRepository.findAllByReviewedAndApproved(true, true, pageable),
+            return new PageImpl(openAnswerRepository
+                    .findAllByReviewedAndApproved(true, true, pageable.getPageSize(), pageable.getOffset()),
                     pageable,
                     openAnswerRepository.countAllByReviewedAndApproved(true, true));
         }
         if (reviewedFilter == ReviewedFilter.DISAPPROVED) {
-            return new PageImpl(openAnswerRepository.findAllByReviewedAndApproved(true, false, pageable),
+            return new PageImpl(openAnswerRepository
+                    .findAllByReviewedAndApproved(true, false, pageable.getPageSize(), pageable.getOffset()),
                     pageable,
                     openAnswerRepository.countAllByReviewedAndApproved(true, false));
         }
-        return new PageImpl(openAnswerRepository.findAllByReviewed(true, pageable),
+        return new PageImpl(openAnswerRepository.findAllByReviewed(true, pageable.getPageSize(), pageable.getOffset()),
                 pageable,
                 openAnswerRepository.countAllByReviewed(true));
     }

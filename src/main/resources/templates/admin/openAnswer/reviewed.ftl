@@ -31,7 +31,7 @@
         <#list openAnswersPage.getContent() as openAnswer >
             <tr class="container <#if openAnswer.approved>table-secondary</#if>">
                 <th scope="row">
-                    <div class="d-flex justify-content-end row">
+                    <div class="d-flex justify-content-between row">
                         <div class="block col-10 ">
                             <p class="px-3 <#if openAnswer.approved>text-body</#if>">${openAnswer.content}</p>
                         </div>
@@ -39,6 +39,10 @@
                             <i class="fa fa-clock-o fa-lg p-1"></i>
                             <span>${openAnswer.updatedAt.format(formatter)}</span>
                         </div>
+                    </div>
+                    <div class="block col-2">
+                        <i class="fa fa-graduation-cap fa-lg"></i>
+                        <span>${openAnswer.educationalProgramTitle}</span>
                     </div>
                     <div class="row">
                         <#if !openAnswer.approved>
