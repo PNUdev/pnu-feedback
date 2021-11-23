@@ -15,7 +15,7 @@
         <#list openAnswersPage.getContent() as openAnswer >
             <tr class="container">
                 <th scope="row">
-                    <div class="d-flex justify-content-end row">
+                    <div class="d-flex justify-content-between row">
                         <div class="block col-10 ">
                             <p class="px-3">${openAnswer.content}</p>
                         </div>

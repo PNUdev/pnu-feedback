@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -48,11 +49,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
 
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
-                                            SubmissionRepository submissionRepository,
-                                            OpenAnswerRepository openAnswerRepository,
-                                            EducationalProgramService educationalProgramService,
-                                            StakeholderCategoryService stakeholderCategoryService,
-                                            ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
+            SubmissionRepository submissionRepository,
+            OpenAnswerRepository openAnswerRepository,
+            EducationalProgramService educationalProgramService,
+            StakeholderCategoryService stakeholderCategoryService,
+            ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
 
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
@@ -77,7 +78,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .findAllToShowInReportByEducationalProgramIdAndSubmissionTimeBetween(
                         educationalProgram.getId(), startDate, endDate
                 );
-        checkIfNoSubmissions(submissions, startDate, endDate);
+        checkIfNoSubmissions(submissions, startDate.toLocalDate(), endDate.toLocalDate());
 
         List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
@@ -85,7 +86,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         );
         List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
                 generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
-        checkIfNoActiveOpenAnswerNorAnswers(openAnswerData, chartAnswerData, startDate, endDate);
+        checkIfNoActiveOpenAnswerNorAnswers(openAnswerData, chartAnswerData, startDate.toLocalDate(),
+                endDate.toLocalDate());
 
         String stakeholderStatistics = generateStakeHolderStatistics(chartAnswerData);
 
@@ -104,8 +106,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
     private List<ReportChartInfoJasperDto> getChartData(List<StakeholderCategory> stakeholderCategories,
-                                                        List<Submission> submissions,
-                                                        boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport) {
+            List<Submission> submissions,
+            boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport) {
 
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(
                 getSubmissionIds(submissions)
@@ -207,7 +209,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return submissions.stream().map(Submission::getId).collect(Collectors.toList());
     }
 
-    private void checkIfNoSubmissions(List<Submission> data, LocalDateTime startDate, LocalDateTime endDate) {
+    private void checkIfNoSubmissions(List<Submission> data, LocalDate startDate, LocalDate endDate) {
         if (data.isEmpty()) {
             throw new EmptyReportException(
                     String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
@@ -216,8 +218,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     }
 
     private void checkIfNoActiveOpenAnswerNorAnswers(
-            List<ReportOpenAnswerDto> openAnswers, List<ReportChartInfoJasperDto> answers, LocalDateTime startDate,
-            LocalDateTime endDate) {
+            List<ReportOpenAnswerDto> openAnswers, List<ReportChartInfoJasperDto> answers,
+            LocalDate startDate, LocalDate endDate) {
         if (answers.isEmpty() && openAnswers.isEmpty()) {
             throw new EmptyReportException(
                     String.format("У системі ще немає жодних результатів опитувань з %s по %s", startDate, endDate)
