@@ -60,7 +60,7 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", String.format("attachment; filename=%s--%s.xls",
-                generateReportDto.getStartDate(), generateReportDto.getEndDate()));
+                generateReportDto.getStartDate().toLocalDate(), generateReportDto.getEndDate().toLocalDate()));
 
         try (OutputStream outputStream = response.getOutputStream(); Workbook workbook = new HSSFWorkbook()) {
 
