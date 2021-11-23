@@ -15,8 +15,14 @@
         <#list openAnswersPage.getContent() as openAnswer >
             <tr class="container">
                 <th scope="row">
-                    <div class="block">
-                        <p class="px-3">${openAnswer.content}</p>
+                    <div class="d-flex justify-content-end row">
+                        <div class="block col-10 ">
+                            <p class="px-3">${openAnswer.content}</p>
+                        </div>
+                        <div class="block col-2">
+                            <i class="fa fa-clock-o fa-lg p-1"></i>
+                            <span>${openAnswer.updatedAt.format(formatter)}</span>
+                        </div>
                     </div>
                     <form class="form-inline d-flex justify-content-center" method="post">
                         <div class="d-flex justify-content-center align-middle p-1">

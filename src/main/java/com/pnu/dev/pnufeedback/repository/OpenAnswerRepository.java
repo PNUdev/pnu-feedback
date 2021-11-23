@@ -18,8 +18,6 @@ public interface OpenAnswerRepository extends CrudRepository<OpenAnswer, Long> {
 
     long countAllByReviewedAndApproved(boolean reviewed, boolean approved);
 
-    Long countAllByReviewedFalse();
-
     @Query("SELECT sc.title as stakeholder_category_title, oa.content as open_answer_content " +
             "FROM open_answer as oa " +
             "JOIN submission as s ON s.id IN (:submissionIds) " +

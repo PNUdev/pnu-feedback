@@ -17,9 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.format.DateTimeFormatter;
+
 @Controller
 @RequestMapping("/${app.adminPanelUrl}/open-answers")
 public class OpenAnswerController {
+
+    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
 
     private final OpenAnswerService openAnswerService;
 
@@ -38,6 +42,7 @@ public class OpenAnswerController {
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<OpenAnswer> openAnswersPage = openAnswerService.findAllUnreviewed(pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
+        model.addAttribute("formatter", DATE_TIME_FORMATTER);
 
         return "admin/openAnswer/index";
     }
@@ -49,6 +54,7 @@ public class OpenAnswerController {
         Page<OpenAnswer> openAnswersPage = openAnswerService.findAllReviewed(reviewedFilter, pageable);
         model.addAttribute("openAnswersPage", openAnswersPage);
         model.addAttribute("reviewedFilter", reviewedFilter);
+        model.addAttribute("formatter", DATE_TIME_FORMATTER);
 
         return "admin/openAnswer/reviewed";
     }
