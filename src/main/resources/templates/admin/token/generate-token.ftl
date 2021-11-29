@@ -35,8 +35,13 @@
 
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+<#if useLocalAssets == true>
+    <link href="/libs/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
+    <script src="/libs/select2-4.1.0-beta1/select2.min.js"></script>
+<#else>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+</#if>
 <script>
     $(document).ready(function () {
         $('.select-program').select2();

@@ -28,3 +28,4 @@ mvn <env variables: -DvariableName='value'> spring-boot:run
 - JWT_SECRET (_default_: 'secret') - _jwt secret, that is used to sign tokens for feedback submissions_
 - APP_BASE_URL (_default_: 'http://localhost:8080') - _application base url_
 - ADMIN_PANEL_URL (_default_: 'admin') - _path to admin panel_
+- USE_LOCAL_ASSETS (_default_: 'false') - _indicator whether to use local libs. If value is true, use it as absolute base path for libs, else download libs from CDN_

@@ -51,11 +51,17 @@
     </#if>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-<#--datetime-->
-<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
-<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css"/>
+<#if useLocalAssets == true>
+    <link href="/libs/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
+    <script src="/libs/select2-4.1.0-beta1/select2.min.js"></script>
+    <link href="/libs/gijgo-1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css"/>
+    <script src="/libs/gijgo-1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<#else>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://cdn.jsdelivr.net/npm/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css"/>
+</#if>
 <script>
     $(document).ready(function () {
         $('.select-program').select2();
