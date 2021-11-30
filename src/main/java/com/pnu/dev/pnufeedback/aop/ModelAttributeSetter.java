@@ -15,12 +15,8 @@ public class ModelAttributeSetter {
     @Value("${app.adminPanelUrl}")
     private String adminPanelUrl;
 
-    @Value("${app.webAssetsLocation}")
-    private String webAssetsLocation;
-
     @ModelAttribute
-    public void setEnvVars(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("webAssetsLocation", webAssetsLocation);
+    public void setAdminPanelUrl(@AuthenticationPrincipal User user, Model model) {
         if (Objects.nonNull(user)) {
             model.addAttribute("adminPanelUrl", adminPanelUrl);
         }
