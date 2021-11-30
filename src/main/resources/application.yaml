@@ -20,3 +20,4 @@ jwt:
 app:
   baseUrl: ${APP_BASE_URL:http://localhost:8080}
   adminPanelUrl: ${ADMIN_PANEL_URL:admin}
+  webAssetsLocation: ${WEB_ASSETS_LOCATION:}
