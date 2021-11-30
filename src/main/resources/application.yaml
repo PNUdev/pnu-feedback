@@ -20,4 +20,4 @@ jwt:
 app:
   baseUrl: ${APP_BASE_URL:http://localhost:8080}
   adminPanelUrl: ${ADMIN_PANEL_URL:admin}
-  useLocalAssets: ${USE_LOCAL_ASSETS:true}
+  webLibsLocation: ${WEB_LIBS_LOCATION:}
