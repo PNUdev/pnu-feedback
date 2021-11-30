@@ -66,7 +66,7 @@ mvn <env variables: -DvariableName='value'> spring-boot:run
     <td>bootstrap.bundle.min.js</td>
     <td>https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js</td>
     <td>https://getbootstrap.com/docs/4.4/getting-started/download/</td>
-    <td>Use /bootstrap-4.4.1 2/dist/js/bootstrap.bundle.min.js<</td>
+    <td>Use /bootstrap-4.4.1 2/dist/js/bootstrap.bundle.min.js</td>
   </tr>
   <tr>
     <td>bootstrap.min.js</td>
