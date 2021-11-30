@@ -35,9 +35,9 @@
 
 </div>
 
-<#if webLibsLocation?has_content>
-    <link href="${webLibsLocation}/assets/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
-    <script src="${webLibsLocation}/assets/select2-4.1.0-beta1/select2.min.js"></script>
+<#if webAssetsLocation?has_content>
+    <link href="${webAssetsLocation}/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
+    <script src="${webAssetsLocation}/select2-4.1.0-beta1/select2.min.js"></script>
 <#else>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>

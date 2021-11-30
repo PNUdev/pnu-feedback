@@ -51,11 +51,11 @@
     </#if>
 </div>
 
-<#if webLibsLocation?has_content>
-    <link href="${webLibsLocation}/assets/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
-    <script src="${webLibsLocation}/assets/select2-4.1.0-beta1/select2.min.js"></script>
-    <link href="${webLibsLocation}/assets/gijgo-1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css"/>
-    <script src="${webLibsLocation}/assets/gijgo-1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<#if webAssetsLocation?has_content>
+    <link href="${webAssetsLocation}/select2-4.1.0-beta1/select2.min.css" rel="stylesheet"/>
+    <script src="${webAssetsLocation}/select2-4.1.0-beta1/select2.min.js"></script>
+    <link href="${webAssetsLocation}/gijgo-1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css"/>
+    <script src="${webAssetsLocation}/gijgo-1.9.13/js/gijgo.min.js" type="text/javascript"></script>
 <#else>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
