@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.pnu.dev</groupId>
     <artifactId>pnu-feedback</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.1</version>
     <name>pnu-feedback</name>
     <description>PNU feedback system</description>
 
