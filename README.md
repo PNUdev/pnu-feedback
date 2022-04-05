@@ -29,6 +29,7 @@ mvn <env variables: -DvariableName='value'> spring-boot:run
 - APP_BASE_URL (_default_: 'http://localhost:8080') - _application base url_
 - ADMIN_PANEL_URL (_default_: 'admin') - _path to admin panel_
 - WEB_ASSETS_LOCATION (_default_: '') - _an absolute path to local libs. If the value is present, js libs will be downloaded from the specified location._
+- ADMIN_EMAIL (_default_: '') - _an email address for the contact to admin._
 
 ## Assets used by Web UI
 <table style="width:100%">
