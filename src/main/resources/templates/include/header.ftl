@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ПНУ опитування</title>
+    <title>Відгуки стейкхолдерів</title>
     <#include "coreDependencies.ftl" >
 </head>
 <body>
