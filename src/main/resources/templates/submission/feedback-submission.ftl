@@ -31,7 +31,7 @@
         <div class="p-3 rounded bg-light educational-program-label">
             <div class="text-center text-wrap mx-auto py-1 px-3 rounded border border-secondary">
                 <#if allowToChooseEducationalProgram>
-                    Опитування ПНУ імені В. Стефаника
+                    Відгук про освітню програму ПНУ
                 <#else >
                     Освітня програма: ${educationalProgram.title}
                 </#if>
