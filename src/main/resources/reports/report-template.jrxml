@@ -165,7 +165,7 @@
 				<textElement>
 					<font size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Опитування проведено з "+ $P{START_DATE} +" р.  по "+ $P{END_DATE} + " р. Центром забезпечення якості ДВНЗ «Прикарпатського національного університету імені Василя Стефаника»"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Опитування проведено з "+ $P{START_DATE} +" р.  по "+ $P{END_DATE} + " р. Центром забезпечення якості «Прикарпатського національного університету імені Василя Стефаника»"]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
