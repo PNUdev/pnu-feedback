@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 7.9.0.final using JasperReports Library version 6.16.0-48579d909b7943b64690c65c71e07e0b80981928  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="700" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryNewPage="false" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="1000" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
 	<style name="default-style" isDefault="true" fontName="Calibri" pdfEncoding="CP1251" isPdfEmbedded="true"/>
 	<subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
 		<field name="stakeholderCategoryTitle" class="java.lang.String"/>
@@ -24,6 +24,9 @@
 	<field name="questionNumber" class="java.lang.String">
 		<fieldDescription><![CDATA[questionNumber]]></fieldDescription>
 	</field>
+	<field name="questionText" class="java.util.List">
+		<fieldDescription><![CDATA[questionText]]></fieldDescription>
+	</field>
 	<field name="averageScore" class="java.lang.Double">
 		<fieldDescription><![CDATA[averageScore]]></fieldDescription>
 	</field>
@@ -33,11 +36,11 @@
 	<group name="charSplitter">
 		<groupExpression><![CDATA[$V{REPORT_COUNT} - 1 - ( ($V{REPORT_COUNT} - 1) % $P{CHART_SPLIT_SIZE} )]]></groupExpression>
 		<groupFooter>
-			<band height="470">
+			<band height="742">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<barChart>
-					<chart>
-						<reportElement stretchType="RelativeToTallestObject" x="7" y="40" width="844" height="430" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
+					<chart customizerClass="com.pnu.dev.pnufeedback.util.ChartTooltipCustomizer">
+						<reportElement stretchType="RelativeToTallestObject" x="7" y="40" width="844" height="630" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
 							<property name="net.sf.jasperreports.chart.range.axis.tick.interval" value="0.5"/>
 							<printWhenExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} != ""]]></printWhenExpression>
 						</reportElement>
@@ -52,7 +55,7 @@
 						<dataset resetType="Group" resetGroup="charSplitter"/>
 						<categorySeries>
 							<seriesExpression><![CDATA[$F{stakeholderCategoryTitle}]]></seriesExpression>
-							<categoryExpression><![CDATA[$F{questionNumber}]]></categoryExpression>
+							<categoryExpression><![CDATA[$F{questionNumber} + " " + $F{questionText}.get(0)]]></categoryExpression>
 							<valueExpression><![CDATA[$F{averageScore}]]></valueExpression>
 						</categorySeries>
 					</categoryDataset>
