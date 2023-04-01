@@ -2,6 +2,7 @@ package com.pnu.dev.pnufeedback.service;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
 import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
+import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
 import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.domain.Submission;
 import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
@@ -21,9 +22,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
@@ -48,12 +52,16 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
 
+    private ScoreQuestionServiceImpl scoreQuestionService;
+
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
             SubmissionRepository submissionRepository,
             OpenAnswerRepository openAnswerRepository,
             EducationalProgramService educationalProgramService,
             StakeholderCategoryService stakeholderCategoryService,
-            ScoreQuestionNumberComparator scoreQuestionNumberComparator) {
+            ScoreQuestionNumberComparator scoreQuestionNumberComparator,
+            ScoreQuestionServiceImpl scoreQuestionService
+    ) {
 
         this.scoreAnswerRepository = scoreAnswerRepository;
         this.submissionRepository = submissionRepository;
@@ -61,6 +69,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         this.educationalProgramService = educationalProgramService;
         this.stakeholderCategoryService = stakeholderCategoryService;
         this.scoreQuestionNumberComparator = scoreQuestionNumberComparator;
+        this.scoreQuestionService = scoreQuestionService;
     }
 
     @Override
@@ -113,6 +122,13 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 getSubmissionIds(submissions)
         );
 
+        List<ScoreQuestion> scoreQuestions = stakeholderCategories.stream().map(
+                stakeholderCategory -> scoreQuestionService.findAllByStakeholderCategoryId(stakeholderCategory.getId())
+        ).flatMap(Collection::stream).collect(toList());
+
+        List<String> questionsTexts = scoreQuestions.stream().map(ScoreQuestion::getContent).collect(toList());
+        int newLineDenominator = questionsTexts.stream().map(String::length).max(Integer::compareTo).orElse(0) / 2;
+
         return scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
                 .distinct()
@@ -137,9 +153,16 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                     .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
+                            List<String> questionText = scoreQuestions.stream()
+                                    .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
+                                    .map(ScoreQuestion::getContent)
+                                    .map(question -> insertNewLines(question, "\n", newLineDenominator))
+                                    .collect(toList());
+
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
                                     .questionNumber(questionNumber)
+                                    .questionTexts(questionText)
                                     .averageScore(questionScoresSum.doubleValue() / stakeholderAnswersCount)
                                     .scoreAnswerCount(stakeholderAnswersCount.intValue()).build();
 
@@ -148,6 +171,17 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                         || reportChartInfoJasperDto.getScoreAnswerCount() != 0)
                 .collect(Collectors.toList());
 
+    }
+
+    private boolean isQuestionEligible(String questionNumber, StakeholderCategory stakeholderCategory, ScoreQuestion question) {
+        return question.getQuestionNumber().equals(questionNumber)
+                && question.getStakeholderCategoryId().equals(stakeholderCategory.getId());
+    }
+
+    public static String insertNewLines(String text, String insert, int period) {
+        Pattern p = Pattern.compile("(.{" + period + "})", Pattern.DOTALL);
+        Matcher m = p.matcher(text);
+        return m.replaceAll("$1" + insert);
     }
 
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {
