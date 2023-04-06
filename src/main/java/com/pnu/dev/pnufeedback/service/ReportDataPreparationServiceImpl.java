@@ -23,11 +23,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.averagingInt;
@@ -38,7 +39,9 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class ReportDataPreparationServiceImpl implements ReportDataPreparationService {
 
-    private final static Integer CHART_SPLIT_SIZE = 25;
+    private static final Integer CHART_SPLIT_SIZE = 25;
+    private static final int CHART_QUESTION_DENOMINATOR_MAXIMUM = 90;
+    private static final int QUESTION_CUTOFF_PREVENT_DENOMINATOR = 45;
 
     private ScoreAnswerRepository scoreAnswerRepository;
 
@@ -93,8 +96,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<ReportOpenAnswerDto> openAnswerData = openAnswerRepository.findAllBySubmissionIdsAndApproved(
                 getSubmissionIds(submissions)
         );
-        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(stakeholderCategories, submissions,
-                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
+        List<ReportChartInfoJasperDto> chartAnswerData = getChartData(
+                stakeholderCategories,
+                submissions,
+                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport(),
+                generateReportDto.isShowFullAnswers()
+        );
         checkIfNoActiveOpenAnswerNorAnswers(openAnswerData, chartAnswerData, startDate.toLocalDate(),
                 endDate.toLocalDate());
 
@@ -114,9 +121,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         return reportDataDto;
     }
 
-    private List<ReportChartInfoJasperDto> getChartData(List<StakeholderCategory> stakeholderCategories,
+    private List<ReportChartInfoJasperDto> getChartData(
+            List<StakeholderCategory> stakeholderCategories,
             List<Submission> submissions,
-            boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport) {
+            boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport,
+            boolean showFullAnswers
+    ) {
 
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(
                 getSubmissionIds(submissions)
@@ -127,8 +137,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         ).flatMap(Collection::stream).collect(toList());
 
         List<String> questionsTexts = scoreQuestions.stream().map(ScoreQuestion::getContent).collect(toList());
-        int newLineDenominator = questionsTexts.stream().map(String::length).max(Integer::compareTo).orElse(0) / 2;
-
+        int newLineDenominator =
+                Math.min(
+                        questionsTexts.stream().map(String::length).max(Integer::compareTo).orElse(0) / 2,
+                        CHART_QUESTION_DENOMINATOR_MAXIMUM
+                );
+        AtomicInteger cutoffQuestionIndex = new AtomicInteger(1);
         return scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
                 .distinct()
@@ -153,16 +167,23 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                     .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
-                            List<String> questionText = scoreQuestions.stream()
-                                    .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
-                                    .map(ScoreQuestion::getContent)
-                                    .map(question -> insertNewLines(question, "\n", newLineDenominator))
-                                    .collect(toList());
-
+                            boolean isCutoffQuestion =
+                                    cutoffQuestionIndex.get() % CHART_SPLIT_SIZE == 0
+                                            || cutoffQuestionIndex.get() == 1;
+                            List<String> questionTexts = showFullAnswers
+                                    ? scoreQuestions.stream()
+                                        .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
+                                        .map(ScoreQuestion::getContent)
+                                        .map(question -> insertNewLines(question, "\n", newLineDenominator, isCutoffQuestion))
+                                        .collect(toList())
+                                    : Collections.emptyList();
+                            if (!questionTexts.isEmpty()) {
+                                cutoffQuestionIndex.incrementAndGet();
+                            }
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
                                     .questionNumber(questionNumber)
-                                    .questionTexts(questionText)
+                                    .questionTexts(questionTexts)
                                     .averageScore(questionScoresSum.doubleValue() / stakeholderAnswersCount)
                                     .scoreAnswerCount(stakeholderAnswersCount.intValue()).build();
 
@@ -178,10 +199,20 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 && question.getStakeholderCategoryId().equals(stakeholderCategory.getId());
     }
 
-    public static String insertNewLines(String text, String insert, int period) {
-        Pattern p = Pattern.compile("(.{" + period + "})", Pattern.DOTALL);
-        Matcher m = p.matcher(text);
-        return m.replaceAll("$1" + insert);
+    public static String insertNewLines(String text, String insert, int period, boolean canBeCutoff) {
+        String[] works = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        StringBuilder result = new StringBuilder();
+        for (String work : works) {
+            if (line.length() + work.length() > (canBeCutoff ? QUESTION_CUTOFF_PREVENT_DENOMINATOR : period)) {
+                result.append(line).append(insert);
+                line = new StringBuilder();
+            }
+            line.append(work).append(" ");
+        }
+        result.append(line);
+
+        return result.toString();
     }
 
     private String generateStakeHolderStatistics(List<ReportChartInfoJasperDto> data) {

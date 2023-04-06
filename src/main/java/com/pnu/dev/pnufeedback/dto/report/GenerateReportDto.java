@@ -21,4 +21,6 @@ public class GenerateReportDto {
 
     private boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport;
 
+    private boolean showFullAnswers;
+
 }

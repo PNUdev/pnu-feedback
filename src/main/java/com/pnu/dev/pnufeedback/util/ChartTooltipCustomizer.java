@@ -15,15 +15,17 @@ public class ChartTooltipCustomizer implements JRChartCustomizer {
     public void customize(JFreeChart chart, JRChart jasperChart) {
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
         BarRenderer barRenderer = (BarRenderer) plot.getRenderer();
-        Font font = new Font("Calibri", Font.BOLD, 12);
+        Font font = new Font("Calibri", Font.BOLD, 10);
 
         plot.getDomainAxis().setCategoryLabelPositions(
-                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.5));
+                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.5)
+        );
 
         barRenderer.setBaseItemLabelFont(font);
         barRenderer.setBaseItemLabelsVisible(true);
         plot.getDomainAxis().setMaximumCategoryLabelWidthRatio(1.0f);
-        plot.getDomainAxis().setMaximumCategoryLabelLines(3);
+
+        plot.getDomainAxis().setMaximumCategoryLabelLines(2);
         plot.getRangeAxis().setUpperMargin(plot.getRangeAxis().getUpperMargin() + 0.1);
         barRenderer.setItemMargin(0.0f);
     }

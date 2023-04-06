@@ -20,5 +20,8 @@ public class GenerateReportForm {
 
     private boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport;
 
+    private boolean showFullAnswers;
+
+
 }
 
