@@ -31,6 +31,13 @@
                     <b>Показувати у PDF звіті категорії стейкхолдерів, що не залишили жодного відгуку</b>
                 </label>
             </div>
+            <div class="form-check">
+                <input class="form-check-input" name="showFullAnswers"
+                       type="checkbox" id="showFullAnswers">
+                <label class="form-check-label" for="showFullAnswers">
+                    <b>Показувати у PDF звіті відповіді стейкхолдерів під діаграмою</b>
+                </label>
+            </div>
         </div>
 
         <div class="my-4 row mx-auto">

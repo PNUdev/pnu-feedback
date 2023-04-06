@@ -24,7 +24,9 @@ public class GenerateReportDtoPreparer {
                 .startDate(startDate.atStartOfDay())
                 .endDate(endDate.plusDays(1).atStartOfDay())
                 .includeStakeholderCategoriesWithZeroSubmissionsToPdfReport(
-                        generateReportForm.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport())
+                        generateReportForm.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport()
+                )
+                .showFullAnswers(generateReportForm.isShowFullAnswers())
                 .build();
     }
 
