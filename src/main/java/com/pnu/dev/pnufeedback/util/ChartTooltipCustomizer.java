@@ -18,7 +18,7 @@ public class ChartTooltipCustomizer implements JRChartCustomizer {
         Font font = new Font("Calibri", Font.BOLD, 10);
 
         plot.getDomainAxis().setCategoryLabelPositions(
-                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.5)
+                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 2.25)
         );
 
         barRenderer.setBaseItemLabelFont(font);

@@ -35,7 +35,7 @@
                 <input class="form-check-input" name="showFullAnswers"
                        type="checkbox" id="showFullAnswers">
                 <label class="form-check-label" for="showFullAnswers">
-                    <b>Показути у PDF звіті відповіді стейкхолдерів під діаграмою</b>
+                    <b>Показувати у PDF звіті відповіді стейкхолдерів під діаграмою</b>
                 </label>
             </div>
         </div>

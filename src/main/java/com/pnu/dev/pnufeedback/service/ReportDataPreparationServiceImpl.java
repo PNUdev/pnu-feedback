@@ -15,6 +15,7 @@ import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.SubmissionRepository;
+import com.pnu.dev.pnufeedback.util.ScoreQuestionComparator;
 import com.pnu.dev.pnufeedback.util.ScoreQuestionNumberComparator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -27,9 +28,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.averagingInt;
 import static java.util.stream.Collectors.joining;
@@ -41,7 +42,6 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private static final Integer CHART_SPLIT_SIZE = 25;
     private static final int CHART_QUESTION_DENOMINATOR_MAXIMUM = 90;
-    private static final int QUESTION_CUTOFF_PREVENT_DENOMINATOR = 45;
 
     private ScoreAnswerRepository scoreAnswerRepository;
 
@@ -55,6 +55,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
 
     private ScoreQuestionNumberComparator scoreQuestionNumberComparator;
 
+    private ScoreQuestionComparator scoreQuestionComparator;
+
     private ScoreQuestionServiceImpl scoreQuestionService;
 
     public ReportDataPreparationServiceImpl(ScoreAnswerRepository scoreAnswerRepository,
@@ -63,6 +65,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
             EducationalProgramService educationalProgramService,
             StakeholderCategoryService stakeholderCategoryService,
             ScoreQuestionNumberComparator scoreQuestionNumberComparator,
+            ScoreQuestionComparator scoreQuestionComparator,
             ScoreQuestionServiceImpl scoreQuestionService
     ) {
 
@@ -72,6 +75,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         this.educationalProgramService = educationalProgramService;
         this.stakeholderCategoryService = stakeholderCategoryService;
         this.scoreQuestionNumberComparator = scoreQuestionNumberComparator;
+        this.scoreQuestionComparator = scoreQuestionComparator;
         this.scoreQuestionService = scoreQuestionService;
     }
 
@@ -142,7 +146,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                         questionsTexts.stream().map(String::length).max(Integer::compareTo).orElse(0) / 2,
                         CHART_QUESTION_DENOMINATOR_MAXIMUM
                 );
-        AtomicInteger cutoffQuestionIndex = new AtomicInteger(1);
+
+        AtomicInteger notEqualPrevent = new AtomicInteger(2);
+
         return scoreAnswers.stream()
                 .map(ScoreAnswer::getQuestionNumber)
                 .distinct()
@@ -167,19 +173,14 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                     .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
-                            boolean isCutoffQuestion =
-                                    cutoffQuestionIndex.get() % CHART_SPLIT_SIZE == 0
-                                            || cutoffQuestionIndex.get() == 1;
                             List<String> questionTexts = showFullAnswers
                                     ? scoreQuestions.stream()
                                         .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
                                         .map(ScoreQuestion::getContent)
-                                        .map(question -> insertNewLines(question, "\n", newLineDenominator, isCutoffQuestion))
+                                        .map(question -> insertNewLines(question, "\n", newLineDenominator, notEqualPrevent.getAndIncrement()))
                                         .collect(toList())
                                     : Collections.emptyList();
-                            if (!questionTexts.isEmpty()) {
-                                cutoffQuestionIndex.incrementAndGet();
-                            }
+
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
                                     .questionNumber(questionNumber)
@@ -199,12 +200,12 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 && question.getStakeholderCategoryId().equals(stakeholderCategory.getId());
     }
 
-    public static String insertNewLines(String text, String insert, int period, boolean canBeCutoff) {
+    public static String insertNewLines(String text, String insert, int period, int invisibleIndex) {
         String[] works = text.split(" ");
         StringBuilder line = new StringBuilder();
         StringBuilder result = new StringBuilder();
         for (String work : works) {
-            if (line.length() + work.length() > (canBeCutoff ? QUESTION_CUTOFF_PREVENT_DENOMINATOR : period)) {
+            if (line.length() + work.length() > period) {
                 result.append(line).append(insert);
                 line = new StringBuilder();
             }
@@ -212,6 +213,9 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         }
         result.append(line);
 
+        IntStream.range(0, invisibleIndex).forEach(
+                i -> result.append("\u200b")
+        );
         return result.toString();
     }
 
