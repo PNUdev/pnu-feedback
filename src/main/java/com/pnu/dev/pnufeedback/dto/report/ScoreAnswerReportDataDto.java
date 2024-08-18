@@ -1,5 +1,6 @@
 package com.pnu.dev.pnufeedback.dto.report;
 
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class ScoreAnswerReportDataDto {
     private String stakeholderStatistics;
 
     private Integer chartSplitSize;
+
+    private Map<String, String> chartColorMap;
 
     private LocalDate startDate;
 

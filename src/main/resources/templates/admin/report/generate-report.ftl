@@ -40,6 +40,18 @@
             </div>
         </div>
 
+        <div class="form-group mb-3">
+            <p class="mb-1">Виберіть колір для кожної категорії стейкхолдерів:</p>
+            <div class="row mb-2 ml-0">
+                <#list stakeholderCategories as stakeholderCategory>
+                    <label class="form-check-label m-2">
+                        <input style="width: 25px" type="color" name="${stakeholderCategory.title}">
+                        ${stakeholderCategory.title}
+                    </label>
+                </#list>
+            </div>
+        </div>
+
         <div class="my-4 row mx-auto">
             <div>
                 <button class="btn btn-primary" formaction="/${adminPanelUrl}/generate-report/pdf">Згенерувати PDF звіт</button>

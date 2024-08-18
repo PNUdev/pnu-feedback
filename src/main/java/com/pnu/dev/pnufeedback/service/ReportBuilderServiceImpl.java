@@ -84,6 +84,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         parameters.put("STAKEHOLDER_STATISTICS", scoreAnswerReportDataDto.getStakeholderStatistics());
         parameters.put("CHART_SPLIT_SIZE", scoreAnswerReportDataDto.getChartSplitSize());
         parameters.put("OPEN_ANSWER_DATASET", new JRBeanCollectionDataSource(scoreAnswerReportDataDto.getOpenAnswerData()));
+        parameters.put("COLOR_MAP", scoreAnswerReportDataDto.getChartColorMap());
 
         return parameters;
     }

@@ -1,5 +1,6 @@
 package com.pnu.dev.pnufeedback.dto.form;
 
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ public class GenerateReportForm {
 
     private boolean showFullAnswers;
 
+    private Map<String, String> chartColorMap;
 
 }
 
