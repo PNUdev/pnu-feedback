@@ -45,7 +45,7 @@
             <div class="row mb-2 ml-0">
                 <#list stakeholderCategories as stakeholderCategory>
                     <label class="form-check-label m-2">
-                        <input style="width: 25px" type="color" name="${stakeholderCategory.title}">
+                        <input style="width: 25px" type="color" name="chartColorMap[${stakeholderCategory.title}]">
                         ${stakeholderCategory.title}
                     </label>
                 </#list>

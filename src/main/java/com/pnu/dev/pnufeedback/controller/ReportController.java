@@ -14,11 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Controller
@@ -58,12 +56,10 @@ public class ReportController {
     }
 
     @GetMapping("/pdf")
-    public void generateReportPdf(@Validated GenerateReportForm generateReportForm,
-                                  @RequestParam Map<String, String> colors, HttpServletResponse response) {
+    public void generateReportPdf(@Validated GenerateReportForm generateReportForm, HttpServletResponse response) {
 
         log.info("PDF report generation started!");
 
-        generateReportForm.setChartColorMap(colors);
         reportBuilderService.exportReport(generateReportForm, response);
 
         log.info("PDF report successfully generated");
