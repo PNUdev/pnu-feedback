@@ -33,10 +33,10 @@ public class ReportController {
 
     @Autowired
     public ReportController(
-        ReportBuilderService reportBuilderService,
-        ExcelReportBuilderService excelReportBuilderService,
-        EducationalProgramService educationalProgramService,
-        StakeholderCategoryService stakeholderCategoryService) {
+            ReportBuilderService reportBuilderService,
+            ExcelReportBuilderService excelReportBuilderService,
+            EducationalProgramService educationalProgramService,
+            StakeholderCategoryService stakeholderCategoryService) {
 
         this.reportBuilderService = reportBuilderService;
         this.excelReportBuilderService = excelReportBuilderService;
@@ -74,5 +74,4 @@ public class ReportController {
 
         log.info("Excel report successfully generated");
     }
-
 }
