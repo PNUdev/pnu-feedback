@@ -118,7 +118,8 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                 .endDate(endDate.toLocalDate())
                 .scoreAnswerReportData(chartAnswerData)
                 .openAnswerData(mapToJasperOpenAnswerDto(openAnswerData))
-                .chartSplitSize(normalizeChartSplitSize(submissions)).build();
+                .chartSplitSize(normalizeChartSplitSize(submissions))
+                .chartColorMap(generateReportDto.getChartColorMap()).build();
 
         log.debug("All data gathered from: [{}] to: [{}]!", startDate, endDate);
 

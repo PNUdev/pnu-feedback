@@ -1,10 +1,12 @@
 package com.pnu.dev.pnufeedback.controller;
 
 import com.pnu.dev.pnufeedback.domain.EducationalProgram;
+import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
 import com.pnu.dev.pnufeedback.dto.form.GenerateReportForm;
 import com.pnu.dev.pnufeedback.service.EducationalProgramService;
 import com.pnu.dev.pnufeedback.service.ExcelReportBuilderService;
 import com.pnu.dev.pnufeedback.service.ReportBuilderService;
+import com.pnu.dev.pnufeedback.service.StakeholderCategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,22 +29,28 @@ public class ReportController {
 
     private EducationalProgramService educationalProgramService;
 
+    private StakeholderCategoryService stakeholderCategoryService;
+
     @Autowired
     public ReportController(
             ReportBuilderService reportBuilderService,
             ExcelReportBuilderService excelReportBuilderService,
-            EducationalProgramService educationalProgramService) {
+            EducationalProgramService educationalProgramService,
+            StakeholderCategoryService stakeholderCategoryService) {
 
         this.reportBuilderService = reportBuilderService;
         this.excelReportBuilderService = excelReportBuilderService;
         this.educationalProgramService = educationalProgramService;
+        this.stakeholderCategoryService = stakeholderCategoryService;
     }
 
     @GetMapping
     public String showGenerateReportPage(Model model) {
 
         List<EducationalProgram> educationalPrograms = educationalProgramService.findAll();
+        List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
         model.addAttribute("educationalPrograms", educationalPrograms);
+        model.addAttribute("stakeholderCategories", stakeholderCategories);
 
         return "admin/report/generate-report";
     }

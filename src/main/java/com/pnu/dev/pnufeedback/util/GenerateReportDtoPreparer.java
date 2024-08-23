@@ -27,6 +27,7 @@ public class GenerateReportDtoPreparer {
                         generateReportForm.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport()
                 )
                 .showFullAnswers(generateReportForm.isShowFullAnswers())
+                .chartColorMap(generateReportForm.getChartColorMap())
                 .build();
     }
 

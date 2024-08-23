@@ -15,6 +15,7 @@
 	<parameter name="START_DATE" class="java.lang.String"/>
 	<parameter name="END_DATE" class="java.lang.String"/>
 	<parameter name="CHART_SPLIT_SIZE" class="java.lang.Integer"/>
+	<parameter name="COLOR_MAP" class="java.util.Map"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
