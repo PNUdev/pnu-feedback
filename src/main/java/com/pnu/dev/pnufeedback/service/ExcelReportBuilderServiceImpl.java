@@ -12,10 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -68,11 +73,21 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                     .findById(generateReportDto.getEducationalProgramId());
             Sheet sheet = workbook.createSheet(educationalProgram.getTitle());
 
-            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService.findAllToShowInReport();
+            List<StakeholderCategory> stakeholderCategories = stakeholderCategoryService
+                .findAllToShowInReport().stream()
+                .filter(stakeholder ->
+                    reportDetailedStatistics.getSubmissionsCountByStakeholderCategory().containsKey(stakeholder.getId())
+                )
+                .collect(Collectors.toList());
+
             Row stakeholderCategoriesRow = sheet.createRow(0);
 
             CellStyle cellBoldFontStyle = getCellBoldFontStyle(workbook);
             CellStyle cellCenterPositionStyle = getCellCenterPositionStyle(workbook);
+            CellStyle cellGreenColorStyle = getCellColorStyle(workbook, IndexedColors.LIGHT_GREEN);
+            CellStyle cellYellowColorStyle = getCellColorStyle(workbook, IndexedColors.LIGHT_YELLOW);
+            CellStyle cellRedColorStyle = getCellColorStyle(workbook, IndexedColors.RED);
+
 
             Map<Long, Long> submissionsCountByStakeholderCategory = reportDetailedStatistics
                     .getSubmissionsCountByStakeholderCategory();
@@ -89,6 +104,28 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                         cell.setCellValue(String.format("%s (%s)", stakeholderCategory.getTitle(), submissionsCount));
                         cell.setCellStyle(cellBoldFontStyle);
                     });
+
+            // Empty cell
+            stakeholderCategoriesRow.createCell(stakeholderCategoriesRow.getLastCellNum());
+
+            // Write a pair of stakeholder category names
+            IntStream.range(0, stakeholderCategories.size())
+                     .forEach(i -> {
+                         String categoryTitle1 = stakeholderCategories.get(i).getTitle();
+
+                         IntStream.range(i+1, stakeholderCategories.size())
+                                  .forEach(j -> {
+                                      String categoryTitle2 = stakeholderCategories.get(j).getTitle();
+
+                                      Cell cell = stakeholderCategoriesRow.createCell(
+                                          stakeholderCategoriesRow.getLastCellNum()
+                                      );
+
+                                      cell.setCellValue(String.format("%s%n  /%n%s", categoryTitle1, categoryTitle2));
+                                      cell.setCellStyle(cellBoldFontStyle);
+                                  });
+                     });
+
 
             List<QuestionDetailedStatistics> questionDetailedStatistics = reportDetailedStatistics
                     .getQuestionDetailedStatistics();
@@ -122,7 +159,7 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
                                 Double averageScore = currentQuestionDetailedStatistic.getAverageScores()
                                         .get(stakeholderCategoryId);
 
-                                averageScoreCell.setCellValue(averageScore);
+                                averageScoreCell.setCellFormula(String.format(Locale.US,"%.2f", averageScore));
                             } else {
                                 averageScoreCell.setCellValue("---");
                             }
@@ -130,9 +167,49 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
                         });
 
+                // Empty cell
+                questionStatisticsRow.createCell(questionStatisticsRow.getLastCellNum());
+
+                // Write discrepancy levels for the question
+                IntStream.range(0, stakeholderCategories.size())
+                         .forEach(i -> {
+                             Long stakeholderCategoryId1 = stakeholderCategories.get(i).getId();
+
+                             IntStream.range(i+1, stakeholderCategories.size())
+                                      .forEach(j -> {
+                                          Long stakeholderCategoryId2 = stakeholderCategories.get(j).getId();
+
+                                          Cell discrepancyScoreCell = questionStatisticsRow.createCell(
+                                              questionStatisticsRow.getLastCellNum()
+                                          );
+
+                                          Double discrepancy = currentQuestionDetailedStatistic
+                                              .getDiscrepancyBetween(stakeholderCategoryId1, stakeholderCategoryId2);
+
+                                          if (discrepancy == null) {
+                                              return;
+                                          }
+
+                                          discrepancyScoreCell.setCellFormula(
+                                              String.format(Locale.US, "%.2f", discrepancy)
+                                          );
+
+                                          if (discrepancy >= 3.5) {
+                                              discrepancyScoreCell.setCellStyle(cellRedColorStyle);
+                                          } else if (discrepancy >= 1.5) {
+                                              discrepancyScoreCell.setCellStyle(cellYellowColorStyle);
+                                          } else if (discrepancy >= 1) {
+                                              discrepancyScoreCell.setCellStyle(cellGreenColorStyle);
+                                          } else {
+                                              discrepancyScoreCell.setCellStyle(cellCenterPositionStyle);
+                                          }
+
+                                      });
+                         });
             });
 
-            IntStream.range(0, stakeholderCategories.size() + 1).forEach(sheet::autoSizeColumn);
+            IntStream.range(0, stakeholderCategories.size() + 2 + getUniquePairsNumber(stakeholderCategories.size()))
+                     .forEach(sheet::autoSizeColumn);
 
             workbook.write(outputStream);
         } catch (Exception e) {
@@ -142,11 +219,18 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
 
     }
 
+    private int getUniquePairsNumber(int n) {
+        return (n * (n - 1)) / 2;
+    }
+
     private CellStyle getCellBoldFontStyle(Workbook workbook) {
         Font boldFont = workbook.createFont();
         boldFont.setBold(true);
         CellStyle cellStyleForBold = workbook.createCellStyle();
         cellStyleForBold.setFont(boldFont);
+        cellStyleForBold.setAlignment(HorizontalAlignment.CENTER);
+        cellStyleForBold.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyleForBold.setWrapText(true);
         return cellStyleForBold;
     }
 
@@ -154,6 +238,14 @@ public class ExcelReportBuilderServiceImpl implements ExcelReportBuilderService 
         CellStyle cellStyleForBold = workbook.createCellStyle();
         cellStyleForBold.setAlignment(HorizontalAlignment.CENTER);
         return cellStyleForBold;
+    }
+
+    private CellStyle getCellColorStyle(Workbook workbook, IndexedColors color) {
+        CellStyle cellStyleForColor = workbook.createCellStyle();
+        cellStyleForColor.setFillForegroundColor(color.getIndex());
+        cellStyleForColor.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        cellStyleForColor.setAlignment(HorizontalAlignment.CENTER);
+        return cellStyleForColor;
     }
 
 }
