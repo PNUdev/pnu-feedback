@@ -1,16 +1,7 @@
 package com.pnu.dev.pnufeedback.service;
 
-import com.pnu.dev.pnufeedback.domain.EducationalProgram;
-import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
-import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
-import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
-import com.pnu.dev.pnufeedback.domain.Submission;
-import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportChartInfoJasperDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
-import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerJasperDto;
-import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerReportDataDto;
+import com.pnu.dev.pnufeedback.domain.*;
+import com.pnu.dev.pnufeedback.dto.report.*;
 import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
@@ -24,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.averagingInt;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Service
@@ -103,9 +91,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
         List<ReportChartInfoJasperDto> chartAnswerData = getChartData(
                 stakeholderCategories,
                 submissions,
-                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport(),
-                generateReportDto.isShowFullAnswers()
-        );
+                generateReportDto.isIncludeStakeholderCategoriesWithZeroSubmissionsToPdfReport());
         checkIfNoActiveOpenAnswerNorAnswers(openAnswerData, chartAnswerData, startDate.toLocalDate(),
                 endDate.toLocalDate());
 
@@ -129,8 +115,7 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
     private List<ReportChartInfoJasperDto> getChartData(
             List<StakeholderCategory> stakeholderCategories,
             List<Submission> submissions,
-            boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport,
-            boolean showFullAnswers
+            boolean includeStakeholderCategoriesWithZeroSubmissionsToPdfReport
     ) {
 
         List<ScoreAnswer> scoreAnswers = scoreAnswerRepository.findAllBySubmissionIdIn(
@@ -174,13 +159,11 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                                     .peek(scoreAnswer -> questionScoresSum.add(scoreAnswer.getScore()))
                                     .count();
 
-                            List<String> questionTexts = showFullAnswers
-                                    ? scoreQuestions.stream()
+                            List<String> questionTexts = scoreQuestions.stream()
                                         .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
                                         .map(ScoreQuestion::getContent)
-                                        .map(question -> insertNewLines(question, "\n", newLineDenominator, notEqualPrevent.getAndIncrement()))
-                                        .collect(toList())
-                                    : Collections.emptyList();
+                                        //.map(question -> insertNewLines(question, "\n", newLineDenominator, notEqualPrevent.getAndIncrement()))
+                                        .collect(toList());
 
                             return ReportChartInfoJasperDto.builder()
                                     .stakeholderCategoryTitle(stakeholderCategory.getTitle())
