@@ -89,12 +89,15 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
             uniqueQuestionNumbers = scoreAnswerReportDataDto.getScoreAnswerReportData().stream()
                     .map(dto -> {
                         Map<String, Object> map = new HashMap<>();
-                        map.put("questionNumber", dto.getQuestionNumber());
+                        map.put("questionNumber", dto.getQuestionNumber() + ", ");
                         return map;
                     })
                     .distinct()
                     .collect(Collectors.toList());
         }
+        String newLastTest = uniqueQuestionNumbers.get(uniqueQuestionNumbers.size() - 1).get("questionNumber")
+                .toString().replaceAll(", ", "");
+        uniqueQuestionNumbers.get(uniqueQuestionNumbers.size() - 1).put("questionNumber", newLastTest);
         parameters.put("allQuestionNumbers", uniqueQuestionNumbers);
         Set<String> seenQuestionNumbers = new HashSet<>();
 

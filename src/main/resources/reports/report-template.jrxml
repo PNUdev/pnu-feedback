@@ -212,7 +212,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Top">
 									<font fontName="Calibri" size="12" isUnderline="true" pdfFontName="Helvetica" isPdfEmbedded="false"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{questionNumber} + ", "]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{questionNumber}]]></textFieldExpression>
 								<hyperlinkAnchorExpression><![CDATA["anchor_qn_" + $F{questionNumber}.toString().trim()]]></hyperlinkAnchorExpression>
 							</textField>
 						</jr:listContents>
