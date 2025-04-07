@@ -7,11 +7,12 @@ import com.pnu.dev.pnufeedback.exception.ServiceException;
 import com.pnu.dev.pnufeedback.util.GenerateReportDtoPreparer;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
+
 import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -20,8 +21,13 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -48,6 +54,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
     public void exportReport(GenerateReportForm generateReportForm, HttpServletResponse response) {
 
         GenerateReportDto generateReportDto = generateReportDtoPreparer.prepare(generateReportForm);
+        boolean showFullAnswers = generateReportDto.isShowFullAnswers();
         ScoreAnswerReportDataDto scoreAnswerReportDataDto = reportDataPreparationService.getReportData(generateReportDto);
 
         response.setContentType("application/pdf");
@@ -61,7 +68,7 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
 
             JRBeanCollectionDataSource beanColDataSource =
                     new JRBeanCollectionDataSource(scoreAnswerReportDataDto.getScoreAnswerReportData());
-            Map<String, Object> parameters = prepareParameters(scoreAnswerReportDataDto);
+            Map<String, Object> parameters = prepareParameters(scoreAnswerReportDataDto, showFullAnswers);
             JasperPrint print = JasperFillManager.fillReport(report, parameters, beanColDataSource);
 
             JasperExportManager.exportReportToPdfStream(print, servletOutputStream);
@@ -74,8 +81,8 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         }
     }
 
-    private Map<String, Object> prepareParameters(ScoreAnswerReportDataDto scoreAnswerReportDataDto) {
-
+    private Map<String, Object> prepareParameters(ScoreAnswerReportDataDto scoreAnswerReportDataDto,
+                                                  boolean showFullAnswers) {
         Map<String, Object> parameters = new HashMap<>();
 
         parameters.put("EDUCATIONAL_PROGRAM_NAME", scoreAnswerReportDataDto.getEducationalProgramName());
@@ -85,6 +92,46 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
         parameters.put("CHART_SPLIT_SIZE", scoreAnswerReportDataDto.getChartSplitSize());
         parameters.put("OPEN_ANSWER_DATASET", new JRBeanCollectionDataSource(scoreAnswerReportDataDto.getOpenAnswerData()));
         parameters.put("COLOR_MAP", scoreAnswerReportDataDto.getChartColorMap());
+
+        List<Map<String, Object>> uniqueQuestionNumbers = new ArrayList<>();
+        List<Map<String, Object>> questionTextList = new ArrayList<>();
+
+        if (showFullAnswers) {
+            uniqueQuestionNumbers = scoreAnswerReportDataDto.getScoreAnswerReportData().stream()
+                    .map(dto -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("questionNumber", dto.getQuestionNumber() + ", ");
+                        return map;
+                    })
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+        String newLastTest = uniqueQuestionNumbers.get(uniqueQuestionNumbers.size() - 1).get("questionNumber")
+                .toString().replaceAll(", ", "");
+        uniqueQuestionNumbers.get(uniqueQuestionNumbers.size() - 1).put("questionNumber", newLastTest);
+        parameters.put("allQuestionNumbers", uniqueQuestionNumbers);
+        Set<String> seenQuestionNumbers = new HashSet<>();
+
+        if (showFullAnswers) {
+            questionTextList = scoreAnswerReportDataDto.getScoreAnswerReportData().stream()
+                    .flatMap(dto -> dto.getQuestionTexts().stream()
+                            .map(text -> {
+                                Map<String, Object> map = new HashMap<>();
+                                String questionNumber = dto.getQuestionNumber();
+                                if (seenQuestionNumbers.contains(questionNumber)) {
+                                    questionNumber = "";
+                                } else {
+                                    seenQuestionNumbers.add(questionNumber);
+                                }
+                                map.put("questionNumber", questionNumber);
+                                map.put("questionText", text);
+                                return map;
+                            }))
+                    .collect(Collectors.toList());
+        }
+        parameters.put("allQuestionTexts", questionTextList);
+
+        parameters.put("LIST_NAME", showFullAnswers ? "Список всіх питань" : " ");
 
         return parameters;
     }
