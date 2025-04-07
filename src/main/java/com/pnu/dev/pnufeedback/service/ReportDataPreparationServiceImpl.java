@@ -1,8 +1,17 @@
 package com.pnu.dev.pnufeedback.service;
 
 
-import com.pnu.dev.pnufeedback.domain.*;
-import com.pnu.dev.pnufeedback.dto.report.*;
+import com.pnu.dev.pnufeedback.domain.ScoreAnswer;
+import com.pnu.dev.pnufeedback.domain.ScoreQuestion;
+import com.pnu.dev.pnufeedback.domain.Submission;
+import com.pnu.dev.pnufeedback.domain.StakeholderCategory;
+import com.pnu.dev.pnufeedback.domain.EducationalProgram;
+import com.pnu.dev.pnufeedback.dto.report.ScoreAnswerReportDataDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportChartInfoJasperDto;
+import com.pnu.dev.pnufeedback.dto.report.GenerateReportDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerJasperDto;
+import com.pnu.dev.pnufeedback.dto.report.ReportOpenAnswerContentJasperDto;
 import com.pnu.dev.pnufeedback.exception.EmptyReportException;
 import com.pnu.dev.pnufeedback.repository.OpenAnswerRepository;
 import com.pnu.dev.pnufeedback.repository.ScoreAnswerRepository;
