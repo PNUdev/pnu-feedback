@@ -1,250 +1,224 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="working_hours" pageWidth="900" pageHeight="1000" whenNoDataType="AllSectionsNoDetail"
-              columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
-              uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
-    <style name="default-style" isDefault="true" fontName="Calibri" pdfEncoding="CP1251" isPdfEmbedded="true"/>
-    <subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
-        <field name="stakeholderCategoryTitle" class="java.lang.String"/>
-        <field name="reportOpenAnswerContents" class="java.util.List"/>
-    </subDataset>
-    <subDataset name="openAnswerNestedDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
-        <field name="openAnswerContent" class="java.lang.String"/>
-    </subDataset>
-    <subDataset name="allQuestionNumbers" uuid="dcc7b17b-d6c7-4636-b335-ba0c82446335">
-        <field name="questionNumber" class="java.lang.Object"/>
-    </subDataset>
-    <subDataset name="allQuestionTexts" uuid="dcc7b17b-d6c7-4636-b335-ba0c82446335">
-        <field name="questionNumber" class="java.lang.String"/>
-        <field name="questionText" class="java.lang.String"/>
-    </subDataset>
-    <parameter name="allQuestionNumbers" class="java.util.Collection"/>
-    <parameter name="allQuestionTexts" class="java.util.Collection"/>
-    <parameter name="OPEN_ANSWER_DATASET" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-    <parameter name="EDUCATIONAL_PROGRAM_NAME" class="java.lang.String"/>
-    <parameter name="STAKEHOLDER_STATISTICS" class="java.lang.String"/>
-    <parameter name="START_DATE" class="java.lang.String"/>
-    <parameter name="END_DATE" class="java.lang.String"/>
-    <parameter name="CHART_SPLIT_SIZE" class="java.lang.Integer"/>
-    <parameter name="COLOR_MAP" class="java.util.Map"/>
-    <parameter name="LIST_NAME" class="java.lang.String"/>
-    <queryString>
-        <![CDATA[]]>
-    </queryString>
-    <field name="stakeholderCategoryTitle" class="java.lang.String">
-        <fieldDescription><![CDATA[stakeholderCategoryTitle]]></fieldDescription>
-    </field>
-    <field name="questionNumber" class="java.lang.String">
-        <fieldDescription><![CDATA[questionNumber]]></fieldDescription>
-    </field>
-    <field name="questionTexts" class="java.util.List">
-        <fieldDescription><![CDATA[questionTexts]]></fieldDescription>
-    </field>
-    <field name="averageScore" class="java.lang.Double">
-        <fieldDescription><![CDATA[averageScore]]></fieldDescription>
-    </field>
-    <variable name="chartNumber" class="java.lang.Integer" incrementType="Group" incrementGroup="charSplitter"
-              calculation="Count">
-        <variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
-    </variable>
-
-    <group name="list of questions">
-        <groupFooter>
-            <band height="822" splitType="Stretch">
-                <textField>
-                    <reportElement x="331" y="0" width="200" height="30" uuid="f75d5f97-e22f-4303-b932-8306ff576769"/>
-                    <textElement textAlignment="Center">
-                        <font size="18" isBold="true"/>
-                    </textElement>
-                    <textFieldExpression><![CDATA[$P{LIST_NAME}]]></textFieldExpression>
-                </textField>
-                <componentElement>
-                    <reportElement stretchType="ContainerBottom" x="12" y="30" width="839" height="730"
-                                   uuid="f0e9d5ec-a157-44a8-9832-c53d8d35e27e"/>
-                    <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
-                             xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
-                             printOrder="Vertical">
-                        <datasetRun subDataset="allQuestionTexts" uuid="f591b2e0-ea4e-4b55-98c9-0f3398301390">
-                            <dataSourceExpression>
-                                <![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{allQuestionTexts})]]></dataSourceExpression>
-                        </datasetRun>
-                        <jr:listContents height="20" width="839">
-                            <textField>
-                                <reportElement x="0" y="0" width="839" height="20"
-                                               uuid="91508d6d-19c2-4beb-860b-c3350b78d952"/>
-                                <textElement textAlignment="Left">
-                                    <font size="12"/>
-                                </textElement>
-                                <textFieldExpression>
-                                    <![CDATA[$F{questionNumber} + " " + $F{questionText}]]></textFieldExpression>
-                                <anchorNameExpression>
-                                    <![CDATA["anchor_qn_" + $F{questionNumber}.toString().trim()]]></anchorNameExpression>
-                            </textField>
-                        </jr:listContents>
-                    </jr:list>
-                </componentElement>
-            </band>
-        </groupFooter>
-    </group>
-
-    <group name="summary">
-        <groupFooter>
-            <band height="720" splitType="Stretch">
-                <property name="com.jaspersoft.studio.unit.height" value="px"/>
-                <staticText>
-                    <reportElement x="330" y="20" width="200" height="30" uuid="be5fd57c-accc-492e-a441-3f5364cf1d6c">
-                        <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-                    </reportElement>
-                    <textElement textAlignment="Center">
-                        <font size="18" isBold="true"/>
-                    </textElement>
-                    <text><![CDATA[Пропозиції]]></text>
-                </staticText>
-                <componentElement>
-                    <reportElement stretchType="ContainerBottom" x="10" y="60" width="839" height="50"
-                                   forecolor="#1541ED" uuid="97d38fef-4d51-4183-8899-c0716784cd09"/>
-                    <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
-                             xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
-                             printOrder="Vertical">
-                        <datasetRun subDataset="openAnswerDataSource" uuid="56186e51-5dfa-457a-b444-65cffc6e9323">
-                            <dataSourceExpression><![CDATA[$P{OPEN_ANSWER_DATASET}]]></dataSourceExpression>
-                        </datasetRun>
-                        <jr:listContents height="50" width="839">
-                            <textField textAdjust="StretchHeight">
-                                <reportElement x="0" y="0" width="170" height="50" isRemoveLineWhenBlank="true"
-                                               forecolor="#391B8C" uuid="8256f692-37f6-403e-b92a-95543947c971"/>
-                                <box leftPadding="10" rightPadding="10">
-                                    <pen lineWidth="1.0" lineStyle="Dotted" lineColor="#000000"/>
-                                </box>
-                                <textElement textAlignment="Justified">
-                                    <font size="14" isBold="true"/>
-                                    <paragraph lineSpacing="Proportional" lineSpacingSize="2.0"/>
-                                </textElement>
-                                <textFieldExpression><![CDATA[$F{stakeholderCategoryTitle}]]></textFieldExpression>
-                            </textField>
-                        </jr:listContents>
-                    </jr:list>
-                </componentElement>
-                <textField>
-                    <reportElement positionType="Float" x="11" y="80" width="839" height="40"
-                                   uuid="968e23f5-964d-42eb-97d8-76e2ac4411c5"/>
-                    <textElement>
-                        <font size="14"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA[$P{OPEN_ANSWER_DATASET}.getRecordCount() == 0 ? "Ще немає пропозицій" : ""]]></textFieldExpression>
-                </textField>
-                <textField>
-                    <reportElement positionType="Float" x="11" y="160" width="839" height="40"
-                                   uuid="c1aa2cdb-30c6-4799-b649-137bfc0e6ad0"/>
-                    <textElement>
-                        <font size="14"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["Опитування проведено з "+ $P{START_DATE} +" р. по "+ $P{END_DATE} + " р. Центром забезпечення якості «Прикарпатського національного університету імені Василя Стефаника»"]]></textFieldExpression>
-                </textField>
-            </band>
-        </groupFooter>
-    </group>
-
-    <group name="charSplitter">
-        <groupExpression>
-            <![CDATA[$V{REPORT_COUNT} - 1 - ( ($V{REPORT_COUNT} - 1) % $P{CHART_SPLIT_SIZE} )]]></groupExpression>
-        <groupFooter>
-            <band height="110">
-                <property name="com.jaspersoft.studio.unit.height" value="px"/>
-                <textField>
-                    <reportElement mode="Opaque" x="10" y="10" width="839" height="30" forecolor="#050505"
-                                   backcolor="#87D0E0" uuid="7a533552-f010-4fb3-b944-44122d862e1f">
-                        <property name="com.jaspersoft.studio.unit.x" value="pixel"/>
-                        <property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-                    </reportElement>
-                    <textElement verticalAlignment="Middle">
-                        <font size="16" isBold="true"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["  Освітня програма: " + $P{EDUCATIONAL_PROGRAM_NAME}]]></textFieldExpression>
-                </textField>
-                <textField>
-                    <reportElement x="10" y="60" width="840" height="40" uuid="08e73aad-a2d1-4efc-a3ab-fd493b83cd1c"/>
-                    <textElement>
-                        <font size="14"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA[$P{STAKEHOLDER_STATISTICS} == "" ? "" : ("Шляхом анонімного анкетування опитано: " + $P{STAKEHOLDER_STATISTICS} + ".  Результати опитувань наведені на гістограмах.")]]></textFieldExpression>
-                </textField>
-            </band>
-            <band height="822">
-                <property name="com.jaspersoft.studio.unit.height" value="px"/>
-                <barChart>
-                    <chart customizerClass="com.pnu.dev.pnufeedback.util.ChartTooltipCustomizer">
-                        <reportElement stretchType="RelativeToTallestObject" x="7" y="0" width="844" height="670"
-                                       isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true"
-                                       uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
-                            <property name="net.sf.jasperreports.chart.range.axis.tick.interval" value="0.5"/>
-                            <printWhenExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} != ""]]></printWhenExpression>
-                        </reportElement>
-                        <chartTitle>
-                            <font size="14" isBold="false"/>
-                            <titleExpression><![CDATA["Рис. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
-                        </chartTitle>
-                        <chartSubtitle/>
-                        <chartLegend/>
-                    </chart>
-                    <categoryDataset>
-                        <dataset resetType="Group" resetGroup="charSplitter"/>
-                        <categorySeries>
-                            <seriesExpression><![CDATA[$F{stakeholderCategoryTitle}]]></seriesExpression>
-                            <categoryExpression><![CDATA[$F{questionNumber}]]></categoryExpression>
-                            <valueExpression><![CDATA[$F{averageScore}]]></valueExpression>
-                        </categorySeries>
-                    </categoryDataset>
-                    <barPlot>
-                        <plot/>
-                        <itemLabel/>
-                        <categoryAxisFormat>
-                            <axisFormat/>
-                        </categoryAxisFormat>
-                        <valueAxisFormat>
-                            <axisFormat/>
-                        </valueAxisFormat>
-                        <rangeAxisMaxValueExpression><![CDATA[new Integer(5)]]></rangeAxisMaxValueExpression>
-                    </barPlot>
-                </barChart>
-                <componentElement>
-                    <reportElement stretchType="ContainerBottom" x="0" y="630" width="839" height="50"
-                                   forecolor="#1541ED" uuid="694297d6-664c-4048-bf0e-f29918135257">
-                        <property name="com.jaspersoft.studio.unit.height" value="px"/>
-                        <property name="com.jaspersoft.studio.layout"
-                                  value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
-                        <property name="com.jaspersoft.studio.unit.CONTENTS.width" value="px"/>
-                        <property name="com.jaspersoft.studio.unit.CONTENTS.height" value="px"/>
-                    </reportElement>
-                    <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
-                             xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
-                             printOrder="Horizontal" ignoreWidth="false">
-                        <datasetRun subDataset="allQuestionNumbers" uuid="f591b2e0-ea4e-4b55-98c9-0f3398301390">
-                            <dataSourceExpression>
-                                <![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{allQuestionNumbers})]]></dataSourceExpression>
-                        </datasetRun>
-                        <jr:listContents height="15" width="20">
-                            <textField hyperlinkType="LocalAnchor">
-                                <reportElement x="0" y="0" width="20" height="15"
-                                               uuid="69e8ab26-7355-444a-a80e-0ee23799029c"/>
-                                <textElement textAlignment="Center" verticalAlignment="Top">
-                                    <font fontName="Calibri" size="10"/>
-                                </textElement>
-                                <textFieldExpression><![CDATA[$F{questionNumber}]]></textFieldExpression>
-                                <hyperlinkAnchorExpression>
-                                    <![CDATA["anchor_qn_" + $F{questionNumber}.toString().trim()]]></hyperlinkAnchorExpression>
-                            </textField>
-                        </jr:listContents>
-                    </jr:list>
-                </componentElement>
-            </band>
-        </groupFooter>
-    </group>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="working_hours" pageWidth="900" pageHeight="1000" whenNoDataType="AllSectionsNoDetail" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1a12c021-57e2-4482-a273-56cbd3f78a17">
+	<style name="default-style" isDefault="true" fontName="Calibri" pdfEncoding="CP1251" isPdfEmbedded="true"/>
+	<subDataset name="openAnswerDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
+		<field name="stakeholderCategoryTitle" class="java.lang.String"/>
+		<field name="reportOpenAnswerContents" class="java.util.List"/>
+	</subDataset>
+	<subDataset name="openAnswerNestedDataSource" uuid="ccf8c188-f9d6-48f3-b9ea-7e62fa571961">
+		<field name="openAnswerContent" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="allQuestionNumbers" uuid="dcc7b17b-d6c7-4636-b335-ba0c82446335">
+		<field name="questionNumber" class="java.lang.Object"/>
+	</subDataset>
+	<subDataset name="allQuestionTexts" uuid="dcc7b17b-d6c7-4636-b335-ba0c82446335">
+		<field name="questionNumber" class="java.lang.String"/>
+		<field name="questionText" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="allQuestionNumbers" class="java.util.Collection"/>
+	<parameter name="allQuestionTexts" class="java.util.Collection"/>
+	<parameter name="OPEN_ANSWER_DATASET" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="EDUCATIONAL_PROGRAM_NAME" class="java.lang.String"/>
+	<parameter name="STAKEHOLDER_STATISTICS" class="java.lang.String"/>
+	<parameter name="START_DATE" class="java.lang.String"/>
+	<parameter name="END_DATE" class="java.lang.String"/>
+	<parameter name="CHART_SPLIT_SIZE" class="java.lang.Integer"/>
+	<parameter name="COLOR_MAP" class="java.util.Map"/>
+	<parameter name="LIST_NAME" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="stakeholderCategoryTitle" class="java.lang.String">
+		<fieldDescription><![CDATA[stakeholderCategoryTitle]]></fieldDescription>
+	</field>
+	<field name="questionNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[questionNumber]]></fieldDescription>
+	</field>
+	<field name="questionTexts" class="java.util.List">
+		<fieldDescription><![CDATA[questionTexts]]></fieldDescription>
+	</field>
+	<field name="averageScore" class="java.lang.Double">
+		<fieldDescription><![CDATA[averageScore]]></fieldDescription>
+	</field>
+	<variable name="chartNumber" class="java.lang.Integer" incrementType="Group" incrementGroup="charSplitter" calculation="Count">
+		<variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
+	</variable>
+	<group name="list of questions">
+		<groupFooter>
+			<band height="822" splitType="Stretch">
+				<textField>
+					<reportElement x="331" y="0" width="200" height="30" uuid="f75d5f97-e22f-4303-b932-8306ff576769"/>
+					<textElement textAlignment="Center">
+						<font size="18" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{LIST_NAME}]]></textFieldExpression>
+				</textField>
+				<componentElement>
+					<reportElement stretchType="ContainerBottom" x="12" y="30" width="839" height="730" uuid="f0e9d5ec-a157-44a8-9832-c53d8d35e27e"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="allQuestionTexts" uuid="f591b2e0-ea4e-4b55-98c9-0f3398301390">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{allQuestionTexts})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="20" width="839">
+							<textField>
+								<reportElement x="0" y="0" width="839" height="20" uuid="91508d6d-19c2-4beb-860b-c3350b78d952"/>
+								<textElement textAlignment="Left">
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{questionNumber} + " " + $F{questionText}]]></textFieldExpression>
+								<anchorNameExpression><![CDATA["anchor_qn_" + $F{questionNumber}.toString().trim()]]></anchorNameExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="summary">
+		<groupFooter>
+			<band height="720" splitType="Stretch">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<staticText>
+					<reportElement x="330" y="20" width="200" height="30" uuid="be5fd57c-accc-492e-a441-3f5364cf1d6c">
+						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Center">
+						<font size="18" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Пропозиції]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement stretchType="ContainerBottom" x="10" y="60" width="839" height="50" forecolor="#1541ED" uuid="97d38fef-4d51-4183-8899-c0716784cd09"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="openAnswerDataSource" uuid="56186e51-5dfa-457a-b444-65cffc6e9323">
+							<dataSourceExpression><![CDATA[$P{OPEN_ANSWER_DATASET}]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="50" width="839">
+							<textField textAdjust="StretchHeight">
+								<reportElement x="0" y="0" width="170" height="50" isRemoveLineWhenBlank="true" forecolor="#391B8C" uuid="8256f692-37f6-403e-b92a-95543947c971"/>
+								<box leftPadding="10" rightPadding="10">
+									<pen lineWidth="1.0" lineStyle="Dotted" lineColor="#000000"/>
+								</box>
+								<textElement textAlignment="Justified">
+									<font size="14" isBold="true"/>
+									<paragraph lineSpacing="Proportional" lineSpacingSize="2.0"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{stakeholderCategoryTitle}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<textField>
+					<reportElement positionType="Float" x="11" y="80" width="839" height="40" uuid="968e23f5-964d-42eb-97d8-76e2ac4411c5"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{OPEN_ANSWER_DATASET}.getRecordCount() == 0 ? "Ще немає пропозицій" : ""]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement positionType="Float" x="11" y="160" width="839" height="40" uuid="c1aa2cdb-30c6-4799-b649-137bfc0e6ad0"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Опитування проведено з "+ $P{START_DATE} +" р. по "+ $P{END_DATE} + " р. Центром забезпечення якості «Прикарпатського національного університету імені Василя Стефаника»"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="charSplitter">
+		<groupExpression><![CDATA[$V{REPORT_COUNT} - 1 - ( ($V{REPORT_COUNT} - 1) % $P{CHART_SPLIT_SIZE} )]]></groupExpression>
+		<groupFooter>
+			<band height="110">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<textField>
+					<reportElement mode="Opaque" x="10" y="10" width="839" height="30" forecolor="#050505" backcolor="#87D0E0" uuid="7a533552-f010-4fb3-b944-44122d862e1f">
+						<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					</reportElement>
+					<textElement verticalAlignment="Middle">
+						<font size="16" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["  Освітня програма: " + $P{EDUCATIONAL_PROGRAM_NAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="10" y="60" width="840" height="40" uuid="08e73aad-a2d1-4efc-a3ab-fd493b83cd1c"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} == "" ? "" : ("Шляхом анонімного анкетування опитано: " + $P{STAKEHOLDER_STATISTICS} + ".  Результати опитувань наведені на гістограмах.")]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="822">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<barChart>
+					<chart customizerClass="com.pnu.dev.pnufeedback.util.ChartTooltipCustomizer">
+						<reportElement stretchType="RelativeToTallestObject" x="7" y="0" width="844" height="670" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="c77e584d-93d8-4eea-b9fc-659723b5c932">
+							<property name="net.sf.jasperreports.chart.range.axis.tick.interval" value="0.5"/>
+							<printWhenExpression><![CDATA[$P{STAKEHOLDER_STATISTICS} != ""]]></printWhenExpression>
+						</reportElement>
+						<chartTitle>
+							<font size="14" isBold="false"/>
+							<titleExpression><![CDATA["Рис. 1." + String.valueOf($V{chartNumber})]]></titleExpression>
+						</chartTitle>
+						<chartSubtitle/>
+						<chartLegend/>
+					</chart>
+					<categoryDataset>
+						<dataset resetType="Group" resetGroup="charSplitter"/>
+						<categorySeries>
+							<seriesExpression><![CDATA[$F{stakeholderCategoryTitle}]]></seriesExpression>
+							<categoryExpression><![CDATA[$F{questionNumber}]]></categoryExpression>
+							<valueExpression><![CDATA[$F{averageScore}]]></valueExpression>
+						</categorySeries>
+					</categoryDataset>
+					<barPlot>
+						<plot/>
+						<itemLabel/>
+						<categoryAxisFormat>
+							<axisFormat/>
+						</categoryAxisFormat>
+						<valueAxisFormat>
+							<axisFormat/>
+						</valueAxisFormat>
+						<rangeAxisMaxValueExpression><![CDATA[new Integer(5)]]></rangeAxisMaxValueExpression>
+					</barPlot>
+				</barChart>
+				<staticText>
+					<reportElement x="0" y="675" width="130" height="15" uuid="075b929d-f8d1-476c-bbd2-6a671eb5ab62"/>
+					<textElement>
+						<font fontName="Calibri" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Посилання на питання: ]]></text>
+				</staticText>
+				<componentElement>
+					<reportElement stretchType="ContainerBottom" x="120" y="675" width="740" height="50" forecolor="#1541ED"
+								   uuid="694297d6-664c-4048-bf0e-f29918135257">
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+						<property name="com.jaspersoft.studio.unit.CONTENTS.width" value="px"/>
+						<property name="com.jaspersoft.studio.unit.CONTENTS.height" value="px"/>
+					</reportElement>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
+							 xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components
+							 http://jasperreports.sourceforge.net/xsd/components.xsd"
+							 printOrder="Horizontal" ignoreWidth="false">
+						<datasetRun subDataset="allQuestionNumbers" uuid="f591b2e0-ea4e-4b55-98c9-0f3398301390">
+							<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{allQuestionNumbers})]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="15" width="20">
+							<textField hyperlinkType="LocalAnchor">
+								<reportElement x="0" y="0" width="20" height="15" uuid="69e8ab26-7355-444a-a80e-0ee23799029c"/>
+								<textElement textAlignment="Center" verticalAlignment="Top">
+									<font fontName="Calibri" size="12" isUnderline="true" pdfFontName="Helvetica" isPdfEmbedded="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{questionNumber} + ", "]]></textFieldExpression>
+								<hyperlinkAnchorExpression><![CDATA["anchor_qn_" + $F{questionNumber}.toString().trim()]]></hyperlinkAnchorExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</band>
+		</groupFooter>
+	</group>
 </jasperReport>
