@@ -115,7 +115,6 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
                             }))
                     .collect(Collectors.toList());
         }
-        System.out.println("Final questionTextList: " + questionTextList);
         parameters.put("allQuestionTexts", questionTextList);
 
         parameters.put("LIST_NAME", showFullAnswers ? "Список всіх питань" : " ");

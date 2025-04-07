@@ -1,5 +1,6 @@
 package com.pnu.dev.pnufeedback.service;
 
+
 import com.pnu.dev.pnufeedback.domain.*;
 import com.pnu.dev.pnufeedback.dto.report.*;
 import com.pnu.dev.pnufeedback.exception.EmptyReportException;
@@ -162,7 +163,6 @@ public class ReportDataPreparationServiceImpl implements ReportDataPreparationSe
                             List<String> questionTexts = scoreQuestions.stream()
                                         .filter(question -> isQuestionEligible(questionNumber, stakeholderCategory, question))
                                         .map(ScoreQuestion::getContent)
-                                        //.map(question -> insertNewLines(question, "\n", newLineDenominator, notEqualPrevent.getAndIncrement()))
                                         .collect(toList());
 
                             return ReportChartInfoJasperDto.builder()
