@@ -123,13 +123,17 @@ public class ReportBuilderServiceImpl implements ReportBuilderService {
                                 } else {
                                     seenQuestionNumbers.add(questionNumber);
                                 }
-                                map.put("questionNumber", questionNumber);
+                                map.put("questionNumber", questionNumber + ", ");
                                 map.put("questionText", text);
                                 return map;
                             }))
                     .collect(Collectors.toList());
         }
+        newLastTest = questionTextList.get(questionTextList.size() - 1).get("questionNumber")
+                .toString().replaceAll(", ", "");
+        questionTextList.get(questionTextList.size() - 1).put("questionNumber", newLastTest);
         parameters.put("allQuestionTexts", questionTextList);
+        parameters.put("allQuestionNumbers", uniqueQuestionNumbers);
 
         parameters.put("LIST_NAME", showFullAnswers ? "Список всіх питань" : " ");
 
